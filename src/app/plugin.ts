@@ -1,68 +1,63 @@
 import { Plugin } from 'obsidian'
 import { DEFAULT_SETTINGS } from './types/plugin-settings.intf'
 import type { PluginSettings } from './types/plugin-settings.intf'
-import { MyPluginSettingTab } from './settings/settings-tab'
+import { GraphExplorerSettingTab } from './settings/settings-tab'
+import { GraphExplorerView } from './views/graph-explorer/graph-explorer-view'
+import { getGraphExplorerViewOptions } from './views/graph-explorer/graph-explorer-options'
+import { GRAPH_EXPLORER_VIEW_TYPE } from './views/graph-explorer/graph-explorer.constants'
 import { log } from '../utils/log'
 import { produce } from 'immer'
 import type { Draft } from 'immer'
 
-// TODO: Rename this class to match your plugin name (e.g., MyAwesomePlugin)
-export class MyPlugin extends Plugin {
-    /**
-     * The plugin settings are immutable
-     */
+export class GraphExplorerPlugin extends Plugin {
     settings: PluginSettings = produce(DEFAULT_SETTINGS, () => DEFAULT_SETTINGS)
 
-    /**
-     * Executed as soon as the plugin loads
-     */
-    override async onload() {
+    override async onload(): Promise<void> {
         log('Initializing', 'debug')
         await this.loadSettings()
-
-        // TODO
-
-        // Add a settings screen for the plugin
-        this.addSettingTab(new MyPluginSettingTab(this.app, this))
+        this.registerViews()
+        this.addSettingTab(new GraphExplorerSettingTab(this.app, this))
     }
 
-    override onunload() {}
+    override onunload(): void {
+        log('Unloading', 'debug')
+    }
 
-    /**
-     * Load the plugin settings
-     */
-    async loadSettings() {
+    private registerViews(): void {
+        const registered = this.registerBasesView(GRAPH_EXPLORER_VIEW_TYPE, {
+            name: 'Graph Explorer',
+            icon: 'git-fork',
+            factory: (controller, containerEl) =>
+                new GraphExplorerView(controller, containerEl, this),
+            options: getGraphExplorerViewOptions
+        })
+
+        if (registered) {
+            log('Graph Explorer view registered', 'debug')
+        } else {
+            log('Failed to register Graph Explorer view', 'warn')
+        }
+    }
+
+    async loadSettings(): Promise<void> {
         log('Loading settings', 'debug')
-        let loadedSettings = (await this.loadData()) as PluginSettings
+        const loadedSettings = (await this.loadData()) as PluginSettings | null
 
         if (!loadedSettings) {
             log('Using default settings', 'debug')
-            loadedSettings = produce(DEFAULT_SETTINGS, () => DEFAULT_SETTINGS)
             return
         }
 
-        let needToSaveSettings = false
-
         this.settings = produce(this.settings, (draft: Draft<PluginSettings>) => {
-            if (loadedSettings.enabled) {
-                draft.enabled = loadedSettings.enabled
-            } else {
-                log('The loaded settings miss the [enabled] property', 'debug')
-                needToSaveSettings = true
+            if (typeof loadedSettings.exploredPropertyName === 'string') {
+                draft.exploredPropertyName = loadedSettings.exploredPropertyName
             }
         })
 
-        log(`Settings loaded`, 'debug', loadedSettings)
-
-        if (needToSaveSettings) {
-            void this.saveSettings()
-        }
+        log('Settings loaded', 'debug', loadedSettings)
     }
 
-    /**
-     * Save the plugin settings
-     */
-    async saveSettings() {
+    async saveSettings(): Promise<void> {
         log('Saving settings', 'debug', this.settings)
         await this.saveData(this.settings)
         log('Settings saved', 'debug', this.settings)

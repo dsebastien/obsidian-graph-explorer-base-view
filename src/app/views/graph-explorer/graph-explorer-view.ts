@@ -1,5 +1,6 @@
 import { BasesView, debounce, TFile } from 'obsidian'
-import type { Debouncer, Plugin, QueryController } from 'obsidian'
+import type { Debouncer, QueryController } from 'obsidian'
+import type { GraphExplorerPlugin } from '../../plugin'
 import { GRAPH_EXPLORER_VIEW_TYPE } from './graph-explorer.constants'
 import { GraphCanvas } from '../../components/graph-canvas'
 import { GraphSidePanel } from '../../components/graph-side-panel'
@@ -29,7 +30,7 @@ export class GraphExplorerView extends BasesView {
     private debouncedUpdate: Debouncer<[], void>
     private initialized = false
 
-    constructor(controller: QueryController, scrollEl: HTMLElement, _plugin: Plugin) {
+    constructor(controller: QueryController, scrollEl: HTMLElement, _plugin: GraphExplorerPlugin) {
         super(controller)
         this.scrollEl = scrollEl
         this.debouncedUpdate = debounce(() => {
