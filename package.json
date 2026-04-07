@@ -1,5 +1,5 @@
 {
-    "name": "obsidian-my-plugin",
+    "name": "graph-explorer-base-view",
     "version": "2.4.0",
     "description": "TODO: Add your plugin description here",
     "author": {
@@ -83,6 +83,7 @@
         "typescript-eslint": "8.48.1"
     },
     "dependencies": {
+        "force-graph": "1.51.2",
         "immer": "11.0.1",
         "zod": "^4.1.13"
     }
