@@ -1,5 +1,24 @@
 # Release Notes
 
+## 0.1.0 (2026-04-07)
+
+### Features
+
+- add frontmatter utilities for explored property
+- add graph canvas component with force-graph rendering
+- add graph controls and zoom controls components
+- add graph data builder to transform base entries into graph nodes/links
+- add graph explorer BasesView implementation
+- add graph explorer CSS styles
+- add graph explorer view constants and options
+- add graph side panel with embedded note rendering
+- add graph type definitions and update plugin settings
+- register graph explorer base view and update plugin
+
+### Bug Fixes
+
+- address code review issues (search highlight, theme reactivity, view option sync, cleanup)
+
 ## 2.4.0 (2026-04-07)
 
 ### Features

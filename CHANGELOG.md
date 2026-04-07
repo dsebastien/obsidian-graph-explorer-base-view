@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.0 (2026-04-07)
+
+### Features
+
+* add frontmatter utilities for explored property ([2e4789f](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/2e4789fa49170c25a56808d9f59ad98a3d64b973))
+* add graph canvas component with force-graph rendering ([c82819b](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/c82819b4b8bc83ec11a203d1d60ce91b4552b878))
+* add graph controls and zoom controls components ([2815c6c](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/2815c6cddf817baf9ea9a2dadd2abe62e6fdca26))
+* add graph data builder to transform base entries into graph nodes/links ([d170e61](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/d170e6128e601e3f1a8281c10b26f3eadd6cc6b9))
+* add graph explorer BasesView implementation ([49e5482](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/49e5482c517f9c47c7b8db69675f98a4099bd1f1))
+* add graph explorer CSS styles ([7b4f3c1](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/7b4f3c141cf0a922be881650c7df28be0d6fb83c))
+* add graph explorer view constants and options ([8911434](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/89114349fdbafc89788add4d2114169b487dd924))
+* add graph side panel with embedded note rendering ([bde5661](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/bde5661110ec1bd7a0f99674dfde3fb3a8533609))
+* add graph type definitions and update plugin settings ([c804535](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/c80453573cb5edd28c238ad3b9a4dabb699e0cd0))
+* register graph explorer base view and update plugin ([c111099](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/c1110992607d7edbeae39002b0bd640899d9863e))
+
+### Bug Fixes
+
+* address code review issues (search highlight, theme reactivity, view option sync, cleanup) ([f3294ad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f3294adbf62c2d822dfbb064be309b8cc9686e9e))
+
 ## [2.4.0](https://github.com/your-username/obsidian-my-plugin/compare/2.3.0...2.4.0) (2026-04-07)
 
 ### Features
@@ -51,6 +70,7 @@ All notable changes to this project will be documented in this file.
 ## [1.2.0](https://github.com/your-username/obsidian-my-plugin/compare/1.1.0...1.2.0) (2024-05-14)
 ## [1.1.0](https://github.com/your-username/obsidian-my-plugin/compare/1.0.0...1.1.0) (2024-05-13)
 ## 1.0.0 (2024-04-26)
+
 
 
 
