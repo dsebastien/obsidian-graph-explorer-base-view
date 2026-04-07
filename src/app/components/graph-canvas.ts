@@ -98,6 +98,7 @@ export class GraphCanvas extends Component {
             .cooldownTicks(100)
             .warmupTicks(50)
             .d3AlphaDecay(0.02)
+            .autoPauseRedraw(false)
             .minZoom(0.1)
             .maxZoom(20)
             .enableNodeDrag(true)
@@ -423,6 +424,9 @@ export class GraphCanvas extends Component {
         const isNeighborOfHovered =
             this.hoveredNode != null &&
             this.adjacencyMap.get(this.hoveredNode.id)?.has(node.id) === true
+        const isNeighborOfSelected =
+            this.selectedNodeId != null &&
+            this.adjacencyMap.get(this.selectedNodeId)?.has(node.id) === true
         const isSearchActive = this.searchMatchIds.size > 0
         const isSearchMatch = this.searchMatchIds.has(node.id)
         const isDimmed =
@@ -527,21 +531,20 @@ export class GraphCanvas extends Component {
             ctx.setLineDash([])
         }
 
-        // Always show labels (brighter for selected/hovered/focused)
-        {
-            const isHighlighted = isSelected || isHovered || isNeighborOfHovered || isFocused
-            const fontSize = Math.max((isHighlighted ? 11 : 9) / globalScale, 1.5)
-            ctx.font = `${isHighlighted ? 'bold ' : ''}${fontSize}px sans-serif`
+        // Only show labels for hovered, selected, focused, or their direct neighbors
+        const showLabel =
+            isSelected || isHovered || isNeighborOfHovered || isFocused || isNeighborOfSelected
+        if (showLabel) {
+            const isPrimary = isSelected || isHovered || isFocused
+            const fontSize = Math.max((isPrimary ? 22 : 18) / globalScale, 3)
+            ctx.font = `${isPrimary ? 'bold ' : ''}${fontSize}px sans-serif`
             ctx.textAlign = 'center'
             ctx.textBaseline = 'top'
-            const labelAlpha = isDimmed ? 0.1 : isHighlighted ? 1 : 0.7
             ctx.fillStyle = this.isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)'
-            ctx.globalAlpha = labelAlpha
-
-            // Role icon prefix
+            ctx.globalAlpha = isDimmed ? 0.2 : isPrimary ? 1 : 0.7
             const roleIcon = this.getRoleIcon(node.wikiRole)
             const label = roleIcon ? `${roleIcon} ${node.name}` : node.name
-            ctx.fillText(label, x, y + size + 2)
+            ctx.fillText(label, x, y + size + 4)
             ctx.globalAlpha = 1
         }
     }
@@ -573,10 +576,12 @@ export class GraphCanvas extends Component {
         const tx = targetNode?.x ?? 0
         const ty = targetNode?.y ?? 0
 
-        // Determine if this edge connects to the hovered node
+        // Determine if this edge connects to the hovered or selected node
         const hoveredId = this.hoveredNode?.id
-        const isHoverEdge =
-            hoveredId != null && (sourceNode?.id === hoveredId || targetNode?.id === hoveredId)
+        const selectedId = this.selectedNodeId
+        const isHighlightedEdge =
+            (hoveredId != null && (sourceNode?.id === hoveredId || targetNode?.id === hoveredId)) ||
+            (selectedId != null && (sourceNode?.id === selectedId || targetNode?.id === selectedId))
 
         ctx.beginPath()
         ctx.moveTo(sx, sy)
@@ -586,8 +591,8 @@ export class GraphCanvas extends Component {
             const dashLen = 4 / (this.graph?.zoom() ?? 1)
             ctx.setLineDash([dashLen, dashLen])
             ctx.strokeStyle = this.isDark ? 'rgba(239, 68, 68, 0.25)' : 'rgba(220, 38, 38, 0.2)'
-            ctx.lineWidth = isHoverEdge ? 1.5 : 0.5
-        } else if (isHoverEdge) {
+            ctx.lineWidth = isHighlightedEdge ? 1.5 : 0.5
+        } else if (isHighlightedEdge) {
             ctx.setLineDash([])
             ctx.strokeStyle = this.isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.35)'
             ctx.lineWidth = 1.5
@@ -606,25 +611,25 @@ export class GraphCanvas extends Component {
 
     private getNodeSize(node: GraphNode): number {
         if (node.external) {
-            return Math.max(2, Math.min(8, 2 + node.connectionCount * 0.3))
+            return Math.max(4, Math.min(16, 4 + node.connectionCount * 0.6))
         }
         if (node.frontier) {
-            return 4
+            return 8
         }
 
         switch (this.sizeByProperty) {
             case 'connections':
-                return Math.max(3, Math.min(12, 3 + node.connectionCount * 0.4))
+                return Math.max(6, Math.min(24, 6 + node.connectionCount * 0.8))
             case 'uniform':
-                return 6
+                return 12
             default: {
                 const val = node.frontmatter[this.sizeByProperty]
                 if (typeof val === 'number') {
                     const range = this.sizeMax - this.sizeMin
                     const normalized = range > 0 ? (val - this.sizeMin) / range : 0.5
-                    return 3 + Math.max(0, Math.min(1, normalized)) * 9
+                    return 6 + Math.max(0, Math.min(1, normalized)) * 18
                 }
-                return 6
+                return 12
             }
         }
     }
