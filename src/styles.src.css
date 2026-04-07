@@ -95,6 +95,11 @@
     color: var(--text-normal);
 }
 
+.ge-side-panel__name--clickable:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .ge-side-panel__badges {
     @apply flex flex-wrap gap-1 mt-1;
 }

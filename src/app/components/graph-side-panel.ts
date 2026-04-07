@@ -125,7 +125,20 @@ export class GraphSidePanel extends Component {
         // Row 1: Title + close
         const titleRow = this.headerEl.createDiv({ cls: 'ge-side-panel__title-row' })
         const titleEl = titleRow.createDiv({ cls: 'ge-side-panel__title' })
-        titleEl.createSpan({ text: node.name, cls: 'ge-side-panel__name' })
+        const nameEl = titleEl.createSpan({
+            text: node.name,
+            cls: 'ge-side-panel__name',
+            attr: { title: 'Click to open in new tab' }
+        })
+        if (!node.frontier) {
+            nameEl.addClass('ge-side-panel__name--clickable')
+            nameEl.addEventListener('click', () => {
+                const file = this.app.vault.getAbstractFileByPath(node.id)
+                if (file instanceof TFile) {
+                    void this.app.workspace.getLeaf('tab').openFile(file)
+                }
+            })
+        }
 
         const closeBtn = titleRow.createEl('button', {
             cls: 'ge-side-panel__close clickable-icon',
