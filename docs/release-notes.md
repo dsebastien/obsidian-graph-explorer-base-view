@@ -1,5 +1,12 @@
 # Release Notes
 
+## 0.3.0 (2026-04-07)
+
+### Features
+
+- **all:** improved graph view (selection vs explored rings)
+- **all:** updated
+
 ## 0.2.0 (2026-04-07)
 
 ### Features

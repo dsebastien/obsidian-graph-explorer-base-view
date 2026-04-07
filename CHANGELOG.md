@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/0.2.0...0.3.0) (2026-04-07)
+
+### Features
+
+* **all:** improved graph view (selection vs explored rings) ([b4e545b](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/b4e545b5c246792e91fe02b844a62a60e0a1bf1b))
+* **all:** updated ([e483d60](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/e483d60f419012f0bf783ee0510851db88bdac0c))
+
 ## [0.2.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/0.1.0...0.2.0) (2026-04-07)
 
 ### Features
@@ -84,6 +91,7 @@ All notable changes to this project will be documented in this file.
 ## [1.2.0](https://github.com/your-username/obsidian-my-plugin/compare/1.1.0...1.2.0) (2024-05-14)
 ## [1.1.0](https://github.com/your-username/obsidian-my-plugin/compare/1.0.0...1.1.0) (2024-05-13)
 ## 1.0.0 (2024-04-26)
+
 
 
 
