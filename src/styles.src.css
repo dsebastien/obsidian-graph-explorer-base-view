@@ -4,7 +4,223 @@
    SUPPORT & UI SECTIONS
    ======================================== */
 
-/* Support section */
 .support-header-margin {
     @apply mb-5;
+}
+
+/* ========================================
+   GRAPH EXPLORER VIEW
+   ======================================== */
+
+.ge-view {
+    @apply flex w-full;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.ge-graph-area {
+    @apply flex-1 relative;
+    min-width: 0;
+    height: 100%;
+}
+
+.ge-canvas-container {
+    @apply w-full h-full;
+}
+
+.ge-canvas-container canvas {
+    @apply block;
+}
+
+/* ========================================
+   SIDE PANEL
+   ======================================== */
+
+.ge-side-panel {
+    @apply flex flex-col;
+    width: 380px;
+    min-width: 320px;
+    max-width: 50%;
+    height: 100%;
+    overflow: hidden;
+    border-left: 1px solid var(--background-modifier-border);
+    background-color: var(--background-primary);
+    transition:
+        width 0.15s ease,
+        opacity 0.15s ease;
+}
+
+.ge-side-panel--hidden {
+    @apply hidden;
+}
+
+.ge-side-panel__header {
+    @apply flex-shrink-0 px-4 py-3;
+    border-bottom: 1px solid var(--background-modifier-border);
+    background-color: var(--background-secondary);
+}
+
+.ge-side-panel__title-row {
+    @apply flex items-center justify-between gap-2;
+}
+
+.ge-side-panel__title {
+    @apply flex items-center gap-1 min-w-0;
+    overflow: hidden;
+}
+
+.ge-side-panel__name {
+    @apply font-medium truncate;
+    color: var(--text-normal);
+}
+
+.ge-side-panel__explored-badge {
+    @apply text-xs px-1.5 py-0.5 rounded flex-shrink-0;
+    color: var(--text-on-accent);
+    background-color: rgba(34, 197, 94, 0.8);
+}
+
+.ge-side-panel__external-badge {
+    @apply text-xs px-1.5 py-0.5 rounded flex-shrink-0 italic;
+    color: var(--text-muted);
+    background-color: var(--background-modifier-hover);
+}
+
+.ge-side-panel__actions {
+    @apply flex items-center gap-1 flex-shrink-0;
+}
+
+.ge-side-panel__toggle-explored {
+    @apply text-xs px-2 py-1 rounded cursor-pointer;
+    border: 1px solid var(--background-modifier-border);
+    background-color: var(--interactive-normal);
+    color: var(--text-muted);
+    transition: all 0.15s ease;
+}
+
+.ge-side-panel__toggle-explored:hover {
+    background-color: var(--interactive-hover);
+    color: var(--text-normal);
+}
+
+.ge-side-panel__toggle-explored--active {
+    background-color: rgba(34, 197, 94, 0.15);
+    border-color: rgba(34, 197, 94, 0.4);
+    color: rgba(34, 197, 94, 1);
+}
+
+.ge-side-panel__close {
+    @apply text-base cursor-pointer rounded;
+    color: var(--text-muted);
+}
+
+.ge-side-panel__close:hover {
+    color: var(--text-normal);
+}
+
+.ge-side-panel__content {
+    @apply flex-1 overflow-y-auto px-4 py-3;
+}
+
+/* ========================================
+   CONTROLS OVERLAY
+   ======================================== */
+
+.ge-controls {
+    @apply absolute flex flex-col gap-2 p-3 rounded;
+    top: 8px;
+    left: 8px;
+    z-index: 10;
+    min-width: 200px;
+    max-width: 260px;
+    background-color: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    opacity: 0.95;
+}
+
+.ge-controls__search-input {
+    @apply w-full px-2 py-1.5 rounded text-sm;
+    border: 1px solid var(--background-modifier-border);
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+}
+
+.ge-controls__search-input::placeholder {
+    color: var(--text-muted);
+}
+
+.ge-controls__stats {
+    @apply flex flex-wrap gap-2 text-xs;
+    color: var(--text-muted);
+}
+
+.ge-controls__filter {
+    @apply flex flex-col gap-1;
+}
+
+.ge-controls__filter-label {
+    @apply text-xs;
+    color: var(--text-muted);
+}
+
+.ge-controls__filter-buttons {
+    @apply flex gap-1;
+}
+
+.ge-controls__filter-btn {
+    @apply text-xs px-2 py-1 rounded cursor-pointer;
+    border: 1px solid var(--background-modifier-border);
+    background-color: var(--interactive-normal);
+    color: var(--text-muted);
+    transition: all 0.15s ease;
+}
+
+.ge-controls__filter-btn:hover {
+    background-color: var(--interactive-hover);
+}
+
+.ge-controls__filter-btn--active {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border-color: var(--interactive-accent);
+}
+
+/* ========================================
+   ZOOM CONTROLS
+   ======================================== */
+
+.ge-zoom-controls {
+    @apply absolute flex flex-col gap-1;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+.ge-zoom-controls__btn {
+    @apply flex items-center justify-center rounded cursor-pointer;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    border: 1px solid var(--background-modifier-border);
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+    opacity: 0.9;
+    transition: all 0.15s ease;
+}
+
+.ge-zoom-controls__btn:hover {
+    background-color: var(--interactive-hover);
+    opacity: 1;
+}
+
+/* ========================================
+   EMPTY STATE
+   ======================================== */
+
+.ge-empty-state {
+    @apply flex items-center justify-center w-full h-full;
+    color: var(--text-muted);
+    font-style: italic;
 }

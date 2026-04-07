@@ -49,13 +49,13 @@ User toggles explored → frontmatter updated → node re-styled
 
 ### Node Visual States
 
-| State | Visual |
-|-------|--------|
-| Unexplored | Default circle, muted opacity (~60%), no ring |
-| Explored | Full opacity, green ring (rgba(34,197,94,0.6)) |
-| Selected | Pink/accent stroke ring, full opacity |
-| Hovered | Glow effect + label shown |
-| External (outside Base) | Smaller, dashed outline, very dim (~30%) |
+| State                   | Visual                                         |
+| ----------------------- | ---------------------------------------------- |
+| Unexplored              | Default circle, muted opacity (~60%), no ring  |
+| Explored                | Full opacity, green ring (rgba(34,197,94,0.6)) |
+| Selected                | Pink/accent stroke ring, full opacity          |
+| Hovered                 | Glow effect + label shown                      |
+| External (outside Base) | Smaller, dashed outline, very dim (~30%)       |
 
 ### Node Sizing
 
@@ -88,17 +88,17 @@ Based on connection count (degree): `Math.max(3, Math.min(12, 3 + degree * 0.4))
 
 Configured via `registerBasesView` options API:
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `exploredProperty` | text | `"explored"` | Frontmatter property name for explored status |
-| `showExternalNodes` | toggle | `false` | Show nodes linked from Base notes but not in the Base filter |
-| `exploredFilter` | dropdown | `"all"` | Filter: all / explored / unexplored |
+| Option              | Type     | Default      | Description                                                  |
+| ------------------- | -------- | ------------ | ------------------------------------------------------------ |
+| `exploredProperty`  | text     | `"explored"` | Frontmatter property name for explored status                |
+| `showExternalNodes` | toggle   | `false`      | Show nodes linked from Base notes but not in the Base filter |
+| `exploredFilter`    | dropdown | `"all"`      | Filter: all / explored / unexplored                          |
 
 ## Plugin Settings (global)
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| (none initially) | | | Global settings can be added later as needed |
+| Setting          | Type | Default | Description                                  |
+| ---------------- | ---- | ------- | -------------------------------------------- |
+| (none initially) |      |         | Global settings can be added later as needed |
 
 ## Graph Controls Overlay
 

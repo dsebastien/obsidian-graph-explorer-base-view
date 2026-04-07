@@ -1,10 +1,11 @@
 export interface PluginSettings {
     /**
-     * Enable
+     * Default frontmatter property name used to track explored status.
+     * This is the global default; can be overridden per-view via view options.
      */
-    enabled: boolean
+    exploredPropertyName: string
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {
-    enabled: false
+    exploredPropertyName: 'explored'
 }
