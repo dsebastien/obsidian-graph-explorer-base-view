@@ -152,13 +152,6 @@ export class GraphSidePanel extends Component {
         // Row 2: Badges/pills
         const badgesEl = this.headerEl.createDiv({ cls: 'ge-side-panel__badges' })
 
-        if (node.explored) {
-            badgesEl.createSpan({
-                text: 'explored',
-                cls: 'ge-side-panel__badge ge-side-panel__explored-badge',
-                attr: { title: 'This note has been reviewed and validated' }
-            })
-        }
         if (node.external) {
             badgesEl.createSpan({
                 text: 'external',

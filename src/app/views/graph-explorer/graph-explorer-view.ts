@@ -347,7 +347,8 @@ export class GraphExplorerView extends BasesView {
 
         await setNoteExplored(this.app, file, exploredProperty, newExplored)
 
-        // Update side panel immediately (optimistic)
+        // Update graph node and side panel immediately (optimistic)
+        node.explored = newExplored
         this.sidePanel?.updateExploredState(newExplored)
 
         log(`Toggled explored: ${node.name} -> ${String(newExplored)}`, 'debug')

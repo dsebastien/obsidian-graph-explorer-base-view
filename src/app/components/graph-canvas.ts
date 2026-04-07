@@ -53,6 +53,11 @@ export class GraphCanvas extends Component {
     private lastClickTime = 0
     private lastClickNodeId: string | null = null
 
+    // Fade transition state
+    private nodeAlphas: Map<string, number> = new Map()
+    private lastFrameTimeMs = 0
+    private static readonly FADE_SPEED = 7 // exponential convergence rate
+
     // Visualization config
     private colorByProperty = 'explored'
     private sizeByProperty = 'connections'
@@ -184,6 +189,9 @@ export class GraphCanvas extends Component {
 
     setData(data: GraphData): void {
         if (!this.graph) return
+
+        // Reset fade state for new data
+        this.nodeAlphas.clear()
 
         // Build adjacency map
         this.adjacencyMap.clear()
@@ -443,36 +451,36 @@ export class GraphCanvas extends Component {
             (this.hoveredNode != null && !isHovered && !isNeighborOfHovered) ||
             (isSearchActive && !isSearchMatch)
 
-        const alpha = isDimmed ? 0.15 : 1
+        // Smooth fade transition
+        const targetAlpha = isDimmed ? 0.15 : 1
+        const prevAlpha = this.nodeAlphas.get(node.id) ?? targetAlpha
+        const now = performance.now()
+        if (now - this.lastFrameTimeMs > 1) {
+            this.lastFrameTimeMs = now
+        }
+        const factor = 1 - Math.exp(-GraphCanvas.FADE_SPEED * 0.016)
+        const alpha = prevAlpha + (targetAlpha - prevAlpha) * factor
+        this.nodeAlphas.set(node.id, alpha)
         const ringGap = size * 0.15 // proportional gap for rings
         const ringWidth = Math.max(size * 0.08, 1) / globalScale
 
-        // Glow on hover
-        if (isHovered) {
-            ctx.beginPath()
-            ctx.arc(x, y, size + ringGap * 2, 0, 2 * Math.PI)
-            ctx.fillStyle = color.replace(/[\d.]+\)$/, '0.3)')
-            ctx.fill()
-        }
+        // Ring layout (inner → outer):
+        //   1. Explored:    ringGap * 1   (innermost status)
+        //   2. Confidence:  ringGap * 2   (status)
+        //   3. Hover glow:  ringGap * 3   (fill)
+        //   4. Selected:    ringGap * 4   (interaction)
+        //   5. Focus:       ringGap * 5   (keyboard nav)
+        //   6. Batch:       ringGap * 5   (dashed)
 
-        // Batch selection ring
-        if (isBatchSelected) {
+        // Explored ring (innermost, always shown for explored nodes)
+        if (node.explored && !node.external && !node.frontier) {
             ctx.beginPath()
-            ctx.arc(x, y, size + ringGap * 2, 0, 2 * Math.PI)
-            ctx.strokeStyle = 'rgba(59, 130, 246, 0.7)'
-            ctx.lineWidth = ringWidth * 1.5
-            ctx.setLineDash([3 / globalScale, 3 / globalScale])
-            ctx.stroke()
-            ctx.setLineDash([])
-        }
-
-        // Keyboard focus ring
-        if (isFocused) {
-            ctx.beginPath()
-            ctx.arc(x, y, size + ringGap * 2.5, 0, 2 * Math.PI)
-            ctx.strokeStyle = 'rgba(251, 191, 36, 0.8)'
+            ctx.arc(x, y, size + ringGap, 0, 2 * Math.PI)
+            ctx.globalAlpha = alpha
+            ctx.strokeStyle = 'rgba(34, 197, 94, 0.9)'
             ctx.lineWidth = ringWidth * 1.2
             ctx.stroke()
+            ctx.globalAlpha = 1
         }
 
         // Confidence ring (shown when not coloring by confidence)
@@ -483,34 +491,50 @@ export class GraphCanvas extends Component {
             this.colorByProperty !== 'confidence'
         ) {
             ctx.beginPath()
-            this.drawShape(ctx, x, y, size + ringGap, shape)
+            this.drawShape(ctx, x, y, size + ringGap * 2, shape)
             const confColor = this.getConfidenceColor(node.confidence)
-            ctx.strokeStyle = isDimmed ? confColor.replace(/[\d.]+\)$/, '0.15)') : confColor
+            ctx.globalAlpha = alpha
+            ctx.strokeStyle = confColor
             ctx.lineWidth = ringWidth
             ctx.stroke()
+            ctx.globalAlpha = 1
         }
 
-        // Explored ring (shown when not coloring by explored)
-        if (
-            node.explored &&
-            !node.external &&
-            !node.frontier &&
-            this.colorByProperty !== 'explored'
-        ) {
+        // Glow on hover
+        if (isHovered) {
             ctx.beginPath()
-            this.drawShape(ctx, x, y, size + ringGap, shape)
-            ctx.strokeStyle = isDimmed ? 'rgba(34, 197, 94, 0.15)' : 'rgba(34, 197, 94, 0.6)'
-            ctx.lineWidth = ringWidth
-            ctx.stroke()
+            ctx.arc(x, y, size + ringGap * 3, 0, 2 * Math.PI)
+            ctx.fillStyle = color.replace(/[\d.]+\)$/, '0.3)')
+            ctx.fill()
         }
 
         // Selected ring
         if (isSelected) {
             ctx.beginPath()
-            ctx.arc(x, y, size + ringGap * 1.5, 0, 2 * Math.PI)
+            ctx.arc(x, y, size + ringGap * 4, 0, 2 * Math.PI)
             ctx.strokeStyle = 'rgba(139, 92, 246, 0.8)'
             ctx.lineWidth = ringWidth * 1.2
             ctx.stroke()
+        }
+
+        // Keyboard focus ring
+        if (isFocused) {
+            ctx.beginPath()
+            ctx.arc(x, y, size + ringGap * 5, 0, 2 * Math.PI)
+            ctx.strokeStyle = 'rgba(251, 191, 36, 0.8)'
+            ctx.lineWidth = ringWidth * 1.2
+            ctx.stroke()
+        }
+
+        // Batch selection ring
+        if (isBatchSelected) {
+            ctx.beginPath()
+            ctx.arc(x, y, size + ringGap * 5, 0, 2 * Math.PI)
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.7)'
+            ctx.lineWidth = ringWidth * 1.5
+            ctx.setLineDash([3 / globalScale, 3 / globalScale])
+            ctx.stroke()
+            ctx.setLineDash([])
         }
 
         // Main shape
@@ -554,7 +578,8 @@ export class GraphCanvas extends Component {
             ctx.textAlign = 'center'
             ctx.textBaseline = 'top'
             ctx.fillStyle = this.isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)'
-            ctx.globalAlpha = isDimmed ? 0.2 : isPrimary ? 1 : 0.7
+            const textBaseAlpha = isPrimary ? 1 : 0.7
+            ctx.globalAlpha = textBaseAlpha * alpha
             const roleIcon = this.getRoleIcon(node.wikiRole)
             const label = roleIcon ? `${roleIcon} ${node.name}` : node.name
             ctx.fillText(label, x, y + size + 4)

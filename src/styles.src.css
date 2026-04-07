@@ -108,11 +108,6 @@
     @apply text-xs px-1.5 py-0.5 rounded;
 }
 
-.ge-side-panel__explored-badge {
-    color: var(--text-on-accent);
-    background-color: rgba(34, 197, 94, 0.8);
-}
-
 .ge-side-panel__external-badge {
     @apply italic;
     color: var(--text-muted);
@@ -245,7 +240,7 @@
    ======================================== */
 
 .ge-controls {
-    @apply absolute flex flex-col rounded;
+    @apply absolute flex flex-col rounded overflow-hidden;
     top: 8px;
     left: 8px;
     z-index: 10;
@@ -394,7 +389,7 @@
 }
 
 .ge-controls__filter-buttons {
-    @apply flex gap-1;
+    @apply flex flex-wrap gap-1;
 }
 
 .ge-controls__filter-btn {
