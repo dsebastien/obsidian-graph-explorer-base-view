@@ -97,9 +97,9 @@ export class GraphControls extends Component {
         this.scaleSlider = scaleRow.createEl('input', {
             type: 'range',
             cls: 'ge-controls__slider',
-            attr: { min: '20', max: '300', step: '10', title: 'Node size' }
+            attr: { min: '50', max: '600', step: '10', title: 'Node size' }
         })
-        this.scaleSlider.value = '100'
+        this.scaleSlider.value = '300'
 
         // Text scale slider
         const textRow = slidersSection.createDiv({ cls: 'ge-controls__slider-row' })
@@ -112,7 +112,7 @@ export class GraphControls extends Component {
             cls: 'ge-controls__slider',
             attr: { min: '20', max: '300', step: '10', title: 'Label size' }
         })
-        this.textSlider.value = '100'
+        this.textSlider.value = '150'
 
         // Explored filter
         const filterSection = this.bodyEl.createDiv({ cls: 'ge-controls__filter' })
