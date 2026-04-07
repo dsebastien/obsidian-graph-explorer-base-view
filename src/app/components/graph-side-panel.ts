@@ -5,6 +5,7 @@ import type { GraphNode } from '../types/graph-types'
 export interface GraphSidePanelCallbacks {
     onToggleExplored: (node: GraphNode) => void
     onClose: () => void
+    onNavigateToNode: (nodeId: string) => void
 }
 
 /**
@@ -19,6 +20,7 @@ export class GraphSidePanel extends Component {
     private callbacks: GraphSidePanelCallbacks
     private currentNode: GraphNode | null = null
     private renderComponent: Component | null = null
+    private graphNodePaths: Set<string> = new Set()
 
     constructor(containerEl: HTMLElement, app: App, callbacks: GraphSidePanelCallbacks) {
         super()
@@ -43,6 +45,7 @@ export class GraphSidePanel extends Component {
 
     async showNode(node: GraphNode): Promise<void> {
         this.currentNode = node
+        this.contentEl.scrollTop = 0
 
         // Frontier nodes have no file
         if (node.frontier) {
@@ -76,6 +79,10 @@ export class GraphSidePanel extends Component {
 
     getCurrentNode(): GraphNode | null {
         return this.currentNode
+    }
+
+    setGraphNodePaths(paths: Set<string>): void {
+        this.graphNodePaths = paths
     }
 
     updateExploredState(explored: boolean): void {
@@ -126,7 +133,8 @@ export class GraphSidePanel extends Component {
             const toggleBtn = actionsEl.createEl('button', {
                 cls: 'ge-side-panel__toggle-explored clickable-icon',
                 attr: {
-                    'aria-label': node.explored ? 'Mark as unexplored' : 'Mark as explored'
+                    'aria-label': node.explored ? 'Mark as unexplored' : 'Mark as explored',
+                    'title': node.explored ? 'Mark as unexplored' : 'Mark as explored'
                 }
             })
             toggleBtn.textContent = node.explored ? '\u2713 Explored' : '\u25CB Mark explored'
@@ -142,7 +150,7 @@ export class GraphSidePanel extends Component {
 
         const closeBtn = actionsEl.createEl('button', {
             cls: 'ge-side-panel__close clickable-icon',
-            attr: { 'aria-label': 'Close panel' }
+            attr: { 'aria-label': 'Close panel', 'title': 'Close panel' }
         })
         closeBtn.textContent = '\u2715'
         this.registerDomEvent(closeBtn, 'click', () => {
@@ -155,31 +163,48 @@ export class GraphSidePanel extends Component {
         if (node.explored) {
             badgesEl.createSpan({
                 text: 'explored',
-                cls: 'ge-side-panel__badge ge-side-panel__explored-badge'
+                cls: 'ge-side-panel__badge ge-side-panel__explored-badge',
+                attr: { title: 'This note has been reviewed and validated' }
             })
         }
         if (node.external) {
             badgesEl.createSpan({
                 text: 'external',
-                cls: 'ge-side-panel__badge ge-side-panel__external-badge'
+                cls: 'ge-side-panel__badge ge-side-panel__external-badge',
+                attr: { title: 'This note is outside the current Base filter' }
             })
         }
         if (node.frontier) {
             badgesEl.createSpan({
                 text: 'frontier',
-                cls: 'ge-side-panel__badge ge-side-panel__frontier-badge'
+                cls: 'ge-side-panel__badge ge-side-panel__frontier-badge',
+                attr: { title: 'This note does not exist yet (unresolved link)' }
             })
         }
         if (node.wikiRole !== 'unknown') {
+            const roleDescriptions: Record<string, string> = {
+                article: 'Wiki article: a knowledge entry',
+                index: 'Wiki index: table of contents for the wiki',
+                log: 'Wiki log: change history and activity record',
+                source_summary: 'Source summary: digest of an ingested source'
+            }
             badgesEl.createSpan({
                 text: node.wikiRole.replace(/_/g, ' '),
-                cls: `ge-side-panel__badge ge-side-panel__role-badge ge-side-panel__role-badge--${node.wikiRole}`
+                cls: `ge-side-panel__badge ge-side-panel__role-badge ge-side-panel__role-badge--${node.wikiRole}`,
+                attr: { title: roleDescriptions[node.wikiRole] ?? node.wikiRole }
             })
         }
         if (node.confidence !== 'unknown') {
+            const confDescriptions: Record<string, string> = {
+                high: 'High confidence: well-sourced and cross-referenced',
+                medium: 'Medium confidence: partially verified',
+                low: 'Low confidence: needs more sources',
+                uncertain: 'Uncertain: speculative or unverified'
+            }
             badgesEl.createSpan({
                 text: node.confidence,
-                cls: `ge-side-panel__badge ge-side-panel__confidence-badge ge-side-panel__confidence-badge--${node.confidence}`
+                cls: `ge-side-panel__badge ge-side-panel__confidence-badge ge-side-panel__confidence-badge--${node.confidence}`,
+                attr: { title: confDescriptions[node.confidence] ?? node.confidence }
             })
         }
 
@@ -187,7 +212,11 @@ export class GraphSidePanel extends Component {
         if (node.tags.length > 0) {
             const tagsEl = this.headerEl.createDiv({ cls: 'ge-side-panel__tags' })
             for (const tag of node.tags.slice(0, 5)) {
-                tagsEl.createSpan({ text: tag, cls: 'ge-side-panel__tag' })
+                tagsEl.createSpan({
+                    text: tag,
+                    cls: 'ge-side-panel__tag',
+                    attr: { title: `Tag: ${tag}` }
+                })
             }
         }
     }
@@ -208,8 +237,26 @@ export class GraphSidePanel extends Component {
         )
 
         // Make internal links clickable
+        // Left-click: navigate in-panel if target is a graph node, otherwise open in tab
+        // Middle-click: always open in new tab
         this.contentEl.querySelectorAll('a.internal-link').forEach((el) => {
             el.addEventListener('click', (e) => {
+                e.preventDefault()
+                const href = el.getAttribute('href')
+                if (!href) return
+                const target = this.app.metadataCache.getFirstLinkpathDest(href, file.path)
+                if (!(target instanceof TFile)) return
+
+                if (this.graphNodePaths.has(target.path)) {
+                    // Navigate within the panel
+                    this.callbacks.onNavigateToNode(target.path)
+                } else {
+                    // Open in new tab
+                    void this.app.workspace.getLeaf('tab').openFile(target)
+                }
+            })
+            el.addEventListener('auxclick', (e) => {
+                if ((e as MouseEvent).button !== 1) return
                 e.preventDefault()
                 const href = el.getAttribute('href')
                 if (!href) return

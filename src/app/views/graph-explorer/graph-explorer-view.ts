@@ -143,7 +143,8 @@ export class GraphExplorerView extends BasesView {
         // Side panel
         this.sidePanel = new GraphSidePanel(this.viewEl, this.app, {
             onToggleExplored: (node) => void this.handleToggleExplored(node),
-            onClose: () => this.handleBackgroundClick()
+            onClose: () => this.handleBackgroundClick(),
+            onNavigateToNode: (nodeId) => this.handleNavigateToNode(nodeId)
         })
         this.addChild(this.sidePanel)
 
@@ -233,6 +234,12 @@ export class GraphExplorerView extends BasesView {
         const stats = this.computeStats()
         this.controls?.updateStats(stats)
 
+        // Update side panel with current graph node paths
+        const nodePaths = new Set<string>(
+            this.currentGraphData.nodes.filter((n) => !n.frontier).map((n) => n.id)
+        )
+        this.sidePanel?.setGraphNodePaths(nodePaths)
+
         // Apply search highlight if active
         if (this.searchQuery) {
             this.applySearchHighlight(this.searchQuery)
@@ -301,6 +308,13 @@ export class GraphExplorerView extends BasesView {
         this.contextMenu?.hide()
         this.graphCanvas?.setSelectedNode(null)
         this.sidePanel?.hide()
+    }
+
+    private handleNavigateToNode(nodeId: string): void {
+        const node = this.currentGraphData.nodes.find((n) => n.id === nodeId)
+        if (!node) return
+        this.graphCanvas?.setSelectedNode(node.id)
+        void this.sidePanel?.showNode(node)
     }
 
     private async handleToggleExplored(node: GraphNode): Promise<void> {

@@ -29,7 +29,7 @@ export class GraphZoomControls extends Component {
             const btn = this.controlsEl.createEl('button', {
                 text: b.label,
                 cls: 'ge-zoom-controls__btn clickable-icon',
-                attr: { 'aria-label': b.ariaLabel }
+                attr: { 'aria-label': b.ariaLabel, 'title': b.ariaLabel }
             })
             this.registerDomEvent(btn, 'click', b.callback)
         }

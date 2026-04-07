@@ -31,8 +31,6 @@ const CATEGORICAL_PALETTE = [
     'rgba(6, 182, 212, 0.9)'
 ]
 
-type DagMode = 'td' | 'bu' | 'lr' | 'rl' | 'radialout' | 'radialin' | null
-
 /**
  * Wraps force-graph Canvas renderer with custom node painting, shapes,
  * property-driven visualization, keyboard navigation, and batch selection.
@@ -99,6 +97,7 @@ export class GraphCanvas extends Component {
             .linkTarget('target')
             .cooldownTicks(100)
             .warmupTicks(50)
+            .d3AlphaDecay(0.02)
             .minZoom(0.1)
             .maxZoom(20)
             .enableNodeDrag(true)
@@ -126,6 +125,25 @@ export class GraphCanvas extends Component {
                     this.callbacks.onBackgroundClick()
                 }
             })
+
+        this.applyForceConfig()
+    }
+
+    private applyForceConfig(): void {
+        if (!this.graph) return
+        // Strong repulsion to spread nodes well apart
+        const charge = this.graph.d3Force('charge')
+        if (charge && typeof charge.strength === 'function') {
+            charge.strength(-600)
+            if (typeof charge.distanceMax === 'function') {
+                charge.distanceMax(1000)
+            }
+        }
+        // Longer link distance
+        const link = this.graph.d3Force('link')
+        if (link && typeof link.distance === 'function') {
+            link.distance(120)
+        }
     }
 
     private setupResizeObserver(): void {
@@ -172,15 +190,19 @@ export class GraphCanvas extends Component {
         this.rebuildPropertyColorMap(data.nodes)
         this.rebuildSizeRange(data.nodes)
 
-        // Apply layout
+        // Apply layout mode before feeding data
         this.applyLayout(this.currentLayout)
 
         this.graph.graphData(data)
 
+        // Re-apply force config after data (dagMode can reset forces)
+        this.applyForceConfig()
+        this.graph.d3ReheatSimulation()
+
         if (this.zoomTimer) clearTimeout(this.zoomTimer)
         this.zoomTimer = setTimeout(() => {
             this.graph?.zoomToFit(400, 40)
-        }, 500)
+        }, 800)
     }
 
     // ── Selection ─────────────────────────────────────────────
@@ -380,30 +402,26 @@ export class GraphCanvas extends Component {
 
     private applyLayout(layout: GraphLayout): void {
         if (!this.graph) return
-        const g = this.graph as unknown as {
-            dagMode: (mode: DagMode) => unknown
-            dagLevelDistance: (d: number) => unknown
-            d3ReheatSimulation: () => unknown
-        }
         switch (layout) {
             case 'dag-td':
-                g.dagMode('td')
-                g.dagLevelDistance(50)
+                this.graph.dagMode('td')
+                this.graph.dagLevelDistance(120)
                 break
             case 'dag-lr':
-                g.dagMode('lr')
-                g.dagLevelDistance(80)
+                this.graph.dagMode('lr')
+                this.graph.dagLevelDistance(150)
                 break
             case 'dag-radialout':
-                g.dagMode('radialout')
-                g.dagLevelDistance(60)
+                this.graph.dagMode('radialout')
+                this.graph.dagLevelDistance(120)
                 break
             case 'force':
             default:
-                g.dagMode(null)
+                this.graph.dagMode(null)
                 break
         }
-        g.d3ReheatSimulation()
+        this.applyForceConfig()
+        this.graph.d3ReheatSimulation()
     }
 
     // ── Node rendering ────────────────────────────────────────
@@ -528,14 +546,16 @@ export class GraphCanvas extends Component {
             ctx.setLineDash([])
         }
 
-        // Label for selected, hovered, focused, or neighbor of hovered
-        if (isSelected || isHovered || isNeighborOfHovered || isFocused) {
-            const fontSize = Math.max(10 / globalScale, 2)
-            ctx.font = `${fontSize}px sans-serif`
+        // Always show labels (brighter for selected/hovered/focused)
+        {
+            const isHighlighted = isSelected || isHovered || isNeighborOfHovered || isFocused
+            const fontSize = Math.max((isHighlighted ? 11 : 9) / globalScale, 1.5)
+            ctx.font = `${isHighlighted ? 'bold ' : ''}${fontSize}px sans-serif`
             ctx.textAlign = 'center'
             ctx.textBaseline = 'top'
+            const labelAlpha = isDimmed ? 0.1 : isHighlighted ? 1 : 0.7
             ctx.fillStyle = this.isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)'
-            ctx.globalAlpha = isDimmed ? 0.3 : 1
+            ctx.globalAlpha = labelAlpha
 
             // Role icon prefix
             const roleIcon = this.getRoleIcon(node.wikiRole)

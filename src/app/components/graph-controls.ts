@@ -50,17 +50,17 @@ export class GraphControls extends Component {
         filterSection.createDiv({ cls: 'ge-controls__filter-label', text: 'Show:' })
         const filterBtns = filterSection.createDiv({ cls: 'ge-controls__filter-buttons' })
 
-        const filters: { key: ExploredFilter; label: string }[] = [
-            { key: 'all', label: 'All' },
-            { key: 'explored', label: 'Explored' },
-            { key: 'unexplored', label: 'New' }
+        const filters: { key: ExploredFilter; label: string; tooltip: string }[] = [
+            { key: 'all', label: 'All', tooltip: 'Show all notes' },
+            { key: 'explored', label: 'Explored', tooltip: 'Show only explored notes' },
+            { key: 'unexplored', label: 'New', tooltip: 'Show only unexplored notes' }
         ]
 
         for (const f of filters) {
             const btn = filterBtns.createEl('button', {
                 text: f.label,
                 cls: `ge-controls__filter-btn${f.key === 'all' ? ' ge-controls__filter-btn--active' : ''}`,
-                attr: { 'data-filter': f.key }
+                attr: { 'data-filter': f.key, 'title': f.tooltip }
             })
             this.registerDomEvent(btn, 'click', () => {
                 this.setFilter(f.key)
@@ -73,7 +73,8 @@ export class GraphControls extends Component {
         })
         const batchToggleBtn = this.batchActionsEl.createEl('button', {
             text: 'Toggle explored',
-            cls: 'ge-controls__batch-btn'
+            cls: 'ge-controls__batch-btn',
+            attr: { title: 'Toggle explored status on all selected nodes' }
         })
         this.registerDomEvent(batchToggleBtn, 'click', () => {
             this.callbacks.onBatchToggleExplored()
