@@ -444,11 +444,13 @@ export class GraphCanvas extends Component {
             (isSearchActive && !isSearchMatch)
 
         const alpha = isDimmed ? 0.15 : 1
+        const ringGap = size * 0.15 // proportional gap for rings
+        const ringWidth = Math.max(size * 0.08, 1) / globalScale
 
         // Glow on hover
         if (isHovered) {
             ctx.beginPath()
-            ctx.arc(x, y, size + 4, 0, 2 * Math.PI)
+            ctx.arc(x, y, size + ringGap * 2, 0, 2 * Math.PI)
             ctx.fillStyle = color.replace(/[\d.]+\)$/, '0.3)')
             ctx.fill()
         }
@@ -456,9 +458,9 @@ export class GraphCanvas extends Component {
         // Batch selection ring
         if (isBatchSelected) {
             ctx.beginPath()
-            ctx.arc(x, y, size + 4, 0, 2 * Math.PI)
+            ctx.arc(x, y, size + ringGap * 2, 0, 2 * Math.PI)
             ctx.strokeStyle = 'rgba(59, 130, 246, 0.7)'
-            ctx.lineWidth = 2.5 / globalScale
+            ctx.lineWidth = ringWidth * 1.5
             ctx.setLineDash([3 / globalScale, 3 / globalScale])
             ctx.stroke()
             ctx.setLineDash([])
@@ -467,9 +469,9 @@ export class GraphCanvas extends Component {
         // Keyboard focus ring
         if (isFocused) {
             ctx.beginPath()
-            ctx.arc(x, y, size + 5, 0, 2 * Math.PI)
+            ctx.arc(x, y, size + ringGap * 2.5, 0, 2 * Math.PI)
             ctx.strokeStyle = 'rgba(251, 191, 36, 0.8)'
-            ctx.lineWidth = 2 / globalScale
+            ctx.lineWidth = ringWidth * 1.2
             ctx.stroke()
         }
 
@@ -481,10 +483,10 @@ export class GraphCanvas extends Component {
             this.colorByProperty !== 'confidence'
         ) {
             ctx.beginPath()
-            this.drawShape(ctx, x, y, size + 2, shape)
+            this.drawShape(ctx, x, y, size + ringGap, shape)
             const confColor = this.getConfidenceColor(node.confidence)
             ctx.strokeStyle = isDimmed ? confColor.replace(/[\d.]+\)$/, '0.15)') : confColor
-            ctx.lineWidth = 1.5 / globalScale
+            ctx.lineWidth = ringWidth
             ctx.stroke()
         }
 
@@ -496,18 +498,18 @@ export class GraphCanvas extends Component {
             this.colorByProperty !== 'explored'
         ) {
             ctx.beginPath()
-            this.drawShape(ctx, x, y, size + 2, shape)
+            this.drawShape(ctx, x, y, size + ringGap, shape)
             ctx.strokeStyle = isDimmed ? 'rgba(34, 197, 94, 0.15)' : 'rgba(34, 197, 94, 0.6)'
-            ctx.lineWidth = 1.5 / globalScale
+            ctx.lineWidth = ringWidth
             ctx.stroke()
         }
 
         // Selected ring
         if (isSelected) {
             ctx.beginPath()
-            ctx.arc(x, y, size + 3, 0, 2 * Math.PI)
+            ctx.arc(x, y, size + ringGap * 1.5, 0, 2 * Math.PI)
             ctx.strokeStyle = 'rgba(139, 92, 246, 0.8)'
-            ctx.lineWidth = 2 / globalScale
+            ctx.lineWidth = ringWidth * 1.2
             ctx.stroke()
         }
 
@@ -525,7 +527,7 @@ export class GraphCanvas extends Component {
             this.drawShape(ctx, x, y, size, shape)
             ctx.setLineDash([2 / globalScale, 2 / globalScale])
             ctx.strokeStyle = this.isDark ? 'rgba(239, 68, 68, 0.5)' : 'rgba(220, 38, 38, 0.5)'
-            ctx.lineWidth = 1.5 / globalScale
+            ctx.lineWidth = ringWidth
             ctx.stroke()
             ctx.setLineDash([])
         }
@@ -536,7 +538,7 @@ export class GraphCanvas extends Component {
             this.drawShape(ctx, x, y, size, shape)
             ctx.setLineDash([2 / globalScale, 2 / globalScale])
             ctx.strokeStyle = this.isDark ? 'rgba(150, 150, 170, 0.3)' : 'rgba(100, 100, 120, 0.3)'
-            ctx.lineWidth = 1 / globalScale
+            ctx.lineWidth = ringWidth
             ctx.stroke()
             ctx.setLineDash([])
         }
@@ -547,7 +549,7 @@ export class GraphCanvas extends Component {
         if (showLabel) {
             const isPrimary = isSelected || isHovered || isFocused
             const t = this.textScale / 100
-            const fontSize = Math.max(((isPrimary ? 12 : 10) * t) / globalScale, 2)
+            const fontSize = Math.max(((isPrimary ? 18 : 15) * t) / globalScale, 3)
             ctx.font = `${isPrimary ? 'bold ' : ''}${fontSize}px sans-serif`
             ctx.textAlign = 'center'
             ctx.textBaseline = 'top'
@@ -622,18 +624,18 @@ export class GraphCanvas extends Component {
 
     private getNodeSize(node: GraphNode): number {
         const s = this.nodeScale / 100 // 1.0 at default 100%
-        if (node.external) return (4 + node.connectionCount * 0.5) * s
-        if (node.frontier) return 6 * s
+        if (node.external) return (12 + node.connectionCount * 1.5) * s
+        if (node.frontier) return 18 * s
 
-        let base = 8
+        let base = 24
         if (this.sizeByProperty === 'connections') {
-            base = 8 + Math.min(node.connectionCount * 0.8, 16)
+            base = 24 + Math.min(node.connectionCount * 2.4, 48)
         } else if (this.sizeByProperty !== 'uniform') {
             const val = node.frontmatter[this.sizeByProperty]
             if (typeof val === 'number') {
                 const range = this.sizeMax - this.sizeMin
                 const norm = range > 0 ? (val - this.sizeMin) / range : 0.5
-                base = 8 + Math.max(0, Math.min(1, norm)) * 16
+                base = 24 + Math.max(0, Math.min(1, norm)) * 48
             }
         }
         return base * s
