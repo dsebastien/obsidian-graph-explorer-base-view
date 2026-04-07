@@ -30,9 +30,12 @@ export class GraphExplorerView extends BasesView {
     private debouncedUpdate: Debouncer<[], void>
     private initialized = false
 
-    constructor(controller: QueryController, scrollEl: HTMLElement, _plugin: GraphExplorerPlugin) {
+    private plugin: GraphExplorerPlugin
+
+    constructor(controller: QueryController, scrollEl: HTMLElement, plugin: GraphExplorerPlugin) {
         super(controller)
         this.scrollEl = scrollEl
+        this.plugin = plugin
         this.debouncedUpdate = debounce(() => {
             this.rebuildGraph()
         }, 50)
@@ -79,9 +82,18 @@ export class GraphExplorerView extends BasesView {
         // Controls overlay
         this.controls = new GraphControls(graphArea, {
             onSearchChange: (query) => this.handleSearchChange(query),
-            onExploredFilterChange: (_filter) => this.rebuildGraph()
+            onExploredFilterChange: (filter) => {
+                this.config.set('exploredFilter', filter)
+                this.rebuildGraph()
+            }
         })
         this.addChild(this.controls)
+
+        // Restore saved filter from config
+        const savedFilter = this.config.get('exploredFilter') as ExploredFilter | undefined
+        if (savedFilter && savedFilter !== 'all') {
+            this.controls.setFilter(savedFilter)
+        }
 
         // Zoom controls
         this.zoomControls = new GraphZoomControls(graphArea, {
@@ -105,7 +117,10 @@ export class GraphExplorerView extends BasesView {
 
     private rebuildGraph(): void {
         const entries = this.data.data
-        const exploredProperty = (this.config.get('exploredProperty') as string) || 'explored'
+        const exploredProperty =
+            (this.config.get('exploredProperty') as string) ||
+            this.plugin.settings.exploredPropertyName ||
+            'explored'
         const showExternal = (this.config.get('showExternalNodes') as boolean) || false
         const exploredFilter = (this.controls?.getFilter() as ExploredFilter) || 'all'
 
@@ -116,6 +131,14 @@ export class GraphExplorerView extends BasesView {
             showExternal,
             exploredFilter
         )
+
+        if (this.currentGraphData.nodes.length === 0) {
+            if (!this.viewEl?.querySelector('.ge-empty-state')) {
+                this.viewEl?.createDiv({ cls: 'ge-empty-state', text: 'No notes to display' })
+            }
+            return
+        }
+        this.viewEl?.querySelector('.ge-empty-state')?.remove()
 
         this.graphCanvas?.setData(this.currentGraphData)
 

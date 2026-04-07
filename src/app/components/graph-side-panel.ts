@@ -11,7 +11,6 @@ export interface GraphSidePanelCallbacks {
  * Right-side panel showing the selected note with full rendered content.
  */
 export class GraphSidePanel extends Component {
-    private containerEl: HTMLElement
     private panelEl: HTMLElement
     private headerEl: HTMLElement
     private contentEl: HTMLElement
@@ -22,11 +21,10 @@ export class GraphSidePanel extends Component {
 
     constructor(containerEl: HTMLElement, app: App, callbacks: GraphSidePanelCallbacks) {
         super()
-        this.containerEl = containerEl
         this.app = app
         this.callbacks = callbacks
 
-        this.panelEl = this.containerEl.createDiv({ cls: 'ge-side-panel ge-side-panel--hidden' })
+        this.panelEl = containerEl.createDiv({ cls: 'ge-side-panel ge-side-panel--hidden' })
         this.headerEl = this.panelEl.createDiv({ cls: 'ge-side-panel__header' })
         this.contentEl = this.panelEl.createDiv({ cls: 'ge-side-panel__content' })
     }

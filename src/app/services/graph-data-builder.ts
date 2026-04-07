@@ -13,6 +13,7 @@ export function buildGraphData(
     exploredFilter: ExploredFilter
 ): GraphData {
     const entryPaths = new Set<string>(entries.map((e) => e.file.path))
+    const entryMap = new Map<string, BasesEntry>(entries.map((e) => [e.file.path, e]))
 
     // Build nodes from entries with explored status
     let nodes: GraphNode[] = entries.map((entry) => {
@@ -78,7 +79,7 @@ export function buildGraphData(
                     links.push({ source: sourcePath, target: targetPath })
                 }
                 if (!externalNodes.has(targetPath)) {
-                    const entry = entries.find((e) => e.file.path === targetPath)
+                    const entry = entryMap.get(targetPath)
                     if (entry) {
                         const metadata = metadataCache.getFileCache(entry.file)
                         externalNodes.set(targetPath, {

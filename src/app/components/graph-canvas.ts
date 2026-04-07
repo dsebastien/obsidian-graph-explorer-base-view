@@ -20,6 +20,8 @@ export class GraphCanvas extends Component {
     private adjacencyMap: Map<string, Set<string>> = new Map()
     private callbacks: GraphCanvasCallbacks
     private isDark = false
+    private searchMatchIds: Set<string> = new Set()
+    private zoomTimer: ReturnType<typeof setTimeout> | null = null
     private lastClickTime = 0
     private lastClickNodeId: string | null = null
 
@@ -28,8 +30,6 @@ export class GraphCanvas extends Component {
         this.callbacks = callbacks
 
         this.canvasContainerEl = containerEl.createDiv({ cls: 'ge-canvas-container' })
-
-        this.isDark = document.body.classList.contains('theme-dark')
     }
 
     override onload(): void {
@@ -38,6 +38,7 @@ export class GraphCanvas extends Component {
     }
 
     override onunload(): void {
+        if (this.zoomTimer) clearTimeout(this.zoomTimer)
         this.resizeObserver?.disconnect()
         this.resizeObserver = null
         if (this.graph) {
@@ -114,7 +115,8 @@ export class GraphCanvas extends Component {
 
         this.graph.graphData(data)
 
-        setTimeout(() => {
+        if (this.zoomTimer) clearTimeout(this.zoomTimer)
+        this.zoomTimer = setTimeout(() => {
             this.graph?.zoomToFit(400, 40)
         }, 500)
     }
@@ -123,7 +125,8 @@ export class GraphCanvas extends Component {
         this.selectedNodeId = nodeId
     }
 
-    setSearchHighlight(_matchIds: Set<string>): void {
+    setSearchHighlight(matchIds: Set<string>): void {
+        this.searchMatchIds = matchIds
         // force-graph re-renders on next frame automatically
     }
 
@@ -141,7 +144,8 @@ export class GraphCanvas extends Component {
 
     resetView(): void {
         this.graph?.centerAt(0, 0, 300)
-        setTimeout(() => this.graph?.zoomToFit(400, 40), 350)
+        if (this.zoomTimer) clearTimeout(this.zoomTimer)
+        this.zoomTimer = setTimeout(() => this.graph?.zoomToFit(400, 40), 350)
     }
 
     private handleNodeClick(node: GraphNode): void {
@@ -182,6 +186,8 @@ export class GraphCanvas extends Component {
     }
 
     private paintNode(node: GraphNode, ctx: CanvasRenderingContext2D, globalScale: number): void {
+        this.isDark = document.body.classList.contains('theme-dark')
+
         const x = node.x ?? 0
         const y = node.y ?? 0
         const size = this.getNodeSize(node)
@@ -191,7 +197,11 @@ export class GraphCanvas extends Component {
         const isNeighborOfHovered =
             this.hoveredNode != null &&
             this.adjacencyMap.get(this.hoveredNode.id)?.has(node.id) === true
-        const isDimmed = this.hoveredNode != null && !isHovered && !isNeighborOfHovered
+        const isSearchActive = this.searchMatchIds.size > 0
+        const isSearchMatch = this.searchMatchIds.has(node.id)
+        const isDimmed =
+            (this.hoveredNode != null && !isHovered && !isNeighborOfHovered) ||
+            (isSearchActive && !isSearchMatch)
 
         const alpha = isDimmed ? 0.15 : 1
 
@@ -267,7 +277,8 @@ export class GraphCanvas extends Component {
     }
 
     private getLinkColor(): string {
-        return this.isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'
+        const isDark = document.body.classList.contains('theme-dark')
+        return isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'
     }
 
     private getLinkWidth(link: GraphLink): number {

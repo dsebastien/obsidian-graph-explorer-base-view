@@ -1,11 +1,11 @@
 {
     "name": "graph-explorer-base-view",
-    "version": "2.4.0",
-    "description": "TODO: Add your plugin description here",
+    "version": "0.1.0",
+    "description": "A custom Obsidian Bases view that renders notes as an interactive force-directed graph with explored/unexplored tracking",
     "author": {
-        "name": "Your Name",
-        "email": "your-email@example.com",
-        "url": "https://your-website.com"
+        "name": "Sébastien Dubois",
+        "email": "sebastien@dsebastien.net",
+        "url": "https://dsebastien.net"
     },
     "keywords": [
         "obsidian",
@@ -15,12 +15,12 @@
     "private": true,
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/your-username/obsidian-my-plugin.git"
+        "url": "git+https://github.com/dsebastien/obsidian-graph-explorer-base-view.git"
     },
     "bugs": {
-        "url": "https://github.com/your-username/obsidian-my-plugin/issues"
+        "url": "https://github.com/dsebastien/obsidian-graph-explorer-base-view/issues"
     },
-    "homepage": "https://github.com/your-username/obsidian-my-plugin",
+    "homepage": "https://github.com/dsebastien/obsidian-graph-explorer-base-view#readme",
     "engines": {
         "node": ">=20.0.0",
         "npm": ">=10.1.0"
