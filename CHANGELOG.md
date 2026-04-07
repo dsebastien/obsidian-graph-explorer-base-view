@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/0.1.0...0.2.0) (2026-04-07)
+
+### Features
+
+* **all:** added possibility to easily open the current note in the side panel into a new tab ([cdf2992](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/cdf299268680a2fd5131253b0d7e7e15e7afc894))
+* **all:** added size and text settings ([7809fad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/7809fad3644e2390b89c1348b2e8615c2e60b173))
+* **all:** adjusted the nodes and text scales ([158a23f](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/158a23f9a7271c163ad3c845201450b0f26cdce1))
+* **all:** better layout of the graph ([c1db275](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/c1db275c28c20bbdb67bcb829f60e156f8d19ad3))
+* **all:** improve text ([d42adcf](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/d42adcf64d3cabdd79e1170996f16a1f3f89b5e1))
+* **all:** improved graph nodes spacing ([7dba588](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/7dba58870af522412b9ec2795b7b10bae09ecb15))
+* **all:** improved graph view ([ed29cf1](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/ed29cf1e9cbf1dc75580a13733b8b5c3fdd080f7))
+* **all:** improved the graph and panel features ([e95fd6c](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/e95fd6c521e4dcf0f4183ee93f3a0b471256fafd))
+* **all:** improved visual consistency of the graph controls ([16b84f1](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/16b84f1bc6a9f122b97f654364b05a9ae9b2b677))
+
 ## 0.1.0 (2026-04-07)
 
 ### Features
@@ -70,6 +84,7 @@ All notable changes to this project will be documented in this file.
 ## [1.2.0](https://github.com/your-username/obsidian-my-plugin/compare/1.1.0...1.2.0) (2024-05-14)
 ## [1.1.0](https://github.com/your-username/obsidian-my-plugin/compare/1.0.0...1.1.0) (2024-05-13)
 ## 1.0.0 (2024-04-26)
+
 
 
 

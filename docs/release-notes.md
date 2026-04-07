@@ -1,5 +1,19 @@
 # Release Notes
 
+## 0.2.0 (2026-04-07)
+
+### Features
+
+- **all:** added possibility to easily open the current note in the side panel into a new tab
+- **all:** added size and text settings
+- **all:** adjusted the nodes and text scales
+- **all:** better layout of the graph
+- **all:** improve text
+- **all:** improved graph nodes spacing
+- **all:** improved graph view
+- **all:** improved the graph and panel features
+- **all:** improved visual consistency of the graph controls
+
 ## 0.1.0 (2026-04-07)
 
 ### Features
