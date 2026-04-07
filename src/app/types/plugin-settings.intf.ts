@@ -11,6 +11,8 @@ export interface PluginSettings {
     showFrontierDefault: boolean
     /** Default view preset key (empty = custom) */
     defaultPreset: string
+    /** Node repulsion strength (higher = more spread out). Range 200-5000. */
+    nodeSpacing: number
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {
@@ -19,5 +21,6 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     defaultSizeBy: 'connections',
     defaultLayout: 'force',
     showFrontierDefault: false,
-    defaultPreset: ''
+    defaultPreset: '',
+    nodeSpacing: 1500
 }

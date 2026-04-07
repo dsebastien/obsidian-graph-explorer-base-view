@@ -172,6 +172,7 @@ export class GraphExplorerView extends BasesView {
         this.graphCanvas?.setColorBy(colorBy)
         this.graphCanvas?.setSizeBy(sizeBy)
         this.graphCanvas?.setLayout(layout as GraphLayout)
+        this.graphCanvas?.setNodeSpacing(this.plugin.settings.nodeSpacing)
 
         // Handle preset changes
         const preset = (this.config?.get('preset') as string) || ''

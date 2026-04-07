@@ -108,6 +108,25 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
                     })
             )
 
+        new Setting(containerEl)
+            .setName('Node spacing')
+            .setDesc(
+                'Controls how far apart nodes spread. Higher values = more space between nodes. (200–5000, default 1500)'
+            )
+            .addSlider((slider) =>
+                slider
+                    .setLimits(200, 5000, 100)
+                    .setValue(this.plugin.settings.nodeSpacing)
+                    .setDynamicTooltip()
+                    .onChange(async (value) => {
+                        this.plugin.settings = {
+                            ...this.plugin.settings,
+                            nodeSpacing: value
+                        }
+                        await this.plugin.saveSettings()
+                    })
+            )
+
         // ── Social ────────────────────────────────────────────
 
         this.renderFollowButton(containerEl)

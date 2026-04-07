@@ -67,6 +67,9 @@ export class GraphExplorerPlugin extends Plugin {
             if (typeof loadedSettings.defaultPreset === 'string') {
                 draft.defaultPreset = loadedSettings.defaultPreset
             }
+            if (typeof loadedSettings.nodeSpacing === 'number') {
+                draft.nodeSpacing = Math.max(200, Math.min(5000, loadedSettings.nodeSpacing))
+            }
         })
 
         log('Settings loaded', 'debug', loadedSettings)

@@ -58,6 +58,7 @@ export class GraphCanvas extends Component {
     private colorByProperty = 'explored'
     private sizeByProperty = 'connections'
     private currentLayout: GraphLayout = 'force'
+    private nodeSpacing = 1500
     private propertyColorMap: Map<string, string> = new Map()
     private sizeMin = 0
     private sizeMax = 1
@@ -129,20 +130,24 @@ export class GraphCanvas extends Component {
         this.applyForceConfig()
     }
 
+    setNodeSpacing(spacing: number): void {
+        this.nodeSpacing = Math.max(200, Math.min(5000, spacing))
+        this.applyForceConfig()
+        this.graph?.d3ReheatSimulation()
+    }
+
     private applyForceConfig(): void {
         if (!this.graph) return
-        // Strong repulsion to spread nodes well apart
         const charge = this.graph.d3Force('charge')
         if (charge && typeof charge.strength === 'function') {
-            charge.strength(-600)
+            charge.strength(-this.nodeSpacing)
             if (typeof charge.distanceMax === 'function') {
-                charge.distanceMax(1000)
+                charge.distanceMax(this.nodeSpacing * 2)
             }
         }
-        // Longer link distance
         const link = this.graph.d3Force('link')
         if (link && typeof link.distance === 'function') {
-            link.distance(120)
+            link.distance(Math.round(this.nodeSpacing * 0.2))
         }
     }
 
