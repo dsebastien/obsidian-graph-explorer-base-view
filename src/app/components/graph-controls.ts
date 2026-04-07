@@ -7,6 +7,8 @@ export interface GraphControlsCallbacks {
     onExploredFilterChange: (filter: ExploredFilter) => void
     onBatchToggleExplored: () => void
     onNodeSpacingChange: (spacing: number) => void
+    onNodeScaleChange: (scale: number) => void
+    onTextScaleChange: (scale: number) => void
 }
 
 /**
@@ -14,15 +16,21 @@ export interface GraphControlsCallbacks {
  */
 export class GraphControls extends Component {
     private controlsEl: HTMLElement
+    private bodyEl: HTMLElement
     private statsEl: HTMLElement
     private progressEl: HTMLElement
     private batchActionsEl: HTMLElement
     private searchInput: HTMLInputElement
     private spacingSlider: HTMLInputElement
     private spacingValue: HTMLSpanElement
+    private scaleSlider: HTMLInputElement
+    private scaleValue: HTMLSpanElement
+    private textSlider: HTMLInputElement
+    private textValue: HTMLSpanElement
     private callbacks: GraphControlsCallbacks
     private currentFilter: ExploredFilter = 'all'
     private debouncedSearch: Debouncer<[string], void>
+    private collapsed = false
 
     constructor(containerEl: HTMLElement, callbacks: GraphControlsCallbacks) {
         super()
@@ -33,8 +41,25 @@ export class GraphControls extends Component {
 
         this.controlsEl = containerEl.createDiv({ cls: 'ge-controls' })
 
+        // Header with collapse toggle
+        const header = this.controlsEl.createDiv({ cls: 'ge-controls__header' })
+        header.createSpan({ text: 'Graph', cls: 'ge-controls__header-title' })
+        const collapseBtn = header.createEl('button', {
+            cls: 'ge-controls__collapse-btn clickable-icon',
+            attr: { 'title': 'Toggle controls', 'aria-label': 'Toggle controls' }
+        })
+        collapseBtn.textContent = '\u25B2'
+        header.addEventListener('click', () => {
+            this.collapsed = !this.collapsed
+            this.bodyEl.toggleClass('ge-controls__body--hidden', this.collapsed)
+            collapseBtn.textContent = this.collapsed ? '\u25BC' : '\u25B2'
+        })
+
+        // Collapsible body
+        this.bodyEl = this.controlsEl.createDiv({ cls: 'ge-controls__body' })
+
         // Search
-        const searchSection = this.controlsEl.createDiv({ cls: 'ge-controls__search' })
+        const searchSection = this.bodyEl.createDiv({ cls: 'ge-controls__search' })
         this.searchInput = searchSection.createEl('input', {
             type: 'search',
             placeholder: 'Search notes...',
@@ -42,28 +67,55 @@ export class GraphControls extends Component {
         })
 
         // Stats
-        this.statsEl = this.controlsEl.createDiv({ cls: 'ge-controls__stats' })
+        this.statsEl = this.bodyEl.createDiv({ cls: 'ge-controls__stats' })
 
         // Progress bar
-        this.progressEl = this.controlsEl.createDiv({ cls: 'ge-controls__progress' })
+        this.progressEl = this.bodyEl.createDiv({ cls: 'ge-controls__progress' })
+
+        // Sliders
+        const slidersSection = this.bodyEl.createDiv({ cls: 'ge-controls__sliders' })
 
         // Spacing slider
-        const spacingSection = this.controlsEl.createDiv({ cls: 'ge-controls__spacing' })
-        const spacingLabel = spacingSection.createDiv({ cls: 'ge-controls__spacing-header' })
-        spacingLabel.createSpan({ text: 'Spacing:', cls: 'ge-controls__spacing-label' })
-        this.spacingValue = spacingLabel.createSpan({
-            text: '1500',
-            cls: 'ge-controls__spacing-value'
+        const spacingRow = slidersSection.createDiv({ cls: 'ge-controls__slider-row' })
+        spacingRow.createSpan({ text: 'Spacing', cls: 'ge-controls__slider-label' })
+        this.spacingValue = spacingRow.createSpan({
+            cls: 'ge-controls__slider-value ge-controls__slider-value--hidden'
         })
-        this.spacingSlider = spacingSection.createEl('input', {
+        this.spacingSlider = spacingRow.createEl('input', {
             type: 'range',
-            cls: 'ge-controls__spacing-slider',
+            cls: 'ge-controls__slider',
             attr: { min: '200', max: '5000', step: '100', title: 'Node spacing' }
         })
         this.spacingSlider.value = '1500'
 
+        // Scale slider
+        const scaleRow = slidersSection.createDiv({ cls: 'ge-controls__slider-row' })
+        scaleRow.createSpan({ text: 'Size', cls: 'ge-controls__slider-label' })
+        this.scaleValue = scaleRow.createSpan({
+            cls: 'ge-controls__slider-value ge-controls__slider-value--hidden'
+        })
+        this.scaleSlider = scaleRow.createEl('input', {
+            type: 'range',
+            cls: 'ge-controls__slider',
+            attr: { min: '20', max: '300', step: '10', title: 'Node size' }
+        })
+        this.scaleSlider.value = '100'
+
+        // Text scale slider
+        const textRow = slidersSection.createDiv({ cls: 'ge-controls__slider-row' })
+        textRow.createSpan({ text: 'Text', cls: 'ge-controls__slider-label' })
+        this.textValue = textRow.createSpan({
+            cls: 'ge-controls__slider-value ge-controls__slider-value--hidden'
+        })
+        this.textSlider = textRow.createEl('input', {
+            type: 'range',
+            cls: 'ge-controls__slider',
+            attr: { min: '20', max: '300', step: '10', title: 'Label size' }
+        })
+        this.textSlider.value = '100'
+
         // Explored filter
-        const filterSection = this.controlsEl.createDiv({ cls: 'ge-controls__filter' })
+        const filterSection = this.bodyEl.createDiv({ cls: 'ge-controls__filter' })
         filterSection.createDiv({ cls: 'ge-controls__filter-label', text: 'Show:' })
         const filterBtns = filterSection.createDiv({ cls: 'ge-controls__filter-buttons' })
 
@@ -85,7 +137,7 @@ export class GraphControls extends Component {
         }
 
         // Batch actions (hidden by default)
-        this.batchActionsEl = this.controlsEl.createDiv({
+        this.batchActionsEl = this.bodyEl.createDiv({
             cls: 'ge-controls__batch ge-controls__batch--hidden'
         })
         const batchToggleBtn = this.batchActionsEl.createEl('button', {
@@ -102,10 +154,44 @@ export class GraphControls extends Component {
         this.registerDomEvent(this.searchInput, 'input', () => {
             this.debouncedSearch(this.searchInput.value)
         })
+
+        // Spacing slider — show value while dragging
         this.registerDomEvent(this.spacingSlider, 'input', () => {
             const val = parseInt(this.spacingSlider.value, 10)
             this.spacingValue.textContent = String(val)
+            this.spacingValue.removeClass('ge-controls__slider-value--hidden')
             this.callbacks.onNodeSpacingChange(val)
+        })
+        this.registerDomEvent(this.spacingSlider, 'change', () => {
+            setTimeout(() => {
+                this.spacingValue.addClass('ge-controls__slider-value--hidden')
+            }, 800)
+        })
+
+        // Scale slider — show value while dragging
+        this.registerDomEvent(this.scaleSlider, 'input', () => {
+            const val = parseInt(this.scaleSlider.value, 10)
+            this.scaleValue.textContent = `${val}%`
+            this.scaleValue.removeClass('ge-controls__slider-value--hidden')
+            this.callbacks.onNodeScaleChange(val)
+        })
+        this.registerDomEvent(this.scaleSlider, 'change', () => {
+            setTimeout(() => {
+                this.scaleValue.addClass('ge-controls__slider-value--hidden')
+            }, 800)
+        })
+
+        // Text slider — show value while dragging
+        this.registerDomEvent(this.textSlider, 'input', () => {
+            const val = parseInt(this.textSlider.value, 10)
+            this.textValue.textContent = `${val}%`
+            this.textValue.removeClass('ge-controls__slider-value--hidden')
+            this.callbacks.onTextScaleChange(val)
+        })
+        this.registerDomEvent(this.textSlider, 'change', () => {
+            setTimeout(() => {
+                this.textValue.addClass('ge-controls__slider-value--hidden')
+            }, 800)
         })
     }
 
@@ -191,7 +277,10 @@ export class GraphControls extends Component {
 
     setSpacingValue(value: number): void {
         this.spacingSlider.value = String(value)
-        this.spacingValue.textContent = String(value)
+    }
+
+    setScaleValue(value: number): void {
+        this.scaleSlider.value = String(value)
     }
 
     setBatchSelectionCount(count: number): void {

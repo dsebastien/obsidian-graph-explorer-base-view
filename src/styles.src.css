@@ -240,7 +240,7 @@
    ======================================== */
 
 .ge-controls {
-    @apply absolute flex flex-col gap-2 p-3 rounded;
+    @apply absolute flex flex-col rounded;
     top: 8px;
     left: 8px;
     z-index: 10;
@@ -249,6 +249,31 @@
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);
     opacity: 0.95;
+}
+
+.ge-controls__header {
+    @apply flex items-center justify-between px-3 py-1.5 cursor-pointer;
+    border-bottom: 1px solid var(--background-modifier-border);
+    user-select: none;
+}
+
+.ge-controls__header-title {
+    @apply text-xs font-medium;
+    color: var(--text-muted);
+}
+
+.ge-controls__collapse-btn {
+    @apply text-xs;
+    color: var(--text-muted);
+    line-height: 1;
+}
+
+.ge-controls__body {
+    @apply flex flex-col gap-2 p-3;
+}
+
+.ge-controls__body--hidden {
+    @apply hidden;
 }
 
 .ge-controls__search-input {
@@ -321,26 +346,35 @@
     background-color: rgba(239, 68, 68, 0.15);
 }
 
-.ge-controls__spacing {
-    @apply flex flex-col gap-1;
+.ge-controls__sliders {
+    @apply flex flex-col gap-1.5;
 }
 
-.ge-controls__spacing-header {
-    @apply flex items-center justify-between text-xs;
+.ge-controls__slider-row {
+    @apply flex items-center gap-2;
+}
+
+.ge-controls__slider-label {
+    @apply text-xs flex-shrink-0;
     color: var(--text-muted);
+    width: 48px;
 }
 
-.ge-controls__spacing-label {
-    color: var(--text-muted);
-}
-
-.ge-controls__spacing-value {
+.ge-controls__slider-value {
+    @apply text-xs flex-shrink-0;
     font-family: var(--font-monospace);
     color: var(--text-normal);
+    width: 36px;
+    text-align: right;
+    transition: opacity 0.3s ease;
 }
 
-.ge-controls__spacing-slider {
-    @apply w-full;
+.ge-controls__slider-value--hidden {
+    opacity: 0;
+}
+
+.ge-controls__slider {
+    @apply flex-1;
     height: 4px;
     cursor: pointer;
     accent-color: var(--interactive-accent);

@@ -57,6 +57,8 @@ export class GraphCanvas extends Component {
     private colorByProperty = 'explored'
     private sizeByProperty = 'connections'
     private nodeSpacing = 1500
+    private nodeScale = 100
+    private textScale = 100
     private initialZoomDone = false
     private propertyColorMap: Map<string, string> = new Map()
     private sizeMin = 0
@@ -134,6 +136,14 @@ export class GraphCanvas extends Component {
         this.nodeSpacing = Math.max(200, Math.min(5000, spacing))
         this.applyForceConfig()
         this.graph?.d3ReheatSimulation()
+    }
+
+    setNodeScale(scale: number): void {
+        this.nodeScale = Math.max(20, Math.min(300, scale))
+    }
+
+    setTextScale(scale: number): void {
+        this.textScale = Math.max(20, Math.min(300, scale))
     }
 
     private applyForceConfig(): void {
@@ -536,7 +546,8 @@ export class GraphCanvas extends Component {
             isSelected || isHovered || isNeighborOfHovered || isFocused || isNeighborOfSelected
         if (showLabel) {
             const isPrimary = isSelected || isHovered || isFocused
-            const fontSize = Math.max((isPrimary ? 22 : 18) / globalScale, 3)
+            const t = this.textScale / 100
+            const fontSize = Math.max(((isPrimary ? 12 : 10) * t) / globalScale, 2)
             ctx.font = `${isPrimary ? 'bold ' : ''}${fontSize}px sans-serif`
             ctx.textAlign = 'center'
             ctx.textBaseline = 'top'
@@ -610,28 +621,22 @@ export class GraphCanvas extends Component {
     // ── Visual helpers ────────────────────────────────────────
 
     private getNodeSize(node: GraphNode): number {
-        if (node.external) {
-            return Math.max(4, Math.min(16, 4 + node.connectionCount * 0.6))
-        }
-        if (node.frontier) {
-            return 8
-        }
+        const s = this.nodeScale / 100 // 1.0 at default 100%
+        if (node.external) return (4 + node.connectionCount * 0.5) * s
+        if (node.frontier) return 6 * s
 
-        switch (this.sizeByProperty) {
-            case 'connections':
-                return Math.max(6, Math.min(24, 6 + node.connectionCount * 0.8))
-            case 'uniform':
-                return 12
-            default: {
-                const val = node.frontmatter[this.sizeByProperty]
-                if (typeof val === 'number') {
-                    const range = this.sizeMax - this.sizeMin
-                    const normalized = range > 0 ? (val - this.sizeMin) / range : 0.5
-                    return 6 + Math.max(0, Math.min(1, normalized)) * 18
-                }
-                return 12
+        let base = 8
+        if (this.sizeByProperty === 'connections') {
+            base = 8 + Math.min(node.connectionCount * 0.8, 16)
+        } else if (this.sizeByProperty !== 'uniform') {
+            const val = node.frontmatter[this.sizeByProperty]
+            if (typeof val === 'number') {
+                const range = this.sizeMax - this.sizeMin
+                const norm = range > 0 ? (val - this.sizeMin) / range : 0.5
+                base = 8 + Math.max(0, Math.min(1, norm)) * 16
             }
         }
+        return base * s
     }
 
     private getNodeColor(node: GraphNode): string {
@@ -896,7 +901,7 @@ export class GraphCanvas extends Component {
             })
     }
 
-    private centerOnNode(node: GraphNode): void {
+    centerOnNode(node: GraphNode): void {
         if (!this.graph) return
         this.graph.centerAt(node.x ?? 0, node.y ?? 0, 300)
     }

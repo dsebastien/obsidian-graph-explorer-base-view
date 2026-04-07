@@ -110,6 +110,12 @@ export class GraphExplorerView extends BasesView {
             onBatchToggleExplored: () => void this.handleBatchToggleExplored(),
             onNodeSpacingChange: (spacing) => {
                 this.graphCanvas?.setNodeSpacing(spacing)
+            },
+            onNodeScaleChange: (scale) => {
+                this.graphCanvas?.setNodeScale(scale)
+            },
+            onTextScaleChange: (scale) => {
+                this.graphCanvas?.setTextScale(scale)
             }
         })
         this.addChild(this.controls)
@@ -327,6 +333,7 @@ export class GraphExplorerView extends BasesView {
         const node = this.currentGraphData.nodes.find((n) => n.id === nodeId)
         if (!node) return
         this.graphCanvas?.setSelectedNode(node.id)
+        this.graphCanvas?.centerOnNode(node)
         void this.sidePanel?.showNode(node)
     }
 
