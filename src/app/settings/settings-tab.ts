@@ -13,6 +13,8 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
         const { containerEl } = this
         containerEl.empty()
 
+        // ── Explored property ─────────────────────────────────
+
         new Setting(containerEl)
             .setName('Default explored property')
             .setDesc(
@@ -31,6 +33,83 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
                     })
             )
 
+        // ── Visualization defaults ────────────────────────────
+
+        new Setting(containerEl).setName('Visualization defaults').setHeading()
+
+        new Setting(containerEl)
+            .setName('Default color scheme')
+            .setDesc('Default property used to color nodes in new views.')
+            .addDropdown((dropdown) =>
+                dropdown
+                    .addOption('explored', 'Explored status')
+                    .addOption('confidence', 'Confidence level')
+                    .addOption('wiki_role', 'Wiki role')
+                    .addOption('created', 'Creation date')
+                    .addOption('tags', 'First tag')
+                    .setValue(this.plugin.settings.defaultColorBy)
+                    .onChange(async (value) => {
+                        this.plugin.settings = {
+                            ...this.plugin.settings,
+                            defaultColorBy: value
+                        }
+                        await this.plugin.saveSettings()
+                    })
+            )
+
+        new Setting(containerEl)
+            .setName('Default size scheme')
+            .setDesc('Default property used to size nodes in new views.')
+            .addDropdown((dropdown) =>
+                dropdown
+                    .addOption('connections', 'Connection count')
+                    .addOption('uniform', 'Uniform size')
+                    .setValue(this.plugin.settings.defaultSizeBy)
+                    .onChange(async (value) => {
+                        this.plugin.settings = {
+                            ...this.plugin.settings,
+                            defaultSizeBy: value
+                        }
+                        await this.plugin.saveSettings()
+                    })
+            )
+
+        new Setting(containerEl)
+            .setName('Default layout')
+            .setDesc('Default graph layout algorithm.')
+            .addDropdown((dropdown) =>
+                dropdown
+                    .addOption('force', 'Force-directed')
+                    .addOption('dag-td', 'Hierarchical (top-down)')
+                    .addOption('dag-lr', 'Hierarchical (left-right)')
+                    .addOption('dag-radialout', 'Radial')
+                    .setValue(this.plugin.settings.defaultLayout)
+                    .onChange(async (value) => {
+                        this.plugin.settings = {
+                            ...this.plugin.settings,
+                            defaultLayout: value
+                        }
+                        await this.plugin.saveSettings()
+                    })
+            )
+
+        new Setting(containerEl)
+            .setName('Show frontier nodes by default')
+            .setDesc('Show unresolved links as ghost nodes by default in new views.')
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.showFrontierDefault)
+                    .onChange(async (value) => {
+                        this.plugin.settings = {
+                            ...this.plugin.settings,
+                            showFrontierDefault: value
+                        }
+                        await this.plugin.saveSettings()
+                    })
+            )
+
+        // ── Social ────────────────────────────────────────────
+
         this.renderFollowButton(containerEl)
         this.renderSupportHeader(containerEl)
     }
@@ -38,7 +117,7 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
     renderFollowButton(containerEl: HTMLElement): void {
         new Setting(containerEl)
             .setName('Follow me on X')
-            .setDesc('Sébastien Dubois (@dSebastien)')
+            .setDesc('S\u00e9bastien Dubois (@dSebastien)')
             .addButton((button) => {
                 button.setCta()
                 button.setButtonText('Follow me on X').onClick(() => {

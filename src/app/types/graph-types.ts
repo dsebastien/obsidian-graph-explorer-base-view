@@ -1,5 +1,17 @@
 import type { NodeObject, LinkObject } from 'force-graph'
 
+/** Confidence level from wiki articles */
+export type ConfidenceLevel = 'high' | 'medium' | 'low' | 'uncertain' | 'unknown'
+
+/** Wiki role from wiki articles */
+export type WikiRole = 'article' | 'index' | 'log' | 'source_summary' | 'unknown'
+
+/** Filter mode for explored status */
+export type ExploredFilter = 'all' | 'explored' | 'unexplored'
+
+/** Layout algorithm for the graph */
+export type GraphLayout = 'force' | 'dag-td' | 'dag-lr' | 'dag-radialout'
+
 /**
  * A node in the graph representing a vault note.
  */
@@ -12,20 +24,38 @@ export interface GraphNode extends NodeObject {
     explored: boolean
     /** Number of connections to other nodes in the graph */
     connectionCount: number
-    /** Whether this node is from outside the Base filter (an "external" linked note) */
+    /** Whether this node is from outside the Base filter */
     external: boolean
+    /** Confidence level (from frontmatter) */
+    confidence: ConfidenceLevel
+    /** Wiki role (from frontmatter) */
+    wikiRole: WikiRole
+    /** Creation timestamp in ms (from frontmatter or file stat) */
+    created: number | null
+    /** Tags on the note */
+    tags: string[]
+    /** Raw frontmatter properties for generic visualization */
+    frontmatter: Record<string, unknown>
+    /** Whether this is a frontier/red-link node (unresolved link target) */
+    frontier: boolean
+    /** Whether this node is batch-selected */
+    batchSelected?: boolean
 }
 
 /**
- * A link/edge in the graph representing a wiki-link between two notes.
+ * A link/edge in the graph.
  */
 export interface GraphLink extends LinkObject<GraphNode> {
     source: string
     target: string
+    /** Wiki role of the source node, for edge styling */
+    sourceRole?: WikiRole
+    /** Whether this link points to a frontier node */
+    toFrontier?: boolean
 }
 
 /**
- * The full graph dataset ready for force-graph rendering.
+ * The full graph dataset.
  */
 export interface GraphData {
     nodes: GraphNode[]
@@ -33,6 +63,65 @@ export interface GraphData {
 }
 
 /**
- * Filter mode for explored status.
+ * Extended stats for the progress dashboard.
  */
-export type ExploredFilter = 'all' | 'explored' | 'unexplored'
+export interface GraphStats {
+    totalNodes: number
+    totalLinks: number
+    exploredCount: number
+    unexploredCount: number
+    confidenceDistribution: Record<ConfidenceLevel, number>
+    roleDistribution: Record<WikiRole, number>
+    frontierCount: number
+    coveragePercent: number
+}
+
+/**
+ * A saved view preset configuration.
+ */
+export interface ViewPreset {
+    key: string
+    name: string
+    description: string
+    config: Record<string, unknown>
+}
+
+/** Built-in view presets */
+export const VIEW_PRESETS: ViewPreset[] = [
+    {
+        key: 'wiki-explorer',
+        name: 'LLM Wiki Explorer',
+        description: 'Color by confidence, show frontier nodes',
+        config: {
+            colorBy: 'confidence',
+            sizeBy: 'connections',
+            showFrontier: true,
+            showExternalNodes: true,
+            exploredFilter: 'all',
+            layout: 'force'
+        }
+    },
+    {
+        key: 'exploration-progress',
+        name: 'Exploration Progress',
+        description: 'Track explored vs unexplored notes',
+        config: {
+            colorBy: 'explored',
+            sizeBy: 'connections',
+            showFrontier: false,
+            exploredFilter: 'all',
+            layout: 'force'
+        }
+    },
+    {
+        key: 'role-overview',
+        name: 'Role Overview',
+        description: 'See wiki structure by note role',
+        config: {
+            colorBy: 'wiki_role',
+            sizeBy: 'connections',
+            showFrontier: false,
+            layout: 'force'
+        }
+    }
+]

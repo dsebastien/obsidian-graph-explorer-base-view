@@ -1,25 +1,22 @@
 import { Component, debounce } from 'obsidian'
 import type { Debouncer } from 'obsidian'
-import type { ExploredFilter } from '../types/graph-types'
+import type { ExploredFilter, GraphStats, ConfidenceLevel } from '../types/graph-types'
 
 export interface GraphControlsCallbacks {
     onSearchChange: (query: string) => void
     onExploredFilterChange: (filter: ExploredFilter) => void
-}
-
-export interface GraphStats {
-    totalNodes: number
-    totalLinks: number
-    exploredCount: number
-    unexploredCount: number
+    onBatchToggleExplored: () => void
 }
 
 /**
- * Overlay controls for search and filtering on the graph.
+ * Overlay controls for search, filtering, and stats on the graph.
+ * Includes extended progress dashboard with confidence distribution.
  */
 export class GraphControls extends Component {
     private controlsEl: HTMLElement
     private statsEl: HTMLElement
+    private progressEl: HTMLElement
+    private batchActionsEl: HTMLElement
     private searchInput: HTMLInputElement
     private callbacks: GraphControlsCallbacks
     private currentFilter: ExploredFilter = 'all'
@@ -45,6 +42,9 @@ export class GraphControls extends Component {
         // Stats
         this.statsEl = this.controlsEl.createDiv({ cls: 'ge-controls__stats' })
 
+        // Progress bar
+        this.progressEl = this.controlsEl.createDiv({ cls: 'ge-controls__progress' })
+
         // Explored filter
         const filterSection = this.controlsEl.createDiv({ cls: 'ge-controls__filter' })
         filterSection.createDiv({ cls: 'ge-controls__filter-label', text: 'Show:' })
@@ -66,6 +66,18 @@ export class GraphControls extends Component {
                 this.setFilter(f.key)
             })
         }
+
+        // Batch actions (hidden by default)
+        this.batchActionsEl = this.controlsEl.createDiv({
+            cls: 'ge-controls__batch ge-controls__batch--hidden'
+        })
+        const batchToggleBtn = this.batchActionsEl.createEl('button', {
+            text: 'Toggle explored',
+            cls: 'ge-controls__batch-btn'
+        })
+        this.registerDomEvent(batchToggleBtn, 'click', () => {
+            this.callbacks.onBatchToggleExplored()
+        })
     }
 
     override onload(): void {
@@ -79,6 +91,7 @@ export class GraphControls extends Component {
     }
 
     updateStats(stats: GraphStats): void {
+        // Basic stats
         this.statsEl.empty()
         this.statsEl.createSpan({
             text: `${stats.totalNodes} notes`,
@@ -92,6 +105,51 @@ export class GraphControls extends Component {
             text: `${stats.exploredCount}/${stats.exploredCount + stats.unexploredCount} explored`,
             cls: 'ge-controls__stat'
         })
+        if (stats.frontierCount > 0) {
+            this.statsEl.createSpan({
+                text: `${stats.frontierCount} frontier`,
+                cls: 'ge-controls__stat ge-controls__stat--frontier'
+            })
+        }
+
+        // Progress bar
+        this.progressEl.empty()
+        if (stats.exploredCount + stats.unexploredCount > 0) {
+            const barContainer = this.progressEl.createDiv({
+                cls: 'ge-controls__progress-bar'
+            })
+            const fill = barContainer.createDiv({
+                cls: 'ge-controls__progress-fill'
+            })
+            fill.style.width = `${stats.coveragePercent}%`
+            this.progressEl.createSpan({
+                text: `${stats.coveragePercent}% explored`,
+                cls: 'ge-controls__progress-label'
+            })
+
+            // Confidence distribution dots
+            this.renderConfidenceDistribution(stats)
+        }
+    }
+
+    private renderConfidenceDistribution(stats: GraphStats): void {
+        const confidenceLevels: ConfidenceLevel[] = ['high', 'medium', 'low', 'uncertain']
+        const hasAnyConfidence = confidenceLevels.some((c) => stats.confidenceDistribution[c] > 0)
+        if (!hasAnyConfidence) return
+
+        const distEl = this.progressEl.createDiv({
+            cls: 'ge-controls__confidence-dist'
+        })
+        for (const level of confidenceLevels) {
+            const count = stats.confidenceDistribution[level]
+            if (count > 0) {
+                distEl.createSpan({
+                    text: `${count}`,
+                    cls: `ge-controls__confidence-dot ge-controls__confidence-dot--${level}`,
+                    attr: { title: `${level}: ${count}` }
+                })
+            }
+        }
     }
 
     setFilter(filter: ExploredFilter): void {
@@ -110,5 +168,22 @@ export class GraphControls extends Component {
 
     getFilter(): ExploredFilter {
         return this.currentFilter
+    }
+
+    setBatchSelectionCount(count: number): void {
+        if (count > 0) {
+            this.batchActionsEl.removeClass('ge-controls__batch--hidden')
+            const label = this.batchActionsEl.querySelector('.ge-controls__batch-label')
+            if (label) {
+                label.textContent = `${count} selected`
+            } else {
+                this.batchActionsEl.createSpan({
+                    text: `${count} selected`,
+                    cls: 'ge-controls__batch-label'
+                })
+            }
+        } else {
+            this.batchActionsEl.addClass('ge-controls__batch--hidden')
+        }
     }
 }

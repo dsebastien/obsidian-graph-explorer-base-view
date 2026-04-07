@@ -52,6 +52,21 @@ export class GraphExplorerPlugin extends Plugin {
             if (typeof loadedSettings.exploredPropertyName === 'string') {
                 draft.exploredPropertyName = loadedSettings.exploredPropertyName
             }
+            if (typeof loadedSettings.defaultColorBy === 'string') {
+                draft.defaultColorBy = loadedSettings.defaultColorBy
+            }
+            if (typeof loadedSettings.defaultSizeBy === 'string') {
+                draft.defaultSizeBy = loadedSettings.defaultSizeBy
+            }
+            if (typeof loadedSettings.defaultLayout === 'string') {
+                draft.defaultLayout = loadedSettings.defaultLayout
+            }
+            if (typeof loadedSettings.showFrontierDefault === 'boolean') {
+                draft.showFrontierDefault = loadedSettings.showFrontierDefault
+            }
+            if (typeof loadedSettings.defaultPreset === 'string') {
+                draft.defaultPreset = loadedSettings.defaultPreset
+            }
         })
 
         log('Settings loaded', 'debug', loadedSettings)

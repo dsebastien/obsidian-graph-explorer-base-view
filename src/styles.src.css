@@ -17,6 +17,7 @@
     height: 100%;
     overflow: hidden;
     position: relative;
+    outline: none;
 }
 
 .ge-graph-area {
@@ -38,21 +39,40 @@
    ======================================== */
 
 .ge-side-panel {
-    @apply flex flex-col;
+    @apply flex flex-col relative;
     width: 380px;
-    min-width: 320px;
+    min-width: 240px;
     max-width: 50%;
     height: 100%;
-    overflow: hidden;
+    overflow: visible;
     border-left: 1px solid var(--background-modifier-border);
     background-color: var(--background-primary);
-    transition:
-        width 0.15s ease,
-        opacity 0.15s ease;
+    transition: opacity 0.15s ease;
 }
 
 .ge-side-panel--hidden {
     @apply hidden;
+}
+
+.ge-side-panel__resize-handle {
+    @apply absolute;
+    left: -3px;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 15;
+    transition: background-color 0.15s ease;
+}
+
+.ge-side-panel__resize-handle:hover,
+.ge-resizing .ge-side-panel__resize-handle {
+    background-color: var(--interactive-accent);
+}
+
+.ge-resizing {
+    cursor: col-resize !important;
+    user-select: none;
 }
 
 .ge-side-panel__header {
@@ -75,16 +95,84 @@
     color: var(--text-normal);
 }
 
+.ge-side-panel__badges {
+    @apply flex flex-wrap gap-1 mt-1;
+}
+
+.ge-side-panel__badge {
+    @apply text-xs px-1.5 py-0.5 rounded;
+}
+
 .ge-side-panel__explored-badge {
-    @apply text-xs px-1.5 py-0.5 rounded flex-shrink-0;
     color: var(--text-on-accent);
     background-color: rgba(34, 197, 94, 0.8);
 }
 
 .ge-side-panel__external-badge {
-    @apply text-xs px-1.5 py-0.5 rounded flex-shrink-0 italic;
+    @apply italic;
     color: var(--text-muted);
     background-color: var(--background-modifier-hover);
+}
+
+.ge-side-panel__frontier-badge {
+    @apply italic;
+    color: rgba(239, 68, 68, 1);
+    background-color: rgba(239, 68, 68, 0.15);
+}
+
+.ge-side-panel__role-badge {
+    color: var(--text-on-accent);
+}
+
+.ge-side-panel__role-badge--article {
+    background-color: rgba(59, 130, 246, 0.7);
+}
+
+.ge-side-panel__role-badge--index {
+    background-color: rgba(168, 85, 247, 0.7);
+}
+
+.ge-side-panel__role-badge--log {
+    background-color: rgba(20, 184, 166, 0.7);
+}
+
+.ge-side-panel__role-badge--source_summary {
+    background-color: rgba(234, 179, 8, 0.7);
+}
+
+.ge-side-panel__confidence-badge {
+    font-weight: 500;
+}
+
+.ge-side-panel__confidence-badge--high {
+    color: rgba(22, 163, 74, 1);
+    background-color: rgba(34, 197, 94, 0.15);
+}
+
+.ge-side-panel__confidence-badge--medium {
+    color: rgba(202, 138, 4, 1);
+    background-color: rgba(234, 179, 8, 0.15);
+}
+
+.ge-side-panel__confidence-badge--low {
+    color: rgba(234, 88, 12, 1);
+    background-color: rgba(249, 115, 22, 0.15);
+}
+
+.ge-side-panel__confidence-badge--uncertain {
+    color: rgba(220, 38, 38, 1);
+    background-color: rgba(239, 68, 68, 0.15);
+}
+
+.ge-side-panel__tags {
+    @apply flex flex-wrap gap-1 mt-1.5;
+}
+
+.ge-side-panel__tag {
+    @apply text-xs px-1.5 py-0.5 rounded;
+    color: var(--text-muted);
+    background-color: var(--background-modifier-hover);
+    font-family: var(--font-monospace);
 }
 
 .ge-side-panel__actions {
@@ -120,7 +208,16 @@
 }
 
 .ge-side-panel__content {
-    @apply flex-1 overflow-y-auto px-4 py-3;
+    @apply flex-1 px-4 py-3;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+}
+
+.ge-side-panel__frontier-notice {
+    @apply py-6 text-center;
+    color: var(--text-muted);
+    font-style: italic;
 }
 
 /* ========================================
@@ -155,6 +252,60 @@
     color: var(--text-muted);
 }
 
+.ge-controls__stat--frontier {
+    color: rgba(239, 68, 68, 0.8);
+}
+
+.ge-controls__progress {
+    @apply flex flex-col gap-1;
+}
+
+.ge-controls__progress-bar {
+    @apply w-full rounded overflow-hidden;
+    height: 4px;
+    background-color: var(--background-modifier-border);
+}
+
+.ge-controls__progress-fill {
+    @apply h-full rounded;
+    background-color: rgba(34, 197, 94, 0.8);
+    transition: width 0.3s ease;
+}
+
+.ge-controls__progress-label {
+    @apply text-xs;
+    color: var(--text-muted);
+}
+
+.ge-controls__confidence-dist {
+    @apply flex gap-1.5 mt-0.5;
+}
+
+.ge-controls__confidence-dot {
+    @apply text-xs px-1 rounded;
+    font-weight: 600;
+}
+
+.ge-controls__confidence-dot--high {
+    color: rgba(22, 163, 74, 1);
+    background-color: rgba(34, 197, 94, 0.15);
+}
+
+.ge-controls__confidence-dot--medium {
+    color: rgba(202, 138, 4, 1);
+    background-color: rgba(234, 179, 8, 0.15);
+}
+
+.ge-controls__confidence-dot--low {
+    color: rgba(234, 88, 12, 1);
+    background-color: rgba(249, 115, 22, 0.15);
+}
+
+.ge-controls__confidence-dot--uncertain {
+    color: rgba(220, 38, 38, 1);
+    background-color: rgba(239, 68, 68, 0.15);
+}
+
 .ge-controls__filter {
     @apply flex flex-col gap-1;
 }
@@ -186,6 +337,34 @@
     border-color: var(--interactive-accent);
 }
 
+/* Batch actions */
+
+.ge-controls__batch {
+    @apply flex items-center gap-2 pt-1;
+    border-top: 1px solid var(--background-modifier-border);
+}
+
+.ge-controls__batch--hidden {
+    @apply hidden;
+}
+
+.ge-controls__batch-label {
+    @apply text-xs;
+    color: var(--text-accent);
+}
+
+.ge-controls__batch-btn {
+    @apply text-xs px-2 py-1 rounded cursor-pointer;
+    border: 1px solid var(--interactive-accent);
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    transition: all 0.15s ease;
+}
+
+.ge-controls__batch-btn:hover {
+    opacity: 0.9;
+}
+
 /* ========================================
    ZOOM CONTROLS
    ======================================== */
@@ -213,6 +392,55 @@
 .ge-zoom-controls__btn:hover {
     background-color: var(--interactive-hover);
     opacity: 1;
+}
+
+/* ========================================
+   CONTEXT MENU
+   ======================================== */
+
+.ge-context-menu {
+    @apply absolute flex flex-col rounded;
+    z-index: 20;
+    min-width: 180px;
+    background-color: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.ge-context-menu--hidden {
+    @apply hidden;
+}
+
+.ge-context-menu__item {
+    @apply flex items-center gap-2 px-3 py-2 cursor-pointer;
+    color: var(--text-normal);
+    font-size: var(--font-ui-small);
+    transition: background-color 0.1s ease;
+}
+
+.ge-context-menu__item:hover {
+    background-color: var(--background-modifier-hover);
+}
+
+.ge-context-menu__item--disabled {
+    @apply cursor-default;
+    color: var(--text-muted);
+    opacity: 0.5;
+}
+
+.ge-context-menu__item--disabled:hover {
+    background-color: transparent;
+}
+
+.ge-context-menu__icon {
+    @apply flex-shrink-0;
+    width: 16px;
+    text-align: center;
+}
+
+.ge-context-menu__label {
+    @apply truncate;
 }
 
 /* ========================================
