@@ -109,6 +109,7 @@ export class GraphCanvas extends Component {
             .minZoom(0.1)
             .maxZoom(20)
             .enableNodeDrag(true)
+            .nodeLabel(() => '')
             .nodeCanvasObjectMode(() => 'replace')
             .nodeCanvasObject(
                 (node: GraphNode, ctx: CanvasRenderingContext2D, globalScale: number) =>
@@ -576,13 +577,13 @@ export class GraphCanvas extends Component {
             const fontSize = Math.max(((isPrimary ? 18 : 15) * t) / globalScale, 3)
             ctx.font = `${isPrimary ? 'bold ' : ''}${fontSize}px sans-serif`
             ctx.textAlign = 'center'
-            ctx.textBaseline = 'top'
+            ctx.textBaseline = 'bottom'
             ctx.fillStyle = this.isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)'
             const textBaseAlpha = isPrimary ? 1 : 0.7
             ctx.globalAlpha = textBaseAlpha * alpha
             const roleIcon = this.getRoleIcon(node.wikiRole)
             const label = roleIcon ? `${roleIcon} ${node.name}` : node.name
-            ctx.fillText(label, x, y + size + 4)
+            ctx.fillText(label, x, y - size - 4)
             ctx.globalAlpha = 1
         }
     }
