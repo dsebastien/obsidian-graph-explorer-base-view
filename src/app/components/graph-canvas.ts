@@ -4,7 +4,6 @@ import type {
     GraphData,
     GraphNode,
     GraphLink,
-    GraphLayout,
     ConfidenceLevel,
     WikiRole
 } from '../types/graph-types'
@@ -57,8 +56,8 @@ export class GraphCanvas extends Component {
     // Visualization config
     private colorByProperty = 'explored'
     private sizeByProperty = 'connections'
-    private currentLayout: GraphLayout = 'force'
     private nodeSpacing = 1500
+    private initialZoomDone = false
     private propertyColorMap: Map<string, string> = new Map()
     private sizeMin = 0
     private sizeMax = 1
@@ -142,12 +141,18 @@ export class GraphCanvas extends Component {
         if (charge && typeof charge.strength === 'function') {
             charge.strength(-this.nodeSpacing)
             if (typeof charge.distanceMax === 'function') {
-                charge.distanceMax(this.nodeSpacing * 2)
+                charge.distanceMax(this.nodeSpacing * 3)
             }
         }
         const link = this.graph.d3Force('link')
         if (link && typeof link.distance === 'function') {
-            link.distance(Math.round(this.nodeSpacing * 0.2))
+            // Link distance must be large enough that connected nodes don't cluster
+            link.distance(Math.round(this.nodeSpacing * 0.5))
+        }
+        // Weaken centering force so nodes can spread more
+        const center = this.graph.d3Force('center')
+        if (center && typeof center.strength === 'function') {
+            center.strength(0.03)
         }
     }
 
@@ -195,19 +200,20 @@ export class GraphCanvas extends Component {
         this.rebuildPropertyColorMap(data.nodes)
         this.rebuildSizeRange(data.nodes)
 
-        // Apply layout mode before feeding data
-        this.applyLayout(this.currentLayout)
-
         this.graph.graphData(data)
 
-        // Re-apply force config after data (dagMode can reset forces)
+        // Apply force config after data load
         this.applyForceConfig()
         this.graph.d3ReheatSimulation()
 
-        if (this.zoomTimer) clearTimeout(this.zoomTimer)
-        this.zoomTimer = setTimeout(() => {
-            this.graph?.zoomToFit(400, 40)
-        }, 800)
+        // Only zoom to fit on first load — subsequent updates preserve user's zoom
+        if (!this.initialZoomDone) {
+            this.initialZoomDone = true
+            if (this.zoomTimer) clearTimeout(this.zoomTimer)
+            this.zoomTimer = setTimeout(() => {
+                this.graph?.zoomToFit(400, 40)
+            }, 800)
+        }
     }
 
     // ── Selection ─────────────────────────────────────────────
@@ -257,12 +263,6 @@ export class GraphCanvas extends Component {
         if (this.sizeByProperty === property) return
         this.sizeByProperty = property
         this.rebuildSizeRange(this.nodeList)
-    }
-
-    setLayout(layout: GraphLayout): void {
-        if (this.currentLayout === layout) return
-        this.currentLayout = layout
-        this.applyLayout(layout)
     }
 
     // ── Keyboard navigation ───────────────────────────────────
@@ -404,30 +404,6 @@ export class GraphCanvas extends Component {
     }
 
     // ── Layout ────────────────────────────────────────────────
-
-    private applyLayout(layout: GraphLayout): void {
-        if (!this.graph) return
-        switch (layout) {
-            case 'dag-td':
-                this.graph.dagMode('td')
-                this.graph.dagLevelDistance(120)
-                break
-            case 'dag-lr':
-                this.graph.dagMode('lr')
-                this.graph.dagLevelDistance(150)
-                break
-            case 'dag-radialout':
-                this.graph.dagMode('radialout')
-                this.graph.dagLevelDistance(120)
-                break
-            case 'force':
-            default:
-                this.graph.dagMode(null)
-                break
-        }
-        this.applyForceConfig()
-        this.graph.d3ReheatSimulation()
-    }
 
     // ── Node rendering ────────────────────────────────────────
 
@@ -590,10 +566,17 @@ export class GraphCanvas extends Component {
     private paintLink(link: GraphLink, ctx: CanvasRenderingContext2D, _globalScale: number): void {
         const rawSource = link.source as unknown as GraphNode | string
         const rawTarget = link.target as unknown as GraphNode | string
-        const sx = typeof rawSource === 'object' ? (rawSource.x ?? 0) : 0
-        const sy = typeof rawSource === 'object' ? (rawSource.y ?? 0) : 0
-        const tx = typeof rawTarget === 'object' ? (rawTarget.x ?? 0) : 0
-        const ty = typeof rawTarget === 'object' ? (rawTarget.y ?? 0) : 0
+        const sourceNode = typeof rawSource === 'object' ? rawSource : null
+        const targetNode = typeof rawTarget === 'object' ? rawTarget : null
+        const sx = sourceNode?.x ?? 0
+        const sy = sourceNode?.y ?? 0
+        const tx = targetNode?.x ?? 0
+        const ty = targetNode?.y ?? 0
+
+        // Determine if this edge connects to the hovered node
+        const hoveredId = this.hoveredNode?.id
+        const isHoverEdge =
+            hoveredId != null && (sourceNode?.id === hoveredId || targetNode?.id === hoveredId)
 
         ctx.beginPath()
         ctx.moveTo(sx, sy)
@@ -603,14 +586,14 @@ export class GraphCanvas extends Component {
             const dashLen = 4 / (this.graph?.zoom() ?? 1)
             ctx.setLineDash([dashLen, dashLen])
             ctx.strokeStyle = this.isDark ? 'rgba(239, 68, 68, 0.25)' : 'rgba(220, 38, 38, 0.2)'
-            ctx.lineWidth = 0.5
+            ctx.lineWidth = isHoverEdge ? 1.5 : 0.5
+        } else if (isHoverEdge) {
+            ctx.setLineDash([])
+            ctx.strokeStyle = this.isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.35)'
+            ctx.lineWidth = 1.5
         } else {
             ctx.setLineDash([])
-            const sourceNode = typeof rawSource === 'object' ? rawSource : null
-            const targetNode = typeof rawTarget === 'object' ? rawTarget : null
             const isExternal = sourceNode?.external || targetNode?.external
-
-            // Color by source role
             ctx.strokeStyle = this.getLinkColorByRole(link.sourceRole)
             ctx.lineWidth = isExternal ? 0.3 : 0.5
         }

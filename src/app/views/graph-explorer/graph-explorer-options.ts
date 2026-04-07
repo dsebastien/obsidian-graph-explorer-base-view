@@ -56,18 +56,6 @@ export function getGraphExplorerViewOptions(): ViewOption[] {
         } as DropdownOption,
         {
             type: 'dropdown',
-            key: 'layout',
-            displayName: 'Layout algorithm',
-            default: 'force',
-            options: {
-                'force': 'Force-directed',
-                'dag-td': 'Hierarchical (top-down)',
-                'dag-lr': 'Hierarchical (left-right)',
-                'dag-radialout': 'Radial'
-            }
-        } as DropdownOption,
-        {
-            type: 'dropdown',
             key: 'preset',
             displayName: 'View preset',
             default: '',

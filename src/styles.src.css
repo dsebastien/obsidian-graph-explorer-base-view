@@ -176,7 +176,7 @@
 }
 
 .ge-side-panel__actions {
-    @apply flex items-center gap-1 flex-shrink-0;
+    @apply flex flex-wrap items-center gap-1.5 mt-1.5;
 }
 
 .ge-side-panel__toggle-explored {
@@ -198,6 +198,19 @@
     color: rgba(34, 197, 94, 1);
 }
 
+.ge-side-panel__copy-btn {
+    @apply text-xs px-2 py-1 rounded cursor-pointer;
+    border: 1px solid var(--background-modifier-border);
+    background-color: var(--interactive-normal);
+    color: var(--text-muted);
+    transition: all 0.15s ease;
+}
+
+.ge-side-panel__copy-btn:hover {
+    background-color: var(--interactive-hover);
+    color: var(--text-normal);
+}
+
 .ge-side-panel__close {
     @apply text-base cursor-pointer rounded;
     color: var(--text-muted);
@@ -212,6 +225,8 @@
     overflow-y: auto;
     overflow-x: hidden;
     min-height: 0;
+    user-select: text;
+    -webkit-user-select: text;
 }
 
 .ge-side-panel__frontier-notice {
@@ -304,6 +319,31 @@
 .ge-controls__confidence-dot--uncertain {
     color: rgba(220, 38, 38, 1);
     background-color: rgba(239, 68, 68, 0.15);
+}
+
+.ge-controls__spacing {
+    @apply flex flex-col gap-1;
+}
+
+.ge-controls__spacing-header {
+    @apply flex items-center justify-between text-xs;
+    color: var(--text-muted);
+}
+
+.ge-controls__spacing-label {
+    color: var(--text-muted);
+}
+
+.ge-controls__spacing-value {
+    font-family: var(--font-monospace);
+    color: var(--text-normal);
+}
+
+.ge-controls__spacing-slider {
+    @apply w-full;
+    height: 4px;
+    cursor: pointer;
+    accent-color: var(--interactive-accent);
 }
 
 .ge-controls__filter {

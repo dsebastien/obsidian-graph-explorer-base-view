@@ -21,6 +21,7 @@ export class GraphSidePanel extends Component {
     private currentNode: GraphNode | null = null
     private renderComponent: Component | null = null
     private graphNodePaths: Set<string> = new Set()
+    private currentMarkdown = ''
 
     constructor(containerEl: HTMLElement, app: App, callbacks: GraphSidePanelCallbacks) {
         super()
@@ -49,6 +50,7 @@ export class GraphSidePanel extends Component {
 
         // Frontier nodes have no file
         if (node.frontier) {
+            this.currentMarkdown = ''
             this.panelEl.removeClass('ge-side-panel--hidden')
             this.renderHeader(node)
             this.clearContent()
@@ -120,35 +122,12 @@ export class GraphSidePanel extends Component {
     private renderHeader(node: GraphNode): void {
         this.headerEl.empty()
 
+        // Row 1: Title + close
         const titleRow = this.headerEl.createDiv({ cls: 'ge-side-panel__title-row' })
-
-        // Title
         const titleEl = titleRow.createDiv({ cls: 'ge-side-panel__title' })
         titleEl.createSpan({ text: node.name, cls: 'ge-side-panel__name' })
 
-        // Actions
-        const actionsEl = titleRow.createDiv({ cls: 'ge-side-panel__actions' })
-
-        if (!node.external && !node.frontier) {
-            const toggleBtn = actionsEl.createEl('button', {
-                cls: 'ge-side-panel__toggle-explored clickable-icon',
-                attr: {
-                    'aria-label': node.explored ? 'Mark as unexplored' : 'Mark as explored',
-                    'title': node.explored ? 'Mark as unexplored' : 'Mark as explored'
-                }
-            })
-            toggleBtn.textContent = node.explored ? '\u2713 Explored' : '\u25CB Mark explored'
-            if (node.explored) {
-                toggleBtn.addClass('ge-side-panel__toggle-explored--active')
-            }
-            this.registerDomEvent(toggleBtn, 'click', () => {
-                if (this.currentNode) {
-                    this.callbacks.onToggleExplored(this.currentNode)
-                }
-            })
-        }
-
-        const closeBtn = actionsEl.createEl('button', {
+        const closeBtn = titleRow.createEl('button', {
             cls: 'ge-side-panel__close clickable-icon',
             attr: { 'aria-label': 'Close panel', 'title': 'Close panel' }
         })
@@ -157,7 +136,7 @@ export class GraphSidePanel extends Component {
             this.callbacks.onClose()
         })
 
-        // Badge row
+        // Row 2: Badges/pills
         const badgesEl = this.headerEl.createDiv({ cls: 'ge-side-panel__badges' })
 
         if (node.explored) {
@@ -207,17 +186,56 @@ export class GraphSidePanel extends Component {
                 attr: { title: confDescriptions[node.confidence] ?? node.confidence }
             })
         }
-
-        // Tags
         if (node.tags.length > 0) {
-            const tagsEl = this.headerEl.createDiv({ cls: 'ge-side-panel__tags' })
             for (const tag of node.tags.slice(0, 5)) {
-                tagsEl.createSpan({
+                badgesEl.createSpan({
                     text: tag,
-                    cls: 'ge-side-panel__tag',
+                    cls: 'ge-side-panel__badge ge-side-panel__tag',
                     attr: { title: `Tag: ${tag}` }
                 })
             }
+        }
+
+        // Row 3: Action buttons
+        const actionsEl = this.headerEl.createDiv({ cls: 'ge-side-panel__actions' })
+
+        if (!node.external && !node.frontier) {
+            const toggleBtn = actionsEl.createEl('button', {
+                cls: 'ge-side-panel__toggle-explored',
+                attr: {
+                    'aria-label': node.explored ? 'Mark as unexplored' : 'Mark as explored',
+                    'title': node.explored ? 'Mark as unexplored' : 'Mark as explored'
+                }
+            })
+            toggleBtn.textContent = node.explored ? '\u2713 Explored' : '\u25CB Mark explored'
+            if (node.explored) {
+                toggleBtn.addClass('ge-side-panel__toggle-explored--active')
+            }
+            this.registerDomEvent(toggleBtn, 'click', () => {
+                if (this.currentNode) {
+                    this.callbacks.onToggleExplored(this.currentNode)
+                }
+            })
+        }
+
+        if (!node.frontier) {
+            const copyBtn = actionsEl.createEl('button', {
+                text: '\u2398 Copy md',
+                cls: 'ge-side-panel__copy-btn',
+                attr: {
+                    'aria-label': 'Copy note content as markdown',
+                    'title': 'Copy note content as markdown'
+                }
+            })
+            this.registerDomEvent(copyBtn, 'click', () => {
+                if (this.currentMarkdown) {
+                    void navigator.clipboard.writeText(this.currentMarkdown)
+                    copyBtn.textContent = '\u2713 Copied!'
+                    setTimeout(() => {
+                        copyBtn.textContent = '\u2398 Copy md'
+                    }, 1500)
+                }
+            })
         }
     }
 
@@ -225,6 +243,8 @@ export class GraphSidePanel extends Component {
         this.clearContent()
 
         const content = await this.app.vault.cachedRead(file)
+        // Strip frontmatter for copy
+        this.currentMarkdown = content.replace(/^---\n[\s\S]*?\n---\n*/, '').trim()
         this.renderComponent = new Component()
         this.renderComponent.load()
 

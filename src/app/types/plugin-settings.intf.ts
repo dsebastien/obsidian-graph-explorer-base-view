@@ -5,8 +5,6 @@ export interface PluginSettings {
     defaultColorBy: string
     /** Default property for node sizing */
     defaultSizeBy: string
-    /** Default graph layout algorithm */
-    defaultLayout: string
     /** Whether to show frontier nodes by default */
     showFrontierDefault: boolean
     /** Default view preset key (empty = custom) */
@@ -19,7 +17,6 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     exploredPropertyName: 'explored',
     defaultColorBy: 'explored',
     defaultSizeBy: 'connections',
-    defaultLayout: 'force',
     showFrontierDefault: false,
     defaultPreset: '',
     nodeSpacing: 1500

@@ -58,9 +58,6 @@ export class GraphExplorerPlugin extends Plugin {
             if (typeof loadedSettings.defaultSizeBy === 'string') {
                 draft.defaultSizeBy = loadedSettings.defaultSizeBy
             }
-            if (typeof loadedSettings.defaultLayout === 'string') {
-                draft.defaultLayout = loadedSettings.defaultLayout
-            }
             if (typeof loadedSettings.showFrontierDefault === 'boolean') {
                 draft.showFrontierDefault = loadedSettings.showFrontierDefault
             }
@@ -79,5 +76,7 @@ export class GraphExplorerPlugin extends Plugin {
         log('Saving settings', 'debug', this.settings)
         await this.saveData(this.settings)
         log('Settings saved', 'debug', this.settings)
+        // Notify active views to re-read settings
+        document.dispatchEvent(new CustomEvent('graph-explorer:settings-changed'))
     }
 }

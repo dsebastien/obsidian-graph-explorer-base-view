@@ -13,7 +13,6 @@ import { setNoteExplored } from '../../utils/frontmatter-utils'
 import type {
     ExploredFilter,
     GraphData,
-    GraphLayout,
     GraphNode,
     GraphStats,
     ConfidenceLevel,
@@ -108,9 +107,15 @@ export class GraphExplorerView extends BasesView {
                 this.config?.set('exploredFilter', filter)
                 this.rebuildGraph()
             },
-            onBatchToggleExplored: () => void this.handleBatchToggleExplored()
+            onBatchToggleExplored: () => void this.handleBatchToggleExplored(),
+            onNodeSpacingChange: (spacing) => {
+                this.graphCanvas?.setNodeSpacing(spacing)
+            }
         })
         this.addChild(this.controls)
+
+        // Initialize spacing slider from plugin settings
+        this.controls.setSpacingValue(this.plugin.settings.nodeSpacing)
 
         // Restore saved filter from config
         const savedFilter = this.config?.get('exploredFilter') as ExploredFilter | undefined
@@ -151,6 +156,16 @@ export class GraphExplorerView extends BasesView {
         // Keyboard events
         this.registerDomEvent(this.viewEl, 'keydown', (e) => this.handleKeyDown(e))
 
+        // Listen for plugin settings changes
+        this.registerDomEvent(
+            document,
+            'graph-explorer:settings-changed' as keyof DocumentEventMap,
+            () => {
+                this.syncConfigToCanvas()
+                this.rebuildGraph()
+            }
+        )
+
         // Initial render
         this.rebuildGraph()
     }
@@ -166,12 +181,9 @@ export class GraphExplorerView extends BasesView {
             (this.config?.get('sizeBy') as string) ||
             this.plugin.settings.defaultSizeBy ||
             'connections'
-        const layout =
-            (this.config?.get('layout') as string) || this.plugin.settings.defaultLayout || 'force'
 
         this.graphCanvas?.setColorBy(colorBy)
         this.graphCanvas?.setSizeBy(sizeBy)
-        this.graphCanvas?.setLayout(layout as GraphLayout)
         this.graphCanvas?.setNodeSpacing(this.plugin.settings.nodeSpacing)
 
         // Handle preset changes

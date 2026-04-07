@@ -6,11 +6,11 @@ export interface GraphControlsCallbacks {
     onSearchChange: (query: string) => void
     onExploredFilterChange: (filter: ExploredFilter) => void
     onBatchToggleExplored: () => void
+    onNodeSpacingChange: (spacing: number) => void
 }
 
 /**
  * Overlay controls for search, filtering, and stats on the graph.
- * Includes extended progress dashboard with confidence distribution.
  */
 export class GraphControls extends Component {
     private controlsEl: HTMLElement
@@ -18,6 +18,8 @@ export class GraphControls extends Component {
     private progressEl: HTMLElement
     private batchActionsEl: HTMLElement
     private searchInput: HTMLInputElement
+    private spacingSlider: HTMLInputElement
+    private spacingValue: HTMLSpanElement
     private callbacks: GraphControlsCallbacks
     private currentFilter: ExploredFilter = 'all'
     private debouncedSearch: Debouncer<[string], void>
@@ -44,6 +46,21 @@ export class GraphControls extends Component {
 
         // Progress bar
         this.progressEl = this.controlsEl.createDiv({ cls: 'ge-controls__progress' })
+
+        // Spacing slider
+        const spacingSection = this.controlsEl.createDiv({ cls: 'ge-controls__spacing' })
+        const spacingLabel = spacingSection.createDiv({ cls: 'ge-controls__spacing-header' })
+        spacingLabel.createSpan({ text: 'Spacing:', cls: 'ge-controls__spacing-label' })
+        this.spacingValue = spacingLabel.createSpan({
+            text: '1500',
+            cls: 'ge-controls__spacing-value'
+        })
+        this.spacingSlider = spacingSection.createEl('input', {
+            type: 'range',
+            cls: 'ge-controls__spacing-slider',
+            attr: { min: '200', max: '5000', step: '100', title: 'Node spacing' }
+        })
+        this.spacingSlider.value = '1500'
 
         // Explored filter
         const filterSection = this.controlsEl.createDiv({ cls: 'ge-controls__filter' })
@@ -85,6 +102,11 @@ export class GraphControls extends Component {
         this.registerDomEvent(this.searchInput, 'input', () => {
             this.debouncedSearch(this.searchInput.value)
         })
+        this.registerDomEvent(this.spacingSlider, 'input', () => {
+            const val = parseInt(this.spacingSlider.value, 10)
+            this.spacingValue.textContent = String(val)
+            this.callbacks.onNodeSpacingChange(val)
+        })
     }
 
     override onunload(): void {
@@ -92,7 +114,6 @@ export class GraphControls extends Component {
     }
 
     updateStats(stats: GraphStats): void {
-        // Basic stats
         this.statsEl.empty()
         this.statsEl.createSpan({
             text: `${stats.totalNodes} notes`,
@@ -113,7 +134,6 @@ export class GraphControls extends Component {
             })
         }
 
-        // Progress bar
         this.progressEl.empty()
         if (stats.exploredCount + stats.unexploredCount > 0) {
             const barContainer = this.progressEl.createDiv({
@@ -127,8 +147,6 @@ export class GraphControls extends Component {
                 text: `${stats.coveragePercent}% explored`,
                 cls: 'ge-controls__progress-label'
             })
-
-            // Confidence distribution dots
             this.renderConfidenceDistribution(stats)
         }
     }
@@ -169,6 +187,11 @@ export class GraphControls extends Component {
 
     getFilter(): ExploredFilter {
         return this.currentFilter
+    }
+
+    setSpacingValue(value: number): void {
+        this.spacingSlider.value = String(value)
+        this.spacingValue.textContent = String(value)
     }
 
     setBatchSelectionCount(count: number): void {

@@ -75,25 +75,6 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
             )
 
         new Setting(containerEl)
-            .setName('Default layout')
-            .setDesc('Default graph layout algorithm.')
-            .addDropdown((dropdown) =>
-                dropdown
-                    .addOption('force', 'Force-directed')
-                    .addOption('dag-td', 'Hierarchical (top-down)')
-                    .addOption('dag-lr', 'Hierarchical (left-right)')
-                    .addOption('dag-radialout', 'Radial')
-                    .setValue(this.plugin.settings.defaultLayout)
-                    .onChange(async (value) => {
-                        this.plugin.settings = {
-                            ...this.plugin.settings,
-                            defaultLayout: value
-                        }
-                        await this.plugin.saveSettings()
-                    })
-            )
-
-        new Setting(containerEl)
             .setName('Show frontier nodes by default')
             .setDesc('Show unresolved links as ghost nodes by default in new views.')
             .addToggle((toggle) =>
