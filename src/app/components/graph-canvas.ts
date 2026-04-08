@@ -5,7 +5,8 @@ import type {
     GraphNode,
     GraphLink,
     ConfidenceLevel,
-    WikiRole
+    WikiRole,
+    MaturityLevel
 } from '../types/graph-types'
 
 export interface GraphCanvasCallbacks {
@@ -501,6 +502,36 @@ export class GraphCanvas extends Component {
             ctx.globalAlpha = 1
         }
 
+        // Maturity ring (shown when not coloring by maturity)
+        if (
+            node.maturity !== 'unknown' &&
+            !node.external &&
+            !node.frontier &&
+            this.colorByProperty !== 'maturity'
+        ) {
+            ctx.beginPath()
+            this.drawShape(ctx, x, y, size + ringGap * 2.5, shape)
+            const matColor = this.getMaturityColor(node.maturity)
+            ctx.globalAlpha = alpha * 0.6
+            ctx.strokeStyle = matColor
+            ctx.lineWidth = ringWidth * 0.8
+            ctx.stroke()
+            ctx.globalAlpha = 1
+        }
+
+        // Graduated indicator (small filled dot at top-right for articles with graduated notes)
+        if (node.graduatedNotes.length > 0 && !node.external && !node.frontier) {
+            const dotRadius = Math.max(size * 0.2, 2)
+            const dotX = x + size * 0.7
+            const dotY = y - size * 0.7
+            ctx.beginPath()
+            ctx.arc(dotX, dotY, dotRadius, 0, 2 * Math.PI)
+            ctx.fillStyle = this.isDark ? 'rgba(168, 85, 247, 0.9)' : 'rgba(147, 51, 234, 0.9)'
+            ctx.globalAlpha = alpha
+            ctx.fill()
+            ctx.globalAlpha = 1
+        }
+
         // Glow on hover
         if (isHovered) {
             ctx.beginPath()
@@ -691,6 +722,9 @@ export class GraphCanvas extends Component {
             case 'wiki_role':
                 return this.getWikiRoleColor(node.wikiRole)
 
+            case 'maturity':
+                return this.getMaturityColor(node.maturity)
+
             case 'created':
                 return this.getCreatedColor(node.created)
 
@@ -802,6 +836,21 @@ export class GraphCanvas extends Component {
         }
     }
 
+    private getMaturityColor(maturity: MaturityLevel): string {
+        switch (maturity) {
+            case 'mature':
+                return this.isDark ? 'rgba(34, 197, 94, 0.9)' : 'rgba(22, 163, 74, 0.9)'
+            case 'substantial':
+                return this.isDark ? 'rgba(59, 130, 246, 0.9)' : 'rgba(37, 99, 235, 0.9)'
+            case 'draft':
+                return this.isDark ? 'rgba(234, 179, 8, 0.9)' : 'rgba(202, 138, 4, 0.9)'
+            case 'stub':
+                return this.isDark ? 'rgba(249, 115, 22, 0.9)' : 'rgba(234, 88, 12, 0.9)'
+            default:
+                return this.isDark ? 'rgba(148, 163, 184, 0.7)' : 'rgba(100, 116, 139, 0.7)'
+        }
+    }
+
     private getCreatedColor(created: number | null): string {
         if (created == null) {
             return this.isDark ? 'rgba(148, 163, 184, 0.7)' : 'rgba(100, 116, 139, 0.7)'
@@ -842,6 +891,8 @@ export class GraphCanvas extends Component {
                 return node.confidence
             case 'wiki_role':
                 return node.wikiRole
+            case 'maturity':
+                return node.maturity
             case 'tags':
                 return node.tags[0] ?? null
             case 'created':
@@ -876,7 +927,8 @@ export class GraphCanvas extends Component {
         if (
             this.colorByProperty === 'explored' ||
             this.colorByProperty === 'confidence' ||
-            this.colorByProperty === 'wiki_role'
+            this.colorByProperty === 'wiki_role' ||
+            this.colorByProperty === 'maturity'
         ) {
             return
         }

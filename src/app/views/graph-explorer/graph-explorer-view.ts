@@ -8,8 +8,10 @@ import { GraphControls } from '../../components/graph-controls'
 import { GraphZoomControls } from '../../components/graph-zoom-controls'
 import { GraphContextMenu } from '../../components/graph-context-menu'
 import type { ContextMenuAction } from '../../components/graph-context-menu'
+import { GraphLegend } from '../../components/graph-legend'
+import type { LegendConfig } from '../../components/graph-legend'
 import { buildGraphData } from '../../services/graph-data-builder'
-import { setNoteExplored } from '../../utils/frontmatter-utils'
+import { setNoteExplored, setNoteMaturity } from '../../utils/frontmatter-utils'
 import type {
     ExploredFilter,
     GraphData,
@@ -17,6 +19,7 @@ import type {
     GraphStats,
     ConfidenceLevel,
     WikiRole,
+    MaturityLevel,
     ViewPreset
 } from '../../types/graph-types'
 import { VIEW_PRESETS } from '../../types/graph-types'
@@ -36,6 +39,7 @@ export class GraphExplorerView extends BasesView {
     private sidePanel: GraphSidePanel | null = null
     private controls: GraphControls | null = null
     private zoomControls: GraphZoomControls | null = null
+    private legend: GraphLegend | null = null
     private contextMenu: GraphContextMenu | null = null
     private currentGraphData: GraphData = { nodes: [], links: [] }
     private searchQuery = ''
@@ -64,11 +68,13 @@ export class GraphExplorerView extends BasesView {
         this.sidePanel?.unload()
         this.controls?.unload()
         this.zoomControls?.unload()
+        this.legend?.unload()
         this.contextMenu?.unload()
         this.graphCanvas = null
         this.sidePanel = null
         this.controls = null
         this.zoomControls = null
+        this.legend = null
         this.contextMenu = null
         this.viewEl?.remove()
         this.viewEl = null
@@ -108,6 +114,7 @@ export class GraphExplorerView extends BasesView {
                 this.rebuildGraph()
             },
             onBatchToggleExplored: () => void this.handleBatchToggleExplored(),
+            onBatchSetMaturity: (maturity) => void this.handleBatchSetMaturity(maturity),
             onNodeSpacingChange: (spacing) => {
                 this.graphCanvas?.setNodeSpacing(spacing)
             },
@@ -147,6 +154,10 @@ export class GraphExplorerView extends BasesView {
         })
         this.addChild(this.zoomControls)
 
+        // Color legend
+        this.legend = new GraphLegend(graphArea)
+        this.addChild(this.legend)
+
         // Context menu
         this.contextMenu = new GraphContextMenu(graphArea)
         this.addChild(this.contextMenu)
@@ -154,6 +165,7 @@ export class GraphExplorerView extends BasesView {
         // Side panel
         this.sidePanel = new GraphSidePanel(this.viewEl, this.app, {
             onToggleExplored: (node) => void this.handleToggleExplored(node),
+            onSetMaturity: (node, maturity) => void this.handleSetMaturity(node, maturity),
             onClose: () => this.handleBackgroundClick(),
             onNavigateToNode: (nodeId) => this.handleNavigateToNode(nodeId)
         })
@@ -191,6 +203,7 @@ export class GraphExplorerView extends BasesView {
         this.graphCanvas?.setColorBy(colorBy)
         this.graphCanvas?.setSizeBy(sizeBy)
         this.graphCanvas?.setNodeSpacing(this.plugin.settings.nodeSpacing)
+        this.legend?.update(this.getLegendConfig(colorBy))
 
         // Handle preset changes
         const preset = (this.config?.get('preset') as string) || ''
@@ -211,6 +224,67 @@ export class GraphExplorerView extends BasesView {
         log(`Applied preset: ${preset.name}`, 'debug')
     }
 
+    // ── Legend ─────────────────────────────────────────────────
+
+    private getLegendConfig(colorBy: string): LegendConfig {
+        switch (colorBy) {
+            case 'explored':
+                return {
+                    title: 'Explored status',
+                    entries: [
+                        { color: 'rgba(34, 197, 94, 0.9)', label: 'Explored' },
+                        { color: 'rgba(148, 163, 184, 0.7)', label: 'Unexplored' }
+                    ]
+                }
+            case 'confidence':
+                return {
+                    title: 'Confidence level',
+                    entries: [
+                        { color: 'rgba(34, 197, 94, 0.9)', label: 'High' },
+                        { color: 'rgba(234, 179, 8, 0.9)', label: 'Medium' },
+                        { color: 'rgba(249, 115, 22, 0.9)', label: 'Low' },
+                        { color: 'rgba(239, 68, 68, 0.9)', label: 'Uncertain' },
+                        { color: 'rgba(148, 163, 184, 0.7)', label: 'Unknown' }
+                    ]
+                }
+            case 'wiki_role':
+                return {
+                    title: 'Wiki role',
+                    entries: [
+                        { color: 'rgba(59, 130, 246, 0.9)', label: 'Article' },
+                        { color: 'rgba(168, 85, 247, 0.9)', label: 'Index' },
+                        { color: 'rgba(20, 184, 166, 0.9)', label: 'Log' },
+                        { color: 'rgba(234, 179, 8, 0.9)', label: 'Source summary' },
+                        { color: 'rgba(148, 163, 184, 0.7)', label: 'Unknown' }
+                    ]
+                }
+            case 'maturity':
+                return {
+                    title: 'Maturity level',
+                    entries: [
+                        { color: 'rgba(34, 197, 94, 0.9)', label: 'Mature' },
+                        { color: 'rgba(59, 130, 246, 0.9)', label: 'Substantial' },
+                        { color: 'rgba(234, 179, 8, 0.9)', label: 'Draft' },
+                        { color: 'rgba(249, 115, 22, 0.9)', label: 'Stub' },
+                        { color: 'rgba(148, 163, 184, 0.7)', label: 'Unknown' }
+                    ]
+                }
+            case 'created':
+                return {
+                    title: 'Creation date',
+                    entries: [
+                        { color: 'rgba(34, 197, 94, 0.9)', label: 'Recent' },
+                        { color: 'rgba(148, 163, 184, 0.7)', label: 'Older' }
+                    ]
+                }
+            default:
+                return {
+                    title: `Color by: ${colorBy}`,
+                    entries: [{ color: 'rgba(148, 163, 184, 0.7)', label: 'Varies by value' }]
+                }
+        }
+    }
+
     // ── Graph data ────────────────────────────────────────────
 
     private rebuildGraph(): void {
@@ -227,13 +301,19 @@ export class GraphExplorerView extends BasesView {
             false
         const exploredFilter = (this.controls?.getFilter() as ExploredFilter) || 'all'
 
+        const maturityProperty = this.plugin.settings.maturityPropertyName || 'maturity'
+        const graduatedNotesProperty =
+            this.plugin.settings.graduatedNotesPropertyName || 'graduated_notes'
+
         this.currentGraphData = buildGraphData(
             entries,
             this.app.metadataCache,
             exploredProperty,
             showExternal,
             exploredFilter,
-            showFrontier
+            showFrontier,
+            maturityProperty,
+            graduatedNotesProperty
         )
 
         if (this.currentGraphData.nodes.length === 0) {
@@ -285,10 +365,20 @@ export class GraphExplorerView extends BasesView {
             source_summary: 0,
             unknown: 0
         }
+        const maturityDistribution: Record<MaturityLevel, number> = {
+            stub: 0,
+            draft: 0,
+            substantial: 0,
+            mature: 0,
+            unknown: 0
+        }
+        let graduatedCount = 0
 
         for (const n of nonExternal) {
             confidenceDistribution[n.confidence]++
             roleDistribution[n.wikiRole]++
+            maturityDistribution[n.maturity]++
+            if (n.graduatedNotes.length > 0) graduatedCount++
         }
 
         const frontierCount = nodes.filter((n) => n.frontier).length
@@ -302,6 +392,8 @@ export class GraphExplorerView extends BasesView {
             unexploredCount,
             confidenceDistribution,
             roleDistribution,
+            maturityDistribution,
+            graduatedCount,
             frontierCount,
             coveragePercent
         }
@@ -354,6 +446,21 @@ export class GraphExplorerView extends BasesView {
         log(`Toggled explored: ${node.name} -> ${String(newExplored)}`, 'debug')
     }
 
+    private async handleSetMaturity(node: GraphNode, maturity: MaturityLevel): Promise<void> {
+        if (node.frontier || node.external) return
+        const file = this.app.vault.getAbstractFileByPath(node.id)
+        if (!(file instanceof TFile)) return
+
+        const maturityProperty = this.plugin.settings.maturityPropertyName || 'maturity'
+        await setNoteMaturity(this.app, file, maturityProperty, maturity)
+
+        // Optimistic update
+        node.maturity = maturity
+        this.sidePanel?.updateMaturityState(maturity)
+
+        log(`Set maturity: ${node.name} -> ${maturity}`, 'debug')
+    }
+
     // ── Context menu ──────────────────────────────────────────
 
     private handleNodeRightClick(node: GraphNode, event: MouseEvent): void {
@@ -384,6 +491,23 @@ export class GraphExplorerView extends BasesView {
                 icon: node.explored ? '\u25CB' : '\u2713',
                 callback: () => void this.handleToggleExplored(node)
             })
+        }
+
+        if (!node.external && !node.frontier) {
+            const maturityLevels: { value: MaturityLevel; label: string; icon: string }[] = [
+                { value: 'stub', label: 'Set maturity: Stub', icon: '\u{1F7E0}' },
+                { value: 'draft', label: 'Set maturity: Draft', icon: '\u{1F7E1}' },
+                { value: 'substantial', label: 'Set maturity: Substantial', icon: '\u{1F535}' },
+                { value: 'mature', label: 'Set maturity: Mature', icon: '\u{1F7E2}' }
+            ]
+            for (const level of maturityLevels) {
+                actions.push({
+                    label: level.label,
+                    icon: level.icon,
+                    callback: () => void this.handleSetMaturity(node, level.value),
+                    disabled: node.maturity === level.value
+                })
+            }
         }
 
         if (!node.frontier) {
@@ -432,6 +556,27 @@ export class GraphExplorerView extends BasesView {
 
         this.graphCanvas?.clearBatchSelection()
         log(`Batch toggled explored for ${selectedIds.size} nodes`, 'debug')
+    }
+
+    private async handleBatchSetMaturity(maturity: MaturityLevel): Promise<void> {
+        const selectedIds = this.graphCanvas?.getBatchSelectedIds()
+        if (!selectedIds || selectedIds.size === 0) return
+
+        const maturityProperty = this.plugin.settings.maturityPropertyName || 'maturity'
+
+        for (const nodeId of selectedIds) {
+            const node = this.currentGraphData.nodes.find((n) => n.id === nodeId)
+            if (!node || node.frontier || node.external) continue
+
+            const file = this.app.vault.getAbstractFileByPath(nodeId)
+            if (!(file instanceof TFile)) continue
+
+            await setNoteMaturity(this.app, file, maturityProperty, maturity)
+            node.maturity = maturity
+        }
+
+        this.graphCanvas?.clearBatchSelection()
+        log(`Batch set maturity to ${maturity} for ${selectedIds.size} nodes`, 'debug')
     }
 
     // ── Keyboard navigation ───────────────────────────────────

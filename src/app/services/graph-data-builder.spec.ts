@@ -177,4 +177,62 @@ describe('buildGraphData', () => {
         expect(result.nodes[0]?.confidence).toBe('high')
         expect(result.nodes[0]?.wikiRole).toBe('article')
     })
+
+    test('extracts maturity from frontmatter', () => {
+        const entries = [makeEntry('a.md', 'a')]
+        const cache = makeMetadataCache({}, { 'a.md': { maturity: 'draft' } })
+        const result = buildGraphData(
+            entries,
+            cache as never,
+            'explored',
+            false,
+            'all',
+            false,
+            'maturity'
+        )
+
+        expect(result.nodes[0]?.maturity).toBe('draft')
+    })
+
+    test('extracts graduated_notes from frontmatter', () => {
+        const entries = [makeEntry('a.md', 'a')]
+        const cache = makeMetadataCache({}, { 'a.md': { graduated_notes: ['Note X', 'Note Y'] } })
+        const result = buildGraphData(
+            entries,
+            cache as never,
+            'explored',
+            false,
+            'all',
+            false,
+            'maturity',
+            'graduated_notes'
+        )
+
+        expect(result.nodes[0]?.graduatedNotes).toEqual(['Note X', 'Note Y'])
+    })
+
+    test('defaults maturity to unknown and graduatedNotes to empty', () => {
+        const entries = [makeEntry('a.md', 'a')]
+        const cache = makeMetadataCache({})
+        const result = buildGraphData(entries, cache as never, 'explored', false, 'all', false)
+
+        expect(result.nodes[0]?.maturity).toBe('unknown')
+        expect(result.nodes[0]?.graduatedNotes).toEqual([])
+    })
+
+    test('uses custom maturity property name', () => {
+        const entries = [makeEntry('a.md', 'a')]
+        const cache = makeMetadataCache({}, { 'a.md': { depth: 'mature' } })
+        const result = buildGraphData(
+            entries,
+            cache as never,
+            'explored',
+            false,
+            'all',
+            false,
+            'depth'
+        )
+
+        expect(result.nodes[0]?.maturity).toBe('mature')
+    })
 })

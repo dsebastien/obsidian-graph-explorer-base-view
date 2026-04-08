@@ -1,5 +1,5 @@
 import type { App, TFile, CachedMetadata } from 'obsidian'
-import type { ConfidenceLevel, WikiRole } from '../types/graph-types'
+import type { ConfidenceLevel, WikiRole, MaturityLevel } from '../types/graph-types'
 
 /**
  * Check if a note is marked as explored based on its cached metadata.
@@ -50,6 +50,54 @@ export function getNoteWikiRole(metadata: Partial<CachedMetadata> | null): WikiR
         return value
     }
     return 'unknown'
+}
+
+/**
+ * Get the maturity level from frontmatter.
+ */
+export function getNoteMaturity(
+    metadata: Partial<CachedMetadata> | null,
+    propertyName: string
+): MaturityLevel {
+    if (!metadata?.frontmatter) return 'unknown'
+    const value: unknown = metadata.frontmatter[propertyName]
+    if (value === 'stub' || value === 'draft' || value === 'substantial' || value === 'mature') {
+        return value
+    }
+    return 'unknown'
+}
+
+/**
+ * Get graduated notes list from frontmatter.
+ */
+export function getNoteGraduatedNotes(
+    metadata: Partial<CachedMetadata> | null,
+    propertyName: string
+): string[] {
+    if (!metadata?.frontmatter) return []
+    const value: unknown = metadata.frontmatter[propertyName]
+    if (Array.isArray(value)) {
+        return value.filter((v): v is string => typeof v === 'string' && v.length > 0)
+    }
+    return []
+}
+
+/**
+ * Set the maturity level of a note by updating its frontmatter property.
+ */
+export async function setNoteMaturity(
+    app: App,
+    file: TFile,
+    propertyName: string,
+    maturity: MaturityLevel
+): Promise<void> {
+    await app.fileManager.processFrontMatter(file, (frontmatter: Record<string, unknown>) => {
+        if (maturity === 'unknown') {
+            delete frontmatter[propertyName]
+        } else {
+            frontmatter[propertyName] = maturity
+        }
+    })
 }
 
 /**

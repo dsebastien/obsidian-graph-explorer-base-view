@@ -41,7 +41,8 @@ export function getGraphExplorerViewOptions(): ViewOption[] {
                 confidence: 'Confidence level',
                 wiki_role: 'Wiki role',
                 created: 'Creation date',
-                tags: 'First tag'
+                tags: 'First tag',
+                maturity: 'Maturity level'
             }
         } as DropdownOption,
         {
@@ -63,7 +64,8 @@ export function getGraphExplorerViewOptions(): ViewOption[] {
                 '': 'Custom',
                 'wiki-explorer': 'LLM Wiki Explorer',
                 'exploration-progress': 'Exploration Progress',
-                'role-overview': 'Role Overview'
+                'role-overview': 'Role Overview',
+                'maturity-pipeline': 'Maturity Pipeline'
             }
         } as DropdownOption
     ]

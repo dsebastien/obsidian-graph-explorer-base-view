@@ -6,6 +6,9 @@ export type ConfidenceLevel = 'high' | 'medium' | 'low' | 'uncertain' | 'unknown
 /** Wiki role from wiki articles */
 export type WikiRole = 'article' | 'index' | 'log' | 'source_summary' | 'unknown'
 
+/** Maturity level from wiki articles */
+export type MaturityLevel = 'stub' | 'draft' | 'substantial' | 'mature' | 'unknown'
+
 /** Filter mode for explored status */
 export type ExploredFilter = 'all' | 'explored' | 'unexplored'
 
@@ -30,6 +33,10 @@ export interface GraphNode extends NodeObject {
     confidence: ConfidenceLevel
     /** Wiki role (from frontmatter) */
     wikiRole: WikiRole
+    /** Maturity level (from frontmatter) */
+    maturity: MaturityLevel
+    /** Graduated permanent notes extracted from this article */
+    graduatedNotes: string[]
     /** Creation timestamp in ms (from frontmatter or file stat) */
     created: number | null
     /** Tags on the note */
@@ -72,6 +79,8 @@ export interface GraphStats {
     unexploredCount: number
     confidenceDistribution: Record<ConfidenceLevel, number>
     roleDistribution: Record<WikiRole, number>
+    maturityDistribution: Record<MaturityLevel, number>
+    graduatedCount: number
     frontierCount: number
     coveragePercent: number
 }
@@ -121,6 +130,18 @@ export const VIEW_PRESETS: ViewPreset[] = [
             colorBy: 'wiki_role',
             sizeBy: 'connections',
             showFrontier: false,
+            layout: 'force'
+        }
+    },
+    {
+        key: 'maturity-pipeline',
+        name: 'Maturity Pipeline',
+        description: 'Track article depth and graduation readiness',
+        config: {
+            colorBy: 'maturity',
+            sizeBy: 'connections',
+            showFrontier: false,
+            exploredFilter: 'all',
             layout: 'force'
         }
     }

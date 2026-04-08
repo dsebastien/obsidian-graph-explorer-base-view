@@ -11,6 +11,10 @@ export interface PluginSettings {
     defaultPreset: string
     /** Node repulsion strength (higher = more spread out). Range 200-5000. */
     nodeSpacing: number
+    /** Frontmatter property name used to read maturity level */
+    maturityPropertyName: string
+    /** Frontmatter property name used to read graduated notes list */
+    graduatedNotesPropertyName: string
 }
 
 export const DEFAULT_SETTINGS: PluginSettings = {
@@ -19,5 +23,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     defaultSizeBy: 'connections',
     showFrontierDefault: false,
     defaultPreset: '',
-    nodeSpacing: 1500
+    nodeSpacing: 1500,
+    maturityPropertyName: 'maturity',
+    graduatedNotesPropertyName: 'graduated_notes'
 }

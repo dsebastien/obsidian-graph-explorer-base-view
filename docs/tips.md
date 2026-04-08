@@ -25,6 +25,15 @@
 4. Source summary nodes (hexagons) show ingested content
 5. Article nodes (circles) are your core knowledge entries
 
+### Tracking maturity and graduation
+
+1. Use the **Maturity Pipeline** preset
+2. Nodes are colored by maturity level — orange (stubs) and yellow (drafts) need deepening
+3. Blue nodes (substantial) are getting close; green nodes (mature) are graduation candidates
+4. Nodes with a small purple dot have already graduated permanent notes
+5. The maturity distribution in the stats panel shows the overall pipeline health
+6. Use this view to identify which articles to deepen next for the biggest knowledge payoff
+
 ### Batch exploration
 
 1. Right-click nodes or use Shift+Enter to batch-select multiple notes

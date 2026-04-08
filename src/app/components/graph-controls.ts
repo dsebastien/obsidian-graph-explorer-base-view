@@ -1,11 +1,17 @@
 import { Component, debounce } from 'obsidian'
 import type { Debouncer } from 'obsidian'
-import type { ExploredFilter, GraphStats, ConfidenceLevel } from '../types/graph-types'
+import type {
+    ExploredFilter,
+    GraphStats,
+    ConfidenceLevel,
+    MaturityLevel
+} from '../types/graph-types'
 
 export interface GraphControlsCallbacks {
     onSearchChange: (query: string) => void
     onExploredFilterChange: (filter: ExploredFilter) => void
     onBatchToggleExplored: () => void
+    onBatchSetMaturity: (maturity: MaturityLevel) => void
     onNodeSpacingChange: (spacing: number) => void
     onNodeScaleChange: (scale: number) => void
     onTextScaleChange: (scale: number) => void
@@ -148,6 +154,28 @@ export class GraphControls extends Component {
         this.registerDomEvent(batchToggleBtn, 'click', () => {
             this.callbacks.onBatchToggleExplored()
         })
+
+        const batchMaturitySelect = this.batchActionsEl.createEl('select', {
+            cls: 'ge-controls__batch-maturity-select',
+            attr: { title: 'Set maturity level on all selected nodes' }
+        })
+        batchMaturitySelect.createEl('option', { text: 'Set maturity\u2026', value: '' })
+        const levels: { value: MaturityLevel; label: string }[] = [
+            { value: 'stub', label: 'Stub' },
+            { value: 'draft', label: 'Draft' },
+            { value: 'substantial', label: 'Substantial' },
+            { value: 'mature', label: 'Mature' }
+        ]
+        for (const level of levels) {
+            batchMaturitySelect.createEl('option', { text: level.label, value: level.value })
+        }
+        this.registerDomEvent(batchMaturitySelect, 'change', () => {
+            const val = batchMaturitySelect.value as MaturityLevel
+            if (val) {
+                this.callbacks.onBatchSetMaturity(val)
+                batchMaturitySelect.value = ''
+            }
+        })
     }
 
     override onload(): void {
@@ -234,6 +262,7 @@ export class GraphControls extends Component {
                 cls: 'ge-controls__progress-label'
             })
             this.renderConfidenceDistribution(stats)
+            this.renderMaturityDistribution(stats)
         }
     }
 
@@ -254,6 +283,33 @@ export class GraphControls extends Component {
                     attr: { title: `${level}: ${count}` }
                 })
             }
+        }
+    }
+
+    private renderMaturityDistribution(stats: GraphStats): void {
+        const maturityLevels: MaturityLevel[] = ['mature', 'substantial', 'draft', 'stub']
+        const hasAnyMaturity = maturityLevels.some((m) => stats.maturityDistribution[m] > 0)
+        if (!hasAnyMaturity) return
+
+        const distEl = this.progressEl.createDiv({
+            cls: 'ge-controls__maturity-dist'
+        })
+        for (const level of maturityLevels) {
+            const count = stats.maturityDistribution[level]
+            if (count > 0) {
+                distEl.createSpan({
+                    text: `${count}`,
+                    cls: `ge-controls__maturity-dot ge-controls__maturity-dot--${level}`,
+                    attr: { title: `${level}: ${count}` }
+                })
+            }
+        }
+        if (stats.graduatedCount > 0) {
+            distEl.createSpan({
+                text: `${stats.graduatedCount}`,
+                cls: 'ge-controls__maturity-dot ge-controls__maturity-dot--graduated',
+                attr: { title: `graduated: ${stats.graduatedCount}` }
+            })
         }
     }
 

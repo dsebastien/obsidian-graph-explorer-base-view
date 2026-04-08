@@ -10,6 +10,8 @@ import {
     isNoteExplored,
     getNoteConfidence,
     getNoteWikiRole,
+    getNoteMaturity,
+    getNoteGraduatedNotes,
     getNoteTags,
     getNoteFrontmatter
 } from '../utils/frontmatter-utils'
@@ -25,7 +27,9 @@ export function buildGraphData(
     exploredProperty: string,
     showExternal: boolean,
     exploredFilter: ExploredFilter,
-    showFrontier: boolean
+    showFrontier: boolean,
+    maturityProperty = 'maturity',
+    graduatedNotesProperty = 'graduated_notes'
 ): GraphData {
     const entryPaths = new Set<string>(entries.map((e) => e.file.path))
     const entryMap = new Map<string, BasesEntry>(entries.map((e) => [e.file.path, e]))
@@ -41,6 +45,8 @@ export function buildGraphData(
             external: false,
             confidence: getNoteConfidence(metadata),
             wikiRole: getNoteWikiRole(metadata),
+            maturity: getNoteMaturity(metadata, maturityProperty),
+            graduatedNotes: getNoteGraduatedNotes(metadata, graduatedNotesProperty),
             created: getCreatedTimestamp(entry, metadata),
             tags: getNoteTags(metadata),
             frontmatter: getNoteFrontmatter(metadata),
@@ -94,6 +100,8 @@ export function buildGraphData(
                         external: true,
                         confidence: 'unknown',
                         wikiRole: 'unknown',
+                        maturity: 'unknown',
+                        graduatedNotes: [],
                         created: null,
                         tags: [],
                         frontmatter: {},
@@ -118,6 +126,8 @@ export function buildGraphData(
                             external: true,
                             confidence: getNoteConfidence(metadata),
                             wikiRole: getNoteWikiRole(metadata),
+                            maturity: getNoteMaturity(metadata, maturityProperty),
+                            graduatedNotes: getNoteGraduatedNotes(metadata, graduatedNotesProperty),
                             created: getCreatedTimestamp(entry, metadata),
                             tags: getNoteTags(metadata),
                             frontmatter: getNoteFrontmatter(metadata),
@@ -148,6 +158,8 @@ export function buildGraphData(
                         external: false,
                         confidence: 'unknown',
                         wikiRole: 'unknown',
+                        maturity: 'unknown',
+                        graduatedNotes: [],
                         created: null,
                         tags: [],
                         frontmatter: {},

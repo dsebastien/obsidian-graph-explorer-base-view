@@ -1,9 +1,10 @@
 import { Component, MarkdownRenderer, TFile } from 'obsidian'
 import type { App } from 'obsidian'
-import type { GraphNode } from '../types/graph-types'
+import type { GraphNode, MaturityLevel } from '../types/graph-types'
 
 export interface GraphSidePanelCallbacks {
     onToggleExplored: (node: GraphNode) => void
+    onSetMaturity: (node: GraphNode, maturity: MaturityLevel) => void
     onClose: () => void
     onNavigateToNode: (nodeId: string) => void
 }
@@ -90,6 +91,12 @@ export class GraphSidePanel extends Component {
     updateExploredState(explored: boolean): void {
         if (!this.currentNode) return
         this.currentNode = { ...this.currentNode, explored }
+        this.renderHeader(this.currentNode)
+    }
+
+    updateMaturityState(maturity: MaturityLevel): void {
+        if (!this.currentNode) return
+        this.currentNode = { ...this.currentNode, maturity }
         this.renderHeader(this.currentNode)
     }
 
@@ -192,6 +199,28 @@ export class GraphSidePanel extends Component {
                 attr: { title: confDescriptions[node.confidence] ?? node.confidence }
             })
         }
+        if (node.maturity !== 'unknown') {
+            const maturityDescriptions: Record<string, string> = {
+                stub: 'Stub: minimal content, placeholder',
+                draft: 'Draft: some content, needs depth',
+                substantial: 'Substantial: decent reference material',
+                mature: 'Mature: deep, well-sourced, ready for graduation'
+            }
+            badgesEl.createSpan({
+                text: node.maturity,
+                cls: `ge-side-panel__badge ge-side-panel__maturity-badge ge-side-panel__maturity-badge--${node.maturity}`,
+                attr: { title: maturityDescriptions[node.maturity] ?? node.maturity }
+            })
+        }
+        if (node.graduatedNotes.length > 0) {
+            badgesEl.createSpan({
+                text: `${node.graduatedNotes.length} graduated`,
+                cls: 'ge-side-panel__badge ge-side-panel__graduated-badge',
+                attr: {
+                    title: `Graduated notes: ${node.graduatedNotes.join(', ')}`
+                }
+            })
+        }
         if (node.tags.length > 0) {
             for (const tag of node.tags.slice(0, 5)) {
                 badgesEl.createSpan({
@@ -220,6 +249,40 @@ export class GraphSidePanel extends Component {
             this.registerDomEvent(toggleBtn, 'click', () => {
                 if (this.currentNode) {
                     this.callbacks.onToggleExplored(this.currentNode)
+                }
+            })
+        }
+
+        if (!node.external && !node.frontier) {
+            const maturitySelect = actionsEl.createEl('select', {
+                cls: 'ge-side-panel__maturity-select',
+                attr: {
+                    'aria-label': 'Set maturity level',
+                    'title': 'Set maturity level'
+                }
+            })
+            const levels: { value: MaturityLevel; label: string }[] = [
+                { value: 'unknown', label: 'No maturity' },
+                { value: 'stub', label: 'Stub' },
+                { value: 'draft', label: 'Draft' },
+                { value: 'substantial', label: 'Substantial' },
+                { value: 'mature', label: 'Mature' }
+            ]
+            for (const level of levels) {
+                const option = maturitySelect.createEl('option', {
+                    text: level.label,
+                    value: level.value
+                })
+                if (level.value === node.maturity) {
+                    option.selected = true
+                }
+            }
+            this.registerDomEvent(maturitySelect, 'change', () => {
+                if (this.currentNode) {
+                    this.callbacks.onSetMaturity(
+                        this.currentNode,
+                        maturitySelect.value as MaturityLevel
+                    )
                 }
             })
         }

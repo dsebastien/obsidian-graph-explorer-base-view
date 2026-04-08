@@ -33,6 +33,42 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
                     })
             )
 
+        new Setting(containerEl)
+            .setName('Maturity property')
+            .setDesc(
+                'The frontmatter property name used to read article maturity level (e.g., "maturity").'
+            )
+            .addText((text) =>
+                text
+                    .setPlaceholder('maturity')
+                    .setValue(this.plugin.settings.maturityPropertyName)
+                    .onChange(async (value) => {
+                        this.plugin.settings = {
+                            ...this.plugin.settings,
+                            maturityPropertyName: value || 'maturity'
+                        }
+                        await this.plugin.saveSettings()
+                    })
+            )
+
+        new Setting(containerEl)
+            .setName('Graduated notes property')
+            .setDesc(
+                'The frontmatter property name used to read the list of graduated permanent notes (e.g., "graduated_notes").'
+            )
+            .addText((text) =>
+                text
+                    .setPlaceholder('graduated_notes')
+                    .setValue(this.plugin.settings.graduatedNotesPropertyName)
+                    .onChange(async (value) => {
+                        this.plugin.settings = {
+                            ...this.plugin.settings,
+                            graduatedNotesPropertyName: value || 'graduated_notes'
+                        }
+                        await this.plugin.saveSettings()
+                    })
+            )
+
         // ── Visualization defaults ────────────────────────────
 
         new Setting(containerEl).setName('Visualization defaults').setHeading()
@@ -47,6 +83,7 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
                     .addOption('wiki_role', 'Wiki role')
                     .addOption('created', 'Creation date')
                     .addOption('tags', 'First tag')
+                    .addOption('maturity', 'Maturity level')
                     .setValue(this.plugin.settings.defaultColorBy)
                     .onChange(async (value) => {
                         this.plugin.settings = {
