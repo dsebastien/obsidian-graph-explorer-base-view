@@ -463,63 +463,85 @@ export class GraphCanvas extends Component {
         const factor = 1 - Math.exp(-GraphCanvas.FADE_SPEED * 0.016)
         const alpha = prevAlpha + (targetAlpha - prevAlpha) * factor
         this.nodeAlphas.set(node.id, alpha)
-        const ringGap = size * 0.15 // proportional gap for rings
+        const ringGap = size * 0.15 // proportional gap for interaction rings
         const ringWidth = Math.max(size * 0.08, 1) / globalScale
 
-        // Ring layout (inner → outer):
-        //   1. Explored:    ringGap * 1   (innermost status)
-        //   2. Confidence:  ringGap * 2   (status)
-        //   3. Hover glow:  ringGap * 3   (fill)
-        //   4. Selected:    ringGap * 4   (interaction)
-        //   5. Focus:       ringGap * 5   (keyboard nav)
-        //   6. Batch:       ringGap * 5   (dashed)
+        // Interaction rings (inner → outer):
+        //   1. Hover glow:  ringGap * 1.5
+        //   2. Selected:    ringGap * 2.5
+        //   3. Focus/Batch: ringGap * 3.5
 
-        // Explored ring (innermost, always shown for explored nodes)
-        if (node.explored && !node.external && !node.frontier) {
+        // Glow on hover
+        if (isHovered) {
             ctx.beginPath()
-            ctx.arc(x, y, size + ringGap, 0, 2 * Math.PI)
-            ctx.globalAlpha = alpha
-            ctx.strokeStyle = 'rgba(34, 197, 94, 0.9)'
+            ctx.arc(x, y, size + ringGap * 1.5, 0, 2 * Math.PI)
+            ctx.fillStyle = color.replace(/[\d.]+\)$/, '0.3)')
+            ctx.fill()
+        }
+
+        // Selected ring
+        if (isSelected) {
+            ctx.beginPath()
+            ctx.arc(x, y, size + ringGap * 2.5, 0, 2 * Math.PI)
+            ctx.strokeStyle = 'rgba(139, 92, 246, 0.8)'
             ctx.lineWidth = ringWidth * 1.2
             ctx.stroke()
-            ctx.globalAlpha = 1
         }
 
-        // Confidence ring (shown when not coloring by confidence)
-        if (
-            node.confidence !== 'unknown' &&
-            !node.external &&
-            !node.frontier &&
-            this.colorByProperty !== 'confidence'
-        ) {
+        // Keyboard focus ring
+        if (isFocused) {
             ctx.beginPath()
-            this.drawShape(ctx, x, y, size + ringGap * 2, shape)
-            const confColor = this.getConfidenceColor(node.confidence)
+            ctx.arc(x, y, size + ringGap * 3.5, 0, 2 * Math.PI)
+            ctx.strokeStyle = 'rgba(251, 191, 36, 0.8)'
+            ctx.lineWidth = ringWidth * 1.2
+            ctx.stroke()
+        }
+
+        // Batch selection ring
+        if (isBatchSelected) {
+            ctx.beginPath()
+            ctx.arc(x, y, size + ringGap * 3.5, 0, 2 * Math.PI)
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.7)'
+            ctx.lineWidth = ringWidth * 1.5
+            ctx.setLineDash([3 / globalScale, 3 / globalScale])
+            ctx.stroke()
+            ctx.setLineDash([])
+        }
+
+        // Main shape: explored = solid fill + green border, unexplored = hollow outline
+        const isExplored = node.explored && !node.external && !node.frontier
+        const isUnexplored = !node.explored && !node.external && !node.frontier
+        ctx.beginPath()
+        this.drawShape(ctx, x, y, size, shape)
+        if (isUnexplored) {
+            // Hollow: faint fill + colored outline
+            ctx.fillStyle = color
+            ctx.globalAlpha = alpha * 0.15
+            ctx.fill()
+            ctx.globalAlpha = alpha * 0.7
+            ctx.strokeStyle = color
+            ctx.lineWidth = Math.max(size * 0.12, 1.5) / globalScale
+            ctx.stroke()
+        } else {
+            // Solid fill
+            ctx.fillStyle = color
+            ctx.globalAlpha = node.frontier ? alpha * 0.4 : alpha
+            ctx.fill()
+        }
+        ctx.globalAlpha = 1
+
+        // Green border for explored nodes
+        if (isExplored) {
+            ctx.beginPath()
+            this.drawShape(ctx, x, y, size, shape)
             ctx.globalAlpha = alpha
-            ctx.strokeStyle = confColor
-            ctx.lineWidth = ringWidth
+            ctx.strokeStyle = this.isDark ? 'rgba(34, 197, 94, 0.9)' : 'rgba(22, 163, 74, 0.9)'
+            ctx.lineWidth = Math.max(size * 0.15, 2) / globalScale
             ctx.stroke()
             ctx.globalAlpha = 1
         }
 
-        // Maturity ring (shown when not coloring by maturity)
-        if (
-            node.maturity !== 'unknown' &&
-            !node.external &&
-            !node.frontier &&
-            this.colorByProperty !== 'maturity'
-        ) {
-            ctx.beginPath()
-            this.drawShape(ctx, x, y, size + ringGap * 2.5, shape)
-            const matColor = this.getMaturityColor(node.maturity)
-            ctx.globalAlpha = alpha * 0.6
-            ctx.strokeStyle = matColor
-            ctx.lineWidth = ringWidth * 0.8
-            ctx.stroke()
-            ctx.globalAlpha = 1
-        }
-
-        // Graduated indicator (small filled dot at top-right for articles with graduated notes)
+        // Graduated indicator (small filled dot at top-right)
         if (node.graduatedNotes.length > 0 && !node.external && !node.frontier) {
             const dotRadius = Math.max(size * 0.2, 2)
             const dotX = x + size * 0.7
@@ -531,51 +553,6 @@ export class GraphCanvas extends Component {
             ctx.fill()
             ctx.globalAlpha = 1
         }
-
-        // Glow on hover
-        if (isHovered) {
-            ctx.beginPath()
-            ctx.arc(x, y, size + ringGap * 3, 0, 2 * Math.PI)
-            ctx.fillStyle = color.replace(/[\d.]+\)$/, '0.3)')
-            ctx.fill()
-        }
-
-        // Selected ring
-        if (isSelected) {
-            ctx.beginPath()
-            ctx.arc(x, y, size + ringGap * 4, 0, 2 * Math.PI)
-            ctx.strokeStyle = 'rgba(139, 92, 246, 0.8)'
-            ctx.lineWidth = ringWidth * 1.2
-            ctx.stroke()
-        }
-
-        // Keyboard focus ring
-        if (isFocused) {
-            ctx.beginPath()
-            ctx.arc(x, y, size + ringGap * 5, 0, 2 * Math.PI)
-            ctx.strokeStyle = 'rgba(251, 191, 36, 0.8)'
-            ctx.lineWidth = ringWidth * 1.2
-            ctx.stroke()
-        }
-
-        // Batch selection ring
-        if (isBatchSelected) {
-            ctx.beginPath()
-            ctx.arc(x, y, size + ringGap * 5, 0, 2 * Math.PI)
-            ctx.strokeStyle = 'rgba(59, 130, 246, 0.7)'
-            ctx.lineWidth = ringWidth * 1.5
-            ctx.setLineDash([3 / globalScale, 3 / globalScale])
-            ctx.stroke()
-            ctx.setLineDash([])
-        }
-
-        // Main shape
-        ctx.beginPath()
-        this.drawShape(ctx, x, y, size, shape)
-        ctx.fillStyle = color
-        ctx.globalAlpha = node.frontier ? alpha * 0.4 : alpha
-        ctx.fill()
-        ctx.globalAlpha = 1
 
         // Frontier dashed outline
         if (node.frontier) {

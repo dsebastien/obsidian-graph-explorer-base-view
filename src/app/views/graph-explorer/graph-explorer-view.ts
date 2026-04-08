@@ -9,7 +9,7 @@ import { GraphZoomControls } from '../../components/graph-zoom-controls'
 import { GraphContextMenu } from '../../components/graph-context-menu'
 import type { ContextMenuAction } from '../../components/graph-context-menu'
 import { GraphLegend } from '../../components/graph-legend'
-import type { LegendConfig } from '../../components/graph-legend'
+import type { LegendConfig, LegendSection } from '../../components/graph-legend'
 import { buildGraphData } from '../../services/graph-data-builder'
 import { setNoteExplored, setNoteMaturity } from '../../utils/frontmatter-utils'
 import type {
@@ -221,10 +221,37 @@ export class GraphExplorerView extends BasesView {
     // ── Legend ─────────────────────────────────────────────────
 
     private getLegendConfig(colorBy: string): LegendConfig {
+        const sections: LegendSection[] = []
+
+        // Section 1: Node fill color
+        sections.push(this.getColorSection(colorBy))
+
+        // Section 2: Node style
+        sections.push({
+            title: 'Node style',
+            entries: [
+                {
+                    color: 'rgba(34, 197, 94, 0.9)',
+                    label: 'Green border = explored',
+                    style: 'ring'
+                },
+                { color: 'rgba(148, 163, 184, 0.7)', label: 'Hollow = unexplored', style: 'ring' },
+                {
+                    color: 'rgba(168, 85, 247, 0.9)',
+                    label: 'Graduated notes',
+                    style: 'dot'
+                }
+            ]
+        })
+
+        return { sections }
+    }
+
+    private getColorSection(colorBy: string): LegendSection {
         switch (colorBy) {
             case 'explored':
                 return {
-                    title: 'Explored status',
+                    title: 'Color — explored status',
                     entries: [
                         { color: 'rgba(34, 197, 94, 0.9)', label: 'Explored' },
                         { color: 'rgba(148, 163, 184, 0.7)', label: 'Unexplored' }
@@ -232,40 +259,37 @@ export class GraphExplorerView extends BasesView {
                 }
             case 'confidence':
                 return {
-                    title: 'Confidence level',
+                    title: 'Color — confidence',
                     entries: [
                         { color: 'rgba(34, 197, 94, 0.9)', label: 'High' },
                         { color: 'rgba(234, 179, 8, 0.9)', label: 'Medium' },
                         { color: 'rgba(249, 115, 22, 0.9)', label: 'Low' },
-                        { color: 'rgba(239, 68, 68, 0.9)', label: 'Uncertain' },
-                        { color: 'rgba(148, 163, 184, 0.7)', label: 'Unknown' }
+                        { color: 'rgba(239, 68, 68, 0.9)', label: 'Uncertain' }
                     ]
                 }
             case 'wiki_role':
                 return {
-                    title: 'Wiki role',
+                    title: 'Color — wiki role',
                     entries: [
-                        { color: 'rgba(59, 130, 246, 0.9)', label: 'Article' },
-                        { color: 'rgba(168, 85, 247, 0.9)', label: 'Index' },
-                        { color: 'rgba(20, 184, 166, 0.9)', label: 'Log' },
-                        { color: 'rgba(234, 179, 8, 0.9)', label: 'Source summary' },
-                        { color: 'rgba(148, 163, 184, 0.7)', label: 'Unknown' }
+                        { color: 'rgba(59, 130, 246, 0.9)', label: 'Article \u25CB' },
+                        { color: 'rgba(168, 85, 247, 0.9)', label: 'Index \u25C7' },
+                        { color: 'rgba(20, 184, 166, 0.9)', label: 'Log \u25A1' },
+                        { color: 'rgba(234, 179, 8, 0.9)', label: 'Source summary \u2B21' }
                     ]
                 }
             case 'maturity':
                 return {
-                    title: 'Maturity level',
+                    title: 'Color — maturity',
                     entries: [
                         { color: 'rgba(34, 197, 94, 0.9)', label: 'Mature' },
                         { color: 'rgba(59, 130, 246, 0.9)', label: 'Substantial' },
                         { color: 'rgba(234, 179, 8, 0.9)', label: 'Draft' },
-                        { color: 'rgba(249, 115, 22, 0.9)', label: 'Stub' },
-                        { color: 'rgba(148, 163, 184, 0.7)', label: 'Unknown' }
+                        { color: 'rgba(249, 115, 22, 0.9)', label: 'Stub' }
                     ]
                 }
             case 'created':
                 return {
-                    title: 'Creation date',
+                    title: 'Color — creation date',
                     entries: [
                         { color: 'rgba(34, 197, 94, 0.9)', label: 'Recent' },
                         { color: 'rgba(148, 163, 184, 0.7)', label: 'Older' }
@@ -273,7 +297,7 @@ export class GraphExplorerView extends BasesView {
                 }
             default:
                 return {
-                    title: `Color by: ${colorBy}`,
+                    title: `Color — ${colorBy}`,
                     entries: [{ color: 'rgba(148, 163, 184, 0.7)', label: 'Varies by value' }]
                 }
         }

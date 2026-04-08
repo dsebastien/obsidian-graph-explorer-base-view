@@ -3,16 +3,22 @@ import { Component } from 'obsidian'
 export interface LegendEntry {
     color: string
     label: string
+    /** 'swatch' = filled circle (default), 'ring' = hollow ring, 'dot' = small dot */
+    style?: 'swatch' | 'ring' | 'dot'
 }
 
-export interface LegendConfig {
+export interface LegendSection {
     title: string
     entries: LegendEntry[]
 }
 
+export interface LegendConfig {
+    sections: LegendSection[]
+}
+
 /**
- * Toggleable color legend panel displayed near the zoom controls.
- * Shows what colors mean based on the current color-by mode.
+ * Toggleable legend panel displayed near the zoom controls.
+ * Shows what colors, rings, and indicators mean.
  */
 export class GraphLegend extends Component {
     private toggleBtn: HTMLElement
@@ -25,7 +31,7 @@ export class GraphLegend extends Component {
         this.toggleBtn = containerEl.createEl('button', {
             text: '\u25A3',
             cls: 'ge-legend__toggle clickable-icon',
-            attr: { 'aria-label': 'Toggle color legend', 'title': 'Toggle color legend' }
+            attr: { 'aria-label': 'Toggle legend', 'title': 'Toggle legend' }
         })
         this.registerDomEvent(this.toggleBtn, 'click', () => this.toggle())
 
@@ -40,14 +46,23 @@ export class GraphLegend extends Component {
     update(config: LegendConfig): void {
         this.panelEl.empty()
 
-        const titleEl = this.panelEl.createDiv({ cls: 'ge-legend__title' })
-        titleEl.textContent = config.title
+        for (const section of config.sections) {
+            if (section.entries.length === 0) continue
+            const sectionEl = this.panelEl.createDiv({ cls: 'ge-legend__section' })
+            sectionEl.createDiv({ cls: 'ge-legend__title', text: section.title })
 
-        for (const entry of config.entries) {
-            const row = this.panelEl.createDiv({ cls: 'ge-legend__entry' })
-            const swatch = row.createDiv({ cls: 'ge-legend__swatch' })
-            swatch.style.backgroundColor = entry.color
-            row.createSpan({ text: entry.label, cls: 'ge-legend__label' })
+            for (const entry of section.entries) {
+                const row = sectionEl.createDiv({ cls: 'ge-legend__entry' })
+                const indicatorStyle = entry.style ?? 'swatch'
+                const indicator = row.createDiv({
+                    cls: `ge-legend__indicator ge-legend__indicator--${indicatorStyle}`
+                })
+                indicator.style.borderColor = entry.color
+                if (indicatorStyle === 'swatch' || indicatorStyle === 'dot') {
+                    indicator.style.backgroundColor = entry.color
+                }
+                row.createSpan({ text: entry.label, cls: 'ge-legend__label' })
+            }
         }
     }
 
