@@ -2,9 +2,13 @@ import { describe, test, expect, mock } from 'bun:test'
 import {
     isNoteExplored,
     setNoteExplored,
+    getNoteConfidence,
+    getNoteWikiRole,
     getNoteMaturity,
     getNoteGraduatedNotes,
-    setNoteMaturity
+    setNoteMaturity,
+    getNoteTags,
+    getNoteFrontmatter
 } from './frontmatter-utils'
 
 describe('isNoteExplored', () => {
@@ -72,6 +76,82 @@ describe('setNoteExplored', () => {
 
         await setNoteExplored(app, file, 'explored', false)
         expect(processFrontMatter).toHaveBeenCalledTimes(1)
+    })
+})
+
+describe('getNoteConfidence', () => {
+    test('returns unknown when frontmatter is missing', () => {
+        expect(getNoteConfidence({})).toBe('unknown')
+        expect(getNoteConfidence(null)).toBe('unknown')
+    })
+
+    test('returns valid confidence levels', () => {
+        expect(getNoteConfidence({ frontmatter: { confidence: 'high' } })).toBe('high')
+        expect(getNoteConfidence({ frontmatter: { confidence: 'medium' } })).toBe('medium')
+        expect(getNoteConfidence({ frontmatter: { confidence: 'low' } })).toBe('low')
+        expect(getNoteConfidence({ frontmatter: { confidence: 'uncertain' } })).toBe('uncertain')
+    })
+
+    test('reads from wiki_confidence as fallback', () => {
+        expect(getNoteConfidence({ frontmatter: { wiki_confidence: 'high' } })).toBe('high')
+    })
+
+    test('returns unknown for invalid values', () => {
+        expect(getNoteConfidence({ frontmatter: { confidence: 'very_high' } })).toBe('unknown')
+    })
+})
+
+describe('getNoteWikiRole', () => {
+    test('returns unknown when frontmatter is missing', () => {
+        expect(getNoteWikiRole({})).toBe('unknown')
+        expect(getNoteWikiRole(null)).toBe('unknown')
+    })
+
+    test('returns valid wiki roles', () => {
+        expect(getNoteWikiRole({ frontmatter: { wiki_role: 'article' } })).toBe('article')
+        expect(getNoteWikiRole({ frontmatter: { wiki_role: 'index' } })).toBe('index')
+        expect(getNoteWikiRole({ frontmatter: { wiki_role: 'log' } })).toBe('log')
+        expect(getNoteWikiRole({ frontmatter: { wiki_role: 'source_summary' } })).toBe(
+            'source_summary'
+        )
+    })
+
+    test('returns unknown for invalid values', () => {
+        expect(getNoteWikiRole({ frontmatter: { wiki_role: 'page' } })).toBe('unknown')
+    })
+})
+
+describe('getNoteTags', () => {
+    test('returns empty array when tags are missing', () => {
+        expect(getNoteTags({})).toEqual([])
+        expect(getNoteTags(null)).toEqual([])
+    })
+
+    test('returns tag strings from metadata', () => {
+        const pos = { start: { line: 0, col: 0, offset: 0 }, end: { line: 0, col: 0, offset: 0 } }
+        const metadata = {
+            tags: [
+                { tag: '#foo', position: pos },
+                { tag: '#bar', position: pos }
+            ]
+        }
+        expect(getNoteTags(metadata)).toEqual(['#foo', '#bar'])
+    })
+})
+
+describe('getNoteFrontmatter', () => {
+    test('returns empty object when frontmatter is missing', () => {
+        expect(getNoteFrontmatter({})).toEqual({})
+        expect(getNoteFrontmatter(null)).toEqual({})
+    })
+
+    test('returns frontmatter properties excluding position', () => {
+        const metadata = {
+            frontmatter: { title: 'Test', confidence: 'high', position: { start: 0, end: 10 } }
+        }
+        const result = getNoteFrontmatter(metadata)
+        expect(result).toEqual({ title: 'Test', confidence: 'high' })
+        expect('position' in result).toBe(false)
     })
 })
 

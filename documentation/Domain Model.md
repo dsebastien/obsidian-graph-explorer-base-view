@@ -11,11 +11,15 @@ A vault note represented as a graph node.
 - `external`: Whether this node is outside the Base filter
 - `confidence`: Confidence level — `high` | `medium` | `low` | `uncertain` | `unknown`
 - `wikiRole`: Structural role — `article` | `index` | `log` | `source_summary` | `unknown`
+- `maturity`: Maturity level — `stub` | `draft` | `substantial` | `mature` | `unknown`
+- `graduatedNotes`: Array of graduated permanent note names (from frontmatter)
 - `created`: Creation timestamp in ms (from frontmatter `created`/`date` or file stat), nullable
 - `tags`: Array of tags from the note
 - `frontmatter`: All raw frontmatter properties (for generic visualization)
 - `frontier`: Whether this is an unresolved link target (note doesn't exist)
 - `batchSelected`: Whether this node is part of a batch selection (optional)
+- `x`, `y`: Current position (managed by force-graph)
+- `fx`, `fy`: Fixed/pinned position (set when user drags a node)
 
 ## GraphLink
 
@@ -39,6 +43,8 @@ A connection between two notes derived from wiki-links.
 - `unexploredCount`: Number of unexplored notes
 - `confidenceDistribution`: Count per confidence level
 - `roleDistribution`: Count per wiki role
+- `maturityDistribution`: Count per maturity level
+- `graduatedCount`: Number of notes with graduated permanent notes
 - `frontierCount`: Number of frontier nodes
 - `coveragePercent`: Explored / (explored + unexplored) as percentage
 
@@ -46,11 +52,15 @@ A connection between two notes derived from wiki-links.
 
 Filter mode: `'all'` | `'explored'` | `'unexplored'`
 
+## MaturityLevel
+
+Maturity levels: `'stub'` | `'draft'` | `'substantial'` | `'mature'` | `'unknown'`
+
 ## ViewPreset
 
 Named configuration bundles: `key`, `name`, `description`, `config` (key-value pairs for view options).
 
-Built-in presets: `wiki-explorer`, `exploration-progress`, `role-overview`.
+Built-in presets: `wiki-explorer`, `exploration-progress`, `role-overview`, `maturity-pipeline`.
 
 ## Explored Property
 
@@ -58,6 +68,7 @@ Built-in presets: `wiki-explorer`, `exploration-progress`, `role-overview`.
 - Missing property = `false` (unexplored)
 - Set via `app.fileManager.processFrontMatter()`
 - Also updated optimistically on the in-memory `GraphNode` for immediate UI feedback
+- Visual encoding: explored = solid fill + green border; unexplored = hollow outline
 
 ## Confidence Property
 
@@ -69,3 +80,24 @@ Built-in presets: `wiki-explorer`, `exploration-progress`, `role-overview`.
 - Read from frontmatter `wiki_role`
 - Values: `article`, `index`, `log`, `source_summary` (anything else = `unknown`)
 - Determines node shape in the graph
+
+## Maturity Property
+
+- Read from and written to frontmatter (configurable property name, default: `maturity`)
+- Values: `stub`, `draft`, `substantial`, `mature` (anything else = `unknown`)
+- Editable from side panel dropdown, context menu, and batch actions
+- Setting to `unknown` removes the property from frontmatter
+
+## Graduated Notes Property
+
+- Read from frontmatter (configurable property name, default: `graduated_notes`)
+- Array of strings (permanent note names)
+- Visual encoding: purple dot at top-right of node
+
+## Node Position Persistence
+
+- Positions saved as `{ x, y }` keyed by file path in the view's config
+- Stored as JSON string under config key `nodePositions`
+- Set on drag end via `onNodeDragEnd` callback
+- Restored on graph load by setting `fx`/`fy` (pins the node)
+- Stale entries (files no longer in vault) are pruned automatically on each graph rebuild

@@ -102,7 +102,8 @@ export class GraphExplorerView extends BasesView {
             onNodeDoubleClick: (node) => this.handleNodeDoubleClick(node),
             onBackgroundClick: () => this.handleBackgroundClick(),
             onNodeRightClick: (node, event) => this.handleNodeRightClick(node, event),
-            onBatchSelectionChange: (ids) => this.handleBatchSelectionChange(ids)
+            onBatchSelectionChange: (ids) => this.handleBatchSelectionChange(ids),
+            onNodeDragEnd: (nodeId, x, y) => this.handleNodeDragEnd(nodeId, x, y)
         })
         this.addChild(this.graphCanvas)
 
@@ -338,6 +339,9 @@ export class GraphExplorerView extends BasesView {
         }
         this.viewEl?.querySelector('.ge-empty-state')?.remove()
 
+        const positions = this.getSavedPositions()
+        this.pruneStalePositions(positions)
+        this.graphCanvas?.setSavedPositions(positions)
         this.graphCanvas?.setData(this.currentGraphData)
 
         // Update stats
@@ -546,6 +550,37 @@ export class GraphExplorerView extends BasesView {
 
     private handleBatchSelectionChange(selectedIds: Set<string>): void {
         this.controls?.setBatchSelectionCount(selectedIds.size)
+    }
+
+    // ── Node positions ───────────────────────────────────────
+
+    private handleNodeDragEnd(nodeId: string, x: number, y: number): void {
+        const positions = this.getSavedPositions()
+        positions[nodeId] = { x, y }
+        this.config?.set('nodePositions', JSON.stringify(positions))
+    }
+
+    private getSavedPositions(): Record<string, { x: number; y: number }> {
+        const raw = this.config?.get('nodePositions') as string | undefined
+        if (!raw) return {}
+        try {
+            return JSON.parse(raw) as Record<string, { x: number; y: number }>
+        } catch {
+            return {}
+        }
+    }
+
+    private pruneStalePositions(positions: Record<string, { x: number; y: number }>): void {
+        let changed = false
+        for (const path of Object.keys(positions)) {
+            if (!this.app.vault.getAbstractFileByPath(path)) {
+                delete positions[path]
+                changed = true
+            }
+        }
+        if (changed) {
+            this.config?.set('nodePositions', JSON.stringify(positions))
+        }
     }
 
     private async handleBatchToggleExplored(): Promise<void> {

@@ -15,6 +15,7 @@ export interface GraphCanvasCallbacks {
     onBackgroundClick: () => void
     onNodeRightClick: (node: GraphNode, event: MouseEvent) => void
     onBatchSelectionChange: (selectedIds: Set<string>) => void
+    onNodeDragEnd: (nodeId: string, x: number, y: number) => void
 }
 
 /** Categorical color palette for generic property visualization */
@@ -135,6 +136,14 @@ export class GraphCanvas extends Component {
                     this.callbacks.onBackgroundClick()
                 }
             })
+            .onNodeDragEnd((node: GraphNode) => {
+                if (node.id && node.x != null && node.y != null) {
+                    // Pin the node at its dragged position
+                    node.fx = node.x
+                    node.fy = node.y
+                    this.callbacks.onNodeDragEnd(node.id, node.x, node.y)
+                }
+            })
 
         this.applyForceConfig()
     }
@@ -189,8 +198,28 @@ export class GraphCanvas extends Component {
 
     // ── Data ──────────────────────────────────────────────────
 
+    private savedPositions: Map<string, { x: number; y: number }> = new Map()
+
+    setSavedPositions(positions: Record<string, { x: number; y: number }>): void {
+        this.savedPositions.clear()
+        for (const [id, pos] of Object.entries(positions)) {
+            this.savedPositions.set(id, pos)
+        }
+    }
+
     setData(data: GraphData): void {
         if (!this.graph) return
+
+        // Apply saved positions to nodes (pin them with fx/fy)
+        for (const node of data.nodes) {
+            const saved = this.savedPositions.get(node.id)
+            if (saved) {
+                node.x = saved.x
+                node.y = saved.y
+                node.fx = saved.x
+                node.fy = saved.y
+            }
+        }
 
         // Reset fade state for new data
         this.nodeAlphas.clear()

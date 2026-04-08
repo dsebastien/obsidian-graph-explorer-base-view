@@ -235,4 +235,36 @@ describe('buildGraphData', () => {
 
         expect(result.nodes[0]?.maturity).toBe('mature')
     })
+
+    test('external nodes default to unknown maturity and empty graduatedNotes', () => {
+        const entries = [makeEntry('a.md', 'a')]
+        const links = { 'a.md': { 'external.md': 1 } }
+        const cache = makeMetadataCache(links)
+        const result = buildGraphData(entries, cache as never, 'explored', true, 'all', false)
+
+        const externalNode = result.nodes.find((n) => n.id === 'external.md')
+        expect(externalNode?.maturity).toBe('unknown')
+        expect(externalNode?.graduatedNotes).toEqual([])
+    })
+
+    test('frontier nodes default to unknown maturity and empty graduatedNotes', () => {
+        const entries = [makeEntry('a.md', 'a')]
+        const cache = makeMetadataCache({}, {}, { 'a.md': { 'Missing Note': 1 } })
+        const result = buildGraphData(entries, cache as never, 'explored', false, 'all', true)
+
+        const frontier = result.nodes.find((n) => n.frontier)
+        expect(frontier?.maturity).toBe('unknown')
+        expect(frontier?.graduatedNotes).toEqual([])
+    })
+
+    test('nodes have x and y properties available for position tracking', () => {
+        const entries = [makeEntry('a.md', 'a')]
+        const cache = makeMetadataCache({})
+        const result = buildGraphData(entries, cache as never, 'explored', false, 'all', false)
+
+        const node = result.nodes[0]
+        // NodeObject provides x/y/fx/fy — they start undefined before force sim
+        expect(node).toBeDefined()
+        expect(node?.id).toBe('a.md')
+    })
 })

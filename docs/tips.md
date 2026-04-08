@@ -31,14 +31,35 @@
 2. Nodes are colored by maturity level — orange (stubs) and yellow (drafts) need deepening
 3. Blue nodes (substantial) are getting close; green nodes (mature) are graduation candidates
 4. Nodes with a small purple dot have already graduated permanent notes
-5. The maturity distribution in the stats panel shows the overall pipeline health
-6. Use this view to identify which articles to deepen next for the biggest knowledge payoff
+5. Right-click or use the side panel dropdown to set maturity directly from the graph
+6. Batch-select multiple stubs and set them all to "draft" in one action
+7. The maturity distribution in the stats panel shows the overall pipeline health
 
 ### Batch exploration
 
 1. Right-click nodes or use Shift+Enter to batch-select multiple notes
-2. Use the **Toggle explored** button in the controls to flip them all at once
-3. Useful for marking a group of related notes as reviewed
+2. Use the **Toggle explored** button to flip them all at once
+3. Use the **Set maturity** dropdown to assign maturity levels in bulk
+4. Useful for processing a group of related notes together
+
+### Organizing your graph layout
+
+1. Drag nodes to arrange them meaningfully — positions are saved automatically
+2. Reopen the view later and your layout is preserved
+3. Nodes you haven't dragged are still positioned by the force simulation
+4. Useful for creating stable visual clusters of related content
+
+## Understanding the visual encoding
+
+The graph uses a minimal set of visual channels to avoid overload:
+
+- **Fill color** = the property you're viewing (confidence, maturity, wiki role, etc.)
+- **Shape** = wiki role (circle, diamond, square, hexagon)
+- **Green border** = explored (reviewed)
+- **Hollow outline** = unexplored (not yet reviewed)
+- **Purple dot** = has graduated notes
+
+Use the **legend button** (◣) at the bottom-right to see what colors mean at any time.
 
 ## Performance tips
 
@@ -59,7 +80,7 @@
 
 - Check that the configured explored property name matches what's in your frontmatter
 - The default property is `explored` — if you use a different name, set it in plugin settings or view options
-- After toggling, the green ring should appear immediately around the node
+- After toggling, a green border should appear immediately around the node
 
 ### Nodes are all the same color
 

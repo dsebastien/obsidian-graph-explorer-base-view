@@ -2,42 +2,48 @@
 
 ## Plugin settings
 
-Global settings available in **Settings > Community plugins > Graph Explorer Base View**:
+Global settings available in **Settings > Community plugins > Graph Explorer Base View**. These define the defaults used when a new Base view is created. After creation, each view's settings are independent.
 
 | Setting                   | Type     | Default           | Description                                                                                   |
 | ------------------------- | -------- | ----------------- | --------------------------------------------------------------------------------------------- |
 | Default explored property | text     | `explored`        | Frontmatter property name used to track exploration status                                    |
-| Maturity property         | text     | `maturity`        | Frontmatter property name used to read article maturity level                                 |
+| Maturity property         | text     | `maturity`        | Frontmatter property name used to read/write article maturity level                           |
 | Graduated notes property  | text     | `graduated_notes` | Frontmatter property name used to read the list of graduated permanent notes                  |
 | Default color scheme      | dropdown | `explored`        | How nodes are colored in new views (explored, confidence, wiki_role, maturity, created, tags) |
 | Default size scheme       | dropdown | `connections`     | How nodes are sized in new views (connections, uniform)                                       |
 | Show frontier by default  | toggle   | `false`           | Whether new views show frontier (unresolved link) nodes                                       |
+| Show external by default  | toggle   | `false`           | Whether new views show external (linked but outside Base) nodes                               |
+| Default explored filter   | dropdown | `all`             | Default filter for explored status in new views                                               |
 | Node spacing              | slider   | `1500`            | Force repulsion strength between nodes (200–5000)                                             |
 
 ## View options
 
-Each Base view instance can override plugin defaults. Access these via the Base view's configuration:
+Each Base view instance has its own settings, initialized from plugin defaults at creation time. Access these via the Base view's configuration:
 
-| Option                                 | Type     | Default       | Description                                                   |
-| -------------------------------------- | -------- | ------------- | ------------------------------------------------------------- |
-| Explored property name                 | text     | `explored`    | Override the frontmatter property for this view               |
-| Show linked notes outside the base     | toggle   | `false`       | Include nodes linked from the Base but not matching its query |
-| Show frontier nodes (unresolved links) | toggle   | `false`       | Show placeholder nodes for links to non-existent notes        |
-| Filter by explored status              | dropdown | `all`         | Show all notes, explored only, or unexplored only             |
-| Color nodes by                         | dropdown | `explored`    | Property used for node coloring                               |
-| Size nodes by                          | dropdown | `connections` | Property used for node sizing                                 |
-| View preset                            | dropdown | `Custom`      | Apply a built-in preset configuration                         |
+| Option                                 | Type     | Default     | Description                                                   |
+| -------------------------------------- | -------- | ----------- | ------------------------------------------------------------- |
+| Explored property name                 | text     | from plugin | Frontmatter property for explored status                      |
+| Maturity property name                 | text     | from plugin | Frontmatter property for maturity level                       |
+| Graduated notes property name          | text     | from plugin | Frontmatter property for graduated notes list                 |
+| Show linked notes outside the base     | toggle   | from plugin | Include nodes linked from the Base but not matching its query |
+| Show frontier nodes (unresolved links) | toggle   | from plugin | Show placeholder nodes for links to non-existent notes        |
+| Filter by explored status              | dropdown | from plugin | Show all notes, explored only, or unexplored only             |
+| Color nodes by                         | dropdown | from plugin | Property used for node coloring                               |
+| Size nodes by                          | dropdown | from plugin | Property used for node sizing                                 |
+| View preset                            | dropdown | from plugin | Apply a built-in preset configuration                         |
+
+All view options inherit their initial value from plugin settings. After that, they are independent — changing plugin settings does not affect existing views.
 
 ## View presets
 
 Four built-in presets configure multiple view options at once:
 
-| Preset               | Color by   | Size by     | Frontier | External | Description                                     |
-| -------------------- | ---------- | ----------- | -------- | -------- | ----------------------------------------------- |
-| LLM Wiki Explorer    | confidence | connections | yes      | yes      | Focus on article quality and coverage           |
-| Exploration Progress | explored   | connections | no       | no       | Track what you've reviewed vs what's new        |
-| Role Overview        | wiki_role  | connections | no       | no       | See the structural roles in your knowledge base |
-| Maturity Pipeline    | maturity   | connections | no       | no       | Track article depth and graduation readiness    |
+| Preset               | Color by   | Size by     | Frontier | External | Description                                          |
+| -------------------- | ---------- | ----------- | -------- | -------- | ---------------------------------------------------- |
+| LLM Wiki Explorer    | confidence | connections | yes      | yes      | Quality review: colors show confidence, reveals gaps |
+| Exploration Progress | explored   | connections | no       | no       | Reading tracker: green = reviewed, gray = untouched  |
+| Role Overview        | wiki_role  | connections | no       | no       | Structure map: see note types and organization       |
+| Maturity Pipeline    | maturity   | connections | no       | no       | Writing pipeline: track article depth and readiness  |
 
 ## Frontmatter properties
 
@@ -55,14 +61,16 @@ The plugin reads the following frontmatter properties from notes:
 
 Any other frontmatter properties are available for color-by and size-by visualization.
 
-## Maturity visualization
+## Maturity editing
 
-When maturity data is available, the plugin provides:
+The plugin can both read and write maturity levels. You can set a note's maturity from:
 
-- **Color-by maturity**: Nodes colored by maturity level (green=mature, blue=substantial, yellow=draft, orange=stub)
-- **Maturity ring**: When not coloring by maturity, a subtle ring around each node shows its maturity level
-- **Graduated indicator**: A small purple dot appears on nodes that have graduated permanent notes
-- **Stats distribution**: The controls panel shows maturity distribution alongside confidence distribution
-- **Side panel badges**: Maturity level and graduated notes count shown as colored badges
+- **Side panel** — color-coded dropdown in the action buttons row
+- **Context menu** — right-click a node and pick from the 4 maturity levels
+- **Batch actions** — select multiple nodes and set maturity on all at once
 
-The maturity and graduated_notes property names are configurable in plugin settings, so the plugin works with any frontmatter schema that uses these concepts.
+Setting "No maturity" removes the property from the note's frontmatter.
+
+## Node position persistence
+
+Dragged node positions are saved in each view's configuration and restored when the view is reopened. Positions for files that no longer exist in the vault are automatically cleaned up.
