@@ -45,9 +45,10 @@
 ### Organizing your graph layout
 
 1. Drag nodes to arrange them meaningfully — positions are saved automatically
-2. Reopen the view later and your layout is preserved
-3. Nodes you haven't dragged are still positioned by the force simulation
-4. Useful for creating stable visual clusters of related content
+2. **Shift+drag** to move a node and all its direct neighbors as a group
+3. Reopen the view later and your layout is preserved
+4. Nodes you haven't dragged are still positioned by the force simulation
+5. Useful for creating stable visual clusters of related content
 
 ## Understanding the visual encoding
 

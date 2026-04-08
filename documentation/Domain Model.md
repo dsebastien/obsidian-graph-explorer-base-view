@@ -101,3 +101,11 @@ Built-in presets: `wiki-explorer`, `exploration-progress`, `role-overview`, `mat
 - Set on drag end via `onNodeDragEnd` callback
 - Restored on graph load by setting `fx`/`fy` (pins the node)
 - Stale entries (files no longer in vault) are pruned automatically on each graph rebuild
+
+## Group Drag (Shift+Drag)
+
+- Shift+drag moves a node and all its direct neighbors as a cluster
+- On drag start: captures relative offsets of all neighbors via adjacency map
+- During drag: neighbors are temporarily pinned (`fx`/`fy`) at their offset from the dragged node
+- On drag end: previously pinned neighbors update their saved positions; unpinned neighbors are released to the simulation
+- Without Shift: standard single-node drag behavior

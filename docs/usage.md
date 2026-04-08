@@ -17,6 +17,7 @@
 | Double-click node | Open note in a new tab                                                          |
 | Right-click node  | Context menu (open, explored toggle, set maturity, copy wikilink, batch select) |
 | Drag node         | Reposition it in the graph (position is saved and restored on reopen)           |
+| Shift+drag node   | Move the node and all its direct neighbors as a group                           |
 | Scroll wheel      | Zoom in/out                                                                     |
 | Click background  | Deselect node, close side panel                                                 |
 
@@ -123,6 +124,8 @@ Nodes can be colored by different properties (configurable in view options):
 ## Node position persistence
 
 When you drag a node to reposition it, the position is saved in the view's configuration. Reopening the view restores all dragged nodes to their saved positions. Nodes you haven't dragged are positioned by the force simulation as usual.
+
+**Shift+drag** moves a node and all its direct neighbors as a group, maintaining their relative positions. On release, the main node stays pinned. Neighbors that were already pinned update their saved positions; unpinned neighbors are released back to the force simulation.
 
 Saved positions are keyed by file path. If a note is renamed, moved, or deleted, its stale position entry is automatically cleaned up on the next graph load.
 

@@ -38,8 +38,10 @@ Graph Explorer Base View is an Obsidian plugin that registers a custom Base view
 - Color modes: explored, confidence, wiki_role, maturity, created, tags, custom frontmatter properties
 - Size modes: connection count, uniform
 - Node position persistence: accepts saved positions via `setSavedPositions()`, pins nodes with `fx`/`fy` on drag end
-- Adjacency map for keyboard neighbor navigation
+- Group drag (Shift+drag): moves a node and its direct neighbors as a cluster, maintaining relative positions
+- Adjacency map for keyboard neighbor navigation and group drag
 - Batch selection support
+- Tracks Shift key state for group drag via document keydown/keyup listeners
 - Handles click (with double-click detection), hover, drag, drag-end, zoom interactions
 - ResizeObserver for responsive sizing
 

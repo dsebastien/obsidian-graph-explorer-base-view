@@ -60,6 +60,10 @@ export class GraphCanvas extends Component {
     private lastFrameTimeMs = 0
     private static readonly FADE_SPEED = 7 // exponential convergence rate
 
+    // Group drag state (Shift+drag moves neighbors)
+    private shiftHeld = false
+    private dragNeighborOffsets: Map<string, { dx: number; dy: number }> | null = null
+
     // Visualization config
     private colorByProperty = 'explored'
     private sizeByProperty = 'connections'
@@ -80,6 +84,12 @@ export class GraphCanvas extends Component {
     override onload(): void {
         this.initGraph()
         this.setupResizeObserver()
+        this.registerDomEvent(document, 'keydown', (e) => {
+            if (e.key === 'Shift') this.shiftHeld = true
+        })
+        this.registerDomEvent(document, 'keyup', (e) => {
+            if (e.key === 'Shift') this.shiftHeld = false
+        })
     }
 
     override onunload(): void {
@@ -136,9 +146,62 @@ export class GraphCanvas extends Component {
                     this.callbacks.onBackgroundClick()
                 }
             })
+            .onNodeDrag((node: GraphNode) => {
+                if (!this.shiftHeld) {
+                    this.dragNeighborOffsets = null
+                    return
+                }
+                if (node.x == null || node.y == null) return
+
+                // First drag tick with shift — capture neighbor offsets
+                if (!this.dragNeighborOffsets) {
+                    this.dragNeighborOffsets = new Map()
+                    const neighbors = this.adjacencyMap.get(node.id)
+                    if (neighbors) {
+                        for (const neighborId of neighbors) {
+                            const neighbor = this.nodeMap.get(neighborId)
+                            if (neighbor?.x != null && neighbor?.y != null) {
+                                this.dragNeighborOffsets.set(neighborId, {
+                                    dx: neighbor.x - node.x,
+                                    dy: neighbor.y - node.y
+                                })
+                            }
+                        }
+                    }
+                }
+
+                // Move neighbors with the dragged node
+                for (const [neighborId, offset] of this.dragNeighborOffsets) {
+                    const neighbor = this.nodeMap.get(neighborId)
+                    if (neighbor) {
+                        neighbor.fx = node.x + offset.dx
+                        neighbor.fy = node.y + offset.dy
+                    }
+                }
+            })
             .onNodeDragEnd((node: GraphNode) => {
+                // Handle group-dragged neighbors
+                if (this.dragNeighborOffsets) {
+                    for (const [neighborId] of this.dragNeighborOffsets) {
+                        const neighbor = this.nodeMap.get(neighborId)
+                        if (!neighbor) continue
+
+                        if (this.savedPositions.has(neighborId)) {
+                            // Was previously pinned — update saved position
+                            if (neighbor.fx != null && neighbor.fy != null) {
+                                this.callbacks.onNodeDragEnd(neighborId, neighbor.fx, neighbor.fy)
+                            }
+                        } else {
+                            // Was not pinned — release to simulation
+                            neighbor.fx = undefined
+                            neighbor.fy = undefined
+                        }
+                    }
+                    this.dragNeighborOffsets = null
+                }
+
+                // Pin the dragged node
                 if (node.id && node.x != null && node.y != null) {
-                    // Pin the node at its dragged position
                     node.fx = node.x
                     node.fy = node.y
                     this.callbacks.onNodeDragEnd(node.id, node.x, node.y)
