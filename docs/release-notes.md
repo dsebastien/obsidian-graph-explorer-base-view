@@ -1,5 +1,16 @@
 # Release Notes
 
+## 0.4.0 (2026-04-08)
+
+### Features
+
+- **all:** added maturity management
+- **all:** added support for changing node positions (mind palace). Updated user guide
+- **all:** improved colors ux
+- **all:** improved graph options and added legend (prev commit)
+- **all:** improved maturity dropdown styling
+- **all:** refactored settings
+
 ## 0.3.0 (2026-04-07)
 
 ### Features

@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/0.3.0...0.4.0) (2026-04-08)
+
+### Features
+
+* **all:** added maturity management ([16a2f4d](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/16a2f4d9b0992a41e505b1fcd4698b64ec705da9))
+* **all:** added support for changing node positions (mind palace). Updated user guide ([d1ec9d6](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/d1ec9d6a3b798ee7c688a1e2ea424866b6283ada))
+* **all:** improved colors ux ([09dc0b1](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/09dc0b1f31a433e51d8df6e6a139bdc01ce6d4c1))
+* **all:** improved graph options and added legend (prev commit) ([cdd32e4](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/cdd32e465b3697c9ea7be51fdb35df5df523edc1))
+* **all:** improved maturity dropdown styling ([7a700a4](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/7a700a4e9fa05cfeb17957ec1ea622633c623de8))
+* **all:** refactored settings ([58dba33](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/58dba33bd5037dc2510d2ed4afcf744ed01cda81))
+
 ## [0.3.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/0.2.0...0.3.0) (2026-04-07)
 
 ### Features
@@ -91,6 +102,7 @@ All notable changes to this project will be documented in this file.
 ## [1.2.0](https://github.com/your-username/obsidian-my-plugin/compare/1.1.0...1.2.0) (2024-05-14)
 ## [1.1.0](https://github.com/your-username/obsidian-my-plugin/compare/1.0.0...1.1.0) (2024-05-13)
 ## 1.0.0 (2024-04-26)
+
 
 
 
