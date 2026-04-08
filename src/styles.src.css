@@ -164,24 +164,28 @@
     background-color: rgba(239, 68, 68, 0.15);
 }
 
-/* Maturity badges (side panel) */
-.ge-side-panel__maturity-badge--mature {
+/* Maturity select value-based colors (side panel) */
+.ge-side-panel__maturity-select--mature {
     color: rgba(22, 163, 74, 1);
+    border-color: rgba(34, 197, 94, 0.4);
     background-color: rgba(34, 197, 94, 0.15);
 }
 
-.ge-side-panel__maturity-badge--substantial {
+.ge-side-panel__maturity-select--substantial {
     color: rgba(37, 99, 235, 1);
+    border-color: rgba(59, 130, 246, 0.4);
     background-color: rgba(59, 130, 246, 0.15);
 }
 
-.ge-side-panel__maturity-badge--draft {
+.ge-side-panel__maturity-select--draft {
     color: rgba(202, 138, 4, 1);
+    border-color: rgba(234, 179, 8, 0.4);
     background-color: rgba(234, 179, 8, 0.15);
 }
 
-.ge-side-panel__maturity-badge--stub {
+.ge-side-panel__maturity-select--stub {
     color: rgba(234, 88, 12, 1);
+    border-color: rgba(249, 115, 22, 0.4);
     background-color: rgba(249, 115, 22, 0.15);
 }
 

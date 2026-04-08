@@ -199,19 +199,6 @@ export class GraphSidePanel extends Component {
                 attr: { title: confDescriptions[node.confidence] ?? node.confidence }
             })
         }
-        if (node.maturity !== 'unknown') {
-            const maturityDescriptions: Record<string, string> = {
-                stub: 'Stub: minimal content, placeholder',
-                draft: 'Draft: some content, needs depth',
-                substantial: 'Substantial: decent reference material',
-                mature: 'Mature: deep, well-sourced, ready for graduation'
-            }
-            badgesEl.createSpan({
-                text: node.maturity,
-                cls: `ge-side-panel__badge ge-side-panel__maturity-badge ge-side-panel__maturity-badge--${node.maturity}`,
-                attr: { title: maturityDescriptions[node.maturity] ?? node.maturity }
-            })
-        }
         if (node.graduatedNotes.length > 0) {
             badgesEl.createSpan({
                 text: `${node.graduatedNotes.length} graduated`,
@@ -255,7 +242,7 @@ export class GraphSidePanel extends Component {
 
         if (!node.external && !node.frontier) {
             const maturitySelect = actionsEl.createEl('select', {
-                cls: 'ge-side-panel__maturity-select',
+                cls: `ge-side-panel__maturity-select ge-side-panel__maturity-select--${node.maturity}`,
                 attr: {
                     'aria-label': 'Set maturity level',
                     'title': 'Set maturity level'
@@ -263,10 +250,10 @@ export class GraphSidePanel extends Component {
             })
             const levels: { value: MaturityLevel; label: string }[] = [
                 { value: 'unknown', label: 'No maturity' },
-                { value: 'stub', label: 'Stub' },
-                { value: 'draft', label: 'Draft' },
-                { value: 'substantial', label: 'Substantial' },
-                { value: 'mature', label: 'Mature' }
+                { value: 'stub', label: '\u{1F7E0} Stub' },
+                { value: 'draft', label: '\u{1F7E1} Draft' },
+                { value: 'substantial', label: '\u{1F535} Substantial' },
+                { value: 'mature', label: '\u{1F7E2} Mature' }
             ]
             for (const level of levels) {
                 const option = maturitySelect.createEl('option', {
@@ -279,10 +266,10 @@ export class GraphSidePanel extends Component {
             }
             this.registerDomEvent(maturitySelect, 'change', () => {
                 if (this.currentNode) {
-                    this.callbacks.onSetMaturity(
-                        this.currentNode,
-                        maturitySelect.value as MaturityLevel
-                    )
+                    const val = maturitySelect.value as MaturityLevel
+                    this.callbacks.onSetMaturity(this.currentNode, val)
+                    // Update styling to match new value
+                    maturitySelect.className = `ge-side-panel__maturity-select ge-side-panel__maturity-select--${val}`
                 }
             })
         }
