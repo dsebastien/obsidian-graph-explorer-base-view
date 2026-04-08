@@ -1,5 +1,11 @@
 # Release Notes
 
+## 0.5.0 (2026-04-08)
+
+### Features
+
+- **all:** enabled moving node and connected ones
+
 ## 0.4.0 (2026-04-08)
 
 ### Features

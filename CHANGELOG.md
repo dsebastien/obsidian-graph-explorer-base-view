@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/0.4.0...0.5.0) (2026-04-08)
+
+### Features
+
+* **all:** enabled moving node and connected ones ([ef2c5c6](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/ef2c5c6ded078b202a07942dc3226d8a7fb989c7))
+
 ## [0.4.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/0.3.0...0.4.0) (2026-04-08)
 
 ### Features
@@ -102,6 +108,7 @@ All notable changes to this project will be documented in this file.
 ## [1.2.0](https://github.com/your-username/obsidian-my-plugin/compare/1.1.0...1.2.0) (2024-05-14)
 ## [1.1.0](https://github.com/your-username/obsidian-my-plugin/compare/1.0.0...1.1.0) (2024-05-13)
 ## 1.0.0 (2024-04-26)
+
 
 
 
