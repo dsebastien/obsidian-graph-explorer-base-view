@@ -100,7 +100,8 @@ export const VIEW_PRESETS: ViewPreset[] = [
     {
         key: 'wiki-explorer',
         name: 'LLM Wiki Explorer',
-        description: 'Color by confidence, show frontier nodes',
+        description:
+            'Quality review: colors show confidence (green=high, red=uncertain), includes frontier nodes and external links to reveal gaps',
         config: {
             colorBy: 'confidence',
             sizeBy: 'connections',
@@ -113,7 +114,8 @@ export const VIEW_PRESETS: ViewPreset[] = [
     {
         key: 'exploration-progress',
         name: 'Exploration Progress',
-        description: 'Track explored vs unexplored notes',
+        description:
+            'Reading tracker: green nodes are reviewed, gray are untouched — see what percentage of your vault you have explored',
         config: {
             colorBy: 'explored',
             sizeBy: 'connections',
@@ -125,7 +127,8 @@ export const VIEW_PRESETS: ViewPreset[] = [
     {
         key: 'role-overview',
         name: 'Role Overview',
-        description: 'See wiki structure by note role',
+        description:
+            'Structure map: colors show note types (blue=article, purple=index, teal=log, yellow=source summary) — see how your wiki is organized',
         config: {
             colorBy: 'wiki_role',
             sizeBy: 'connections',
@@ -136,7 +139,8 @@ export const VIEW_PRESETS: ViewPreset[] = [
     {
         key: 'maturity-pipeline',
         name: 'Maturity Pipeline',
-        description: 'Track article depth and graduation readiness',
+        description:
+            'Writing pipeline: colors show depth (green=mature, blue=substantial, yellow=draft, orange=stub) — find which articles need deepening',
         config: {
             colorBy: 'maturity',
             sizeBy: 'connections',

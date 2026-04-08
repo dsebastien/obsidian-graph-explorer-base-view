@@ -62,10 +62,10 @@ export function getGraphExplorerViewOptions(): ViewOption[] {
             default: '',
             options: {
                 '': 'Custom',
-                'wiki-explorer': 'LLM Wiki Explorer',
-                'exploration-progress': 'Exploration Progress',
-                'role-overview': 'Role Overview',
-                'maturity-pipeline': 'Maturity Pipeline'
+                'wiki-explorer': 'Wiki Explorer — quality & gaps',
+                'exploration-progress': 'Exploration — reviewed vs new',
+                'role-overview': 'Roles — article types & structure',
+                'maturity-pipeline': 'Maturity — writing depth pipeline'
             }
         } as DropdownOption
     ]
