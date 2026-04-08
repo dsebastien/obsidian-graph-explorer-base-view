@@ -1,30 +1,45 @@
 import type { DropdownOption, TextOption, ToggleOption, ViewOption } from 'obsidian'
+import type { PluginSettings } from '../../types/plugin-settings.intf'
+import { DEFAULT_SETTINGS } from '../../types/plugin-settings.intf'
 
-export function getGraphExplorerViewOptions(): ViewOption[] {
+export function getGraphExplorerViewOptions(settings?: PluginSettings): ViewOption[] {
+    const s = settings ?? DEFAULT_SETTINGS
     return [
         {
             type: 'text',
             key: 'exploredProperty',
             displayName: 'Explored property name',
-            default: 'explored'
+            default: s.exploredPropertyName
+        } as TextOption,
+        {
+            type: 'text',
+            key: 'maturityProperty',
+            displayName: 'Maturity property name',
+            default: s.maturityPropertyName
+        } as TextOption,
+        {
+            type: 'text',
+            key: 'graduatedNotesProperty',
+            displayName: 'Graduated notes property name',
+            default: s.graduatedNotesPropertyName
         } as TextOption,
         {
             type: 'toggle',
             key: 'showExternalNodes',
             displayName: 'Show linked notes outside the base',
-            default: false
+            default: s.showExternalNodesDefault
         } as ToggleOption,
         {
             type: 'toggle',
             key: 'showFrontier',
             displayName: 'Show frontier nodes (unresolved links)',
-            default: false
+            default: s.showFrontierDefault
         } as ToggleOption,
         {
             type: 'dropdown',
             key: 'exploredFilter',
             displayName: 'Filter by explored status',
-            default: 'all',
+            default: s.defaultExploredFilter,
             options: {
                 all: 'All',
                 explored: 'Explored only',
@@ -35,7 +50,7 @@ export function getGraphExplorerViewOptions(): ViewOption[] {
             type: 'dropdown',
             key: 'colorBy',
             displayName: 'Color nodes by',
-            default: 'explored',
+            default: s.defaultColorBy,
             options: {
                 explored: 'Explored status',
                 confidence: 'Confidence level',
@@ -49,7 +64,7 @@ export function getGraphExplorerViewOptions(): ViewOption[] {
             type: 'dropdown',
             key: 'sizeBy',
             displayName: 'Size nodes by',
-            default: 'connections',
+            default: s.defaultSizeBy,
             options: {
                 connections: 'Connection count',
                 uniform: 'Uniform size'
@@ -59,7 +74,7 @@ export function getGraphExplorerViewOptions(): ViewOption[] {
             type: 'dropdown',
             key: 'preset',
             displayName: 'View preset',
-            default: '',
+            default: s.defaultPreset,
             options: {
                 '': 'Custom',
                 'wiki-explorer': 'Wiki Explorer — quality & gaps',

@@ -7,6 +7,10 @@ export interface PluginSettings {
     defaultSizeBy: string
     /** Whether to show frontier nodes by default */
     showFrontierDefault: boolean
+    /** Whether to show external nodes by default */
+    showExternalNodesDefault: boolean
+    /** Default explored filter */
+    defaultExploredFilter: string
     /** Default view preset key (empty = custom) */
     defaultPreset: string
     /** Node repulsion strength (higher = more spread out). Range 200-5000. */
@@ -22,6 +26,8 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     defaultColorBy: 'explored',
     defaultSizeBy: 'connections',
     showFrontierDefault: false,
+    showExternalNodesDefault: false,
+    defaultExploredFilter: 'all',
     defaultPreset: '',
     nodeSpacing: 1500,
     maturityPropertyName: 'maturity',

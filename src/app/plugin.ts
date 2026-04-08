@@ -29,7 +29,7 @@ export class GraphExplorerPlugin extends Plugin {
             icon: 'git-fork',
             factory: (controller, containerEl) =>
                 new GraphExplorerView(controller, containerEl, this),
-            options: getGraphExplorerViewOptions
+            options: () => getGraphExplorerViewOptions(this.settings)
         })
 
         if (registered) {
@@ -64,8 +64,20 @@ export class GraphExplorerPlugin extends Plugin {
             if (typeof loadedSettings.defaultPreset === 'string') {
                 draft.defaultPreset = loadedSettings.defaultPreset
             }
+            if (typeof loadedSettings.showExternalNodesDefault === 'boolean') {
+                draft.showExternalNodesDefault = loadedSettings.showExternalNodesDefault
+            }
+            if (typeof loadedSettings.defaultExploredFilter === 'string') {
+                draft.defaultExploredFilter = loadedSettings.defaultExploredFilter
+            }
             if (typeof loadedSettings.nodeSpacing === 'number') {
                 draft.nodeSpacing = Math.max(200, Math.min(5000, loadedSettings.nodeSpacing))
+            }
+            if (typeof loadedSettings.maturityPropertyName === 'string') {
+                draft.maturityPropertyName = loadedSettings.maturityPropertyName
+            }
+            if (typeof loadedSettings.graduatedNotesPropertyName === 'string') {
+                draft.graduatedNotesPropertyName = loadedSettings.graduatedNotesPropertyName
             }
         })
 

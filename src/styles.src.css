@@ -225,7 +225,9 @@
 }
 
 .ge-side-panel__maturity-select {
-    @apply text-xs px-1.5 py-1 rounded cursor-pointer;
+    @apply text-xs px-1.5 rounded cursor-pointer;
+    height: var(--input-height, 28px);
+    line-height: normal;
     border: 1px solid var(--background-modifier-border);
     background-color: var(--interactive-normal);
     color: var(--text-muted);
@@ -513,7 +515,9 @@
 }
 
 .ge-controls__batch-maturity-select {
-    @apply text-xs px-1.5 py-1 rounded cursor-pointer;
+    @apply text-xs px-1.5 rounded cursor-pointer;
+    height: var(--input-height, 28px);
+    line-height: normal;
     border: 1px solid var(--background-modifier-border);
     background-color: var(--interactive-normal);
     color: var(--text-muted);

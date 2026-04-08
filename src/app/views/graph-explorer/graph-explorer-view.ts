@@ -127,8 +127,8 @@ export class GraphExplorerView extends BasesView {
         })
         this.addChild(this.controls)
 
-        // Initialize spacing slider from plugin settings
-        this.controls.setSpacingValue(this.plugin.settings.nodeSpacing)
+        // Initialize spacing slider from config (defaults come from plugin settings via view options)
+        this.controls.setSpacingValue(this.plugin.settings.nodeSpacing) // TODO: nodeSpacing not yet in view config (slider-type not supported by Bases)
 
         // Restore saved filter from config
         const savedFilter = this.config?.get('exploredFilter') as ExploredFilter | undefined
@@ -191,18 +191,12 @@ export class GraphExplorerView extends BasesView {
     // ── Config sync ───────────────────────────────────────────
 
     private syncConfigToCanvas(): void {
-        const colorBy =
-            (this.config?.get('colorBy') as string) ||
-            this.plugin.settings.defaultColorBy ||
-            'explored'
-        const sizeBy =
-            (this.config?.get('sizeBy') as string) ||
-            this.plugin.settings.defaultSizeBy ||
-            'connections'
+        const colorBy = (this.config?.get('colorBy') as string) || 'explored'
+        const sizeBy = (this.config?.get('sizeBy') as string) || 'connections'
 
         this.graphCanvas?.setColorBy(colorBy)
         this.graphCanvas?.setSizeBy(sizeBy)
-        this.graphCanvas?.setNodeSpacing(this.plugin.settings.nodeSpacing)
+        this.graphCanvas?.setNodeSpacing(this.plugin.settings.nodeSpacing) // nodeSpacing stays in plugin settings (no slider ViewOption type)
         this.legend?.update(this.getLegendConfig(colorBy))
 
         // Handle preset changes
@@ -290,20 +284,13 @@ export class GraphExplorerView extends BasesView {
     private rebuildGraph(): void {
         if (!this.data) return
         const entries = this.data.data
-        const exploredProperty =
-            (this.config?.get('exploredProperty') as string) ||
-            this.plugin.settings.exploredPropertyName ||
-            'explored'
+        const exploredProperty = (this.config?.get('exploredProperty') as string) || 'explored'
         const showExternal = (this.config?.get('showExternalNodes') as boolean) || false
-        const showFrontier =
-            (this.config?.get('showFrontier') as boolean) ||
-            this.plugin.settings.showFrontierDefault ||
-            false
+        const showFrontier = (this.config?.get('showFrontier') as boolean) || false
         const exploredFilter = (this.controls?.getFilter() as ExploredFilter) || 'all'
-
-        const maturityProperty = this.plugin.settings.maturityPropertyName || 'maturity'
+        const maturityProperty = (this.config?.get('maturityProperty') as string) || 'maturity'
         const graduatedNotesProperty =
-            this.plugin.settings.graduatedNotesPropertyName || 'graduated_notes'
+            (this.config?.get('graduatedNotesProperty') as string) || 'graduated_notes'
 
         this.currentGraphData = buildGraphData(
             entries,
@@ -451,7 +438,7 @@ export class GraphExplorerView extends BasesView {
         const file = this.app.vault.getAbstractFileByPath(node.id)
         if (!(file instanceof TFile)) return
 
-        const maturityProperty = this.plugin.settings.maturityPropertyName || 'maturity'
+        const maturityProperty = (this.config?.get('maturityProperty') as string) || 'maturity'
         await setNoteMaturity(this.app, file, maturityProperty, maturity)
 
         // Optimistic update
@@ -562,7 +549,7 @@ export class GraphExplorerView extends BasesView {
         const selectedIds = this.graphCanvas?.getBatchSelectedIds()
         if (!selectedIds || selectedIds.size === 0) return
 
-        const maturityProperty = this.plugin.settings.maturityPropertyName || 'maturity'
+        const maturityProperty = (this.config?.get('maturityProperty') as string) || 'maturity'
 
         for (const nodeId of selectedIds) {
             const node = this.currentGraphData.nodes.find((n) => n.id === nodeId)

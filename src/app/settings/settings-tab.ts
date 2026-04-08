@@ -127,6 +127,39 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
             )
 
         new Setting(containerEl)
+            .setName('Show external nodes by default')
+            .setDesc('Show notes linked from outside the base by default in new views.')
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.showExternalNodesDefault)
+                    .onChange(async (value) => {
+                        this.plugin.settings = {
+                            ...this.plugin.settings,
+                            showExternalNodesDefault: value
+                        }
+                        await this.plugin.saveSettings()
+                    })
+            )
+
+        new Setting(containerEl)
+            .setName('Default explored filter')
+            .setDesc('Default filter for explored status in new views.')
+            .addDropdown((dropdown) =>
+                dropdown
+                    .addOption('all', 'All')
+                    .addOption('explored', 'Explored only')
+                    .addOption('unexplored', 'Unexplored only')
+                    .setValue(this.plugin.settings.defaultExploredFilter)
+                    .onChange(async (value) => {
+                        this.plugin.settings = {
+                            ...this.plugin.settings,
+                            defaultExploredFilter: value
+                        }
+                        await this.plugin.saveSettings()
+                    })
+            )
+
+        new Setting(containerEl)
             .setName('Node spacing')
             .setDesc(
                 'Controls how far apart nodes spread. Higher values = more space between nodes. (200–5000, default 1500)'
