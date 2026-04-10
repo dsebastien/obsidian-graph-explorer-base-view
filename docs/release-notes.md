@@ -1,5 +1,11 @@
 # Release Notes
 
+## 0.6.0 (2026-04-10)
+
+### Features
+
+- **all:** added a minimap
+
 ## 0.5.0 (2026-04-08)
 
 ### Features

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/0.5.0...0.6.0) (2026-04-10)
+
+### Features
+
+* **all:** added a minimap ([3b6624f](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/3b6624f8e46408080fe34a0ba2882cb86f3e9f3a))
+
 ## [0.5.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/0.4.0...0.5.0) (2026-04-08)
 
 ### Features
@@ -108,6 +114,7 @@ All notable changes to this project will be documented in this file.
 ## [1.2.0](https://github.com/your-username/obsidian-my-plugin/compare/1.1.0...1.2.0) (2024-05-14)
 ## [1.1.0](https://github.com/your-username/obsidian-my-plugin/compare/1.0.0...1.1.0) (2024-05-13)
 ## 1.0.0 (2024-04-26)
+
 
 
 
