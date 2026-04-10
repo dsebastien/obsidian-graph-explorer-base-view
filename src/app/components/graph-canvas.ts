@@ -118,7 +118,7 @@ export class GraphCanvas extends Component {
             .warmupTicks(50)
             .d3AlphaDecay(0.02)
             .autoPauseRedraw(false)
-            .minZoom(0.1)
+            .minZoom(0.01)
             .maxZoom(20)
             .enableNodeDrag(true)
             .nodeLabel(() => '')
@@ -1053,5 +1053,46 @@ export class GraphCanvas extends Component {
     centerOnNode(node: GraphNode): void {
         if (!this.graph) return
         this.graph.centerAt(node.x ?? 0, node.y ?? 0, 300)
+    }
+
+    // ── Viewport info (for minimap) ──────────────────────────
+
+    /**
+     * Returns the current viewport state for minimap rendering.
+     * Includes all node positions, current zoom, center, and canvas dimensions.
+     */
+    getViewportState(): {
+        nodes: ReadonlyArray<{ x: number; y: number; color: string }>
+        zoom: number
+        centerX: number
+        centerY: number
+        width: number
+        height: number
+    } | null {
+        if (!this.graph) return null
+        const zoom = this.graph.zoom() as number
+        const center = this.graph.centerAt() as { x: number; y: number }
+        const w = this.canvasContainerEl.clientWidth
+        const h = this.canvasContainerEl.clientHeight
+        const nodes = this.nodeList.map((n) => ({
+            x: n.x ?? 0,
+            y: n.y ?? 0,
+            color: this.getNodeColor(n)
+        }))
+        return {
+            nodes,
+            zoom,
+            centerX: center.x,
+            centerY: center.y,
+            width: w,
+            height: h
+        }
+    }
+
+    /**
+     * Pan the main graph to center on a specific world coordinate.
+     */
+    panTo(worldX: number, worldY: number): void {
+        this.graph?.centerAt(worldX, worldY, 300)
     }
 }

@@ -77,6 +77,16 @@ Graph Explorer Base View is an Obsidian plugin that registers a custom Base view
 - Updated dynamically when color-by mode changes
 - Two sections: color meanings + node style (explored/unexplored/graduated)
 
+### GraphMinimap (`src/app/components/graph-minimap.ts`)
+
+- Bird's-eye canvas overlay (right side, vertically centered, left of zoom controls)
+- Collapsible header with toggle
+- Renders all node positions as colored dots at ~15fps
+- Draws a purple viewport rectangle showing the current visible area
+- Click/drag on the minimap pans the main graph to that world coordinate
+- Retina-ready (2x canvas resolution)
+- Reads viewport state from GraphCanvas via `getViewportState()`
+
 ### GraphZoomControls (`src/app/components/graph-zoom-controls.ts`)
 
 - Vertical button stack (right side, vertically centered)
@@ -144,6 +154,7 @@ src/
     components/
       graph-canvas.ts          # Force-graph Canvas renderer
       graph-controls.ts        # Search, stats, sliders, filters
+      graph-minimap.ts         # Bird's-eye minimap overlay
       graph-side-panel.ts      # Note detail panel
       graph-legend.ts          # Color legend panel
       graph-zoom-controls.ts   # Zoom buttons

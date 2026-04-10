@@ -8,6 +8,7 @@ import { GraphControls } from '../../components/graph-controls'
 import { GraphZoomControls } from '../../components/graph-zoom-controls'
 import { GraphContextMenu } from '../../components/graph-context-menu'
 import type { ContextMenuAction } from '../../components/graph-context-menu'
+import { GraphMinimap } from '../../components/graph-minimap'
 import { GraphLegend } from '../../components/graph-legend'
 import type { LegendConfig, LegendSection } from '../../components/graph-legend'
 import { buildGraphData } from '../../services/graph-data-builder'
@@ -39,6 +40,7 @@ export class GraphExplorerView extends BasesView {
     private sidePanel: GraphSidePanel | null = null
     private controls: GraphControls | null = null
     private zoomControls: GraphZoomControls | null = null
+    private minimap: GraphMinimap | null = null
     private legend: GraphLegend | null = null
     private contextMenu: GraphContextMenu | null = null
     private currentGraphData: GraphData = { nodes: [], links: [] }
@@ -68,12 +70,14 @@ export class GraphExplorerView extends BasesView {
         this.sidePanel?.unload()
         this.controls?.unload()
         this.zoomControls?.unload()
+        this.minimap?.unload()
         this.legend?.unload()
         this.contextMenu?.unload()
         this.graphCanvas = null
         this.sidePanel = null
         this.controls = null
         this.zoomControls = null
+        this.minimap = null
         this.legend = null
         this.contextMenu = null
         this.viewEl?.remove()
@@ -107,8 +111,11 @@ export class GraphExplorerView extends BasesView {
         })
         this.addChild(this.graphCanvas)
 
+        // Left-side panel wrapper (controls + minimap)
+        const leftPanel = graphArea.createDiv({ cls: 'ge-left-panel' })
+
         // Controls overlay
-        this.controls = new GraphControls(graphArea, {
+        this.controls = new GraphControls(leftPanel, {
             onSearchChange: (query) => this.handleSearchChange(query),
             onExploredFilterChange: (filter) => {
                 this.config?.set('exploredFilter', filter)
@@ -154,6 +161,13 @@ export class GraphExplorerView extends BasesView {
             onReset: () => this.graphCanvas?.resetView()
         })
         this.addChild(this.zoomControls)
+
+        // Minimap (below controls in left panel)
+        this.minimap = new GraphMinimap(leftPanel, {
+            getViewport: () => this.graphCanvas?.getViewportState() ?? null,
+            onPan: (worldX, worldY) => this.graphCanvas?.panTo(worldX, worldY)
+        })
+        this.addChild(this.minimap)
 
         // Color legend
         this.legend = new GraphLegend(graphArea)

@@ -281,14 +281,28 @@
 }
 
 /* ========================================
+   LEFT PANEL (controls + minimap wrapper)
+   ======================================== */
+
+.ge-left-panel {
+    @apply absolute flex flex-col gap-1.5;
+    top: 8px;
+    left: 8px;
+    z-index: 10;
+    width: 240px;
+    pointer-events: none;
+}
+
+.ge-left-panel > * {
+    pointer-events: auto;
+}
+
+/* ========================================
    CONTROLS OVERLAY
    ======================================== */
 
 .ge-controls {
-    @apply absolute flex flex-col rounded overflow-hidden;
-    top: 8px;
-    left: 8px;
-    z-index: 10;
+    @apply flex flex-col rounded overflow-hidden;
     width: 240px;
     background-color: var(--background-primary);
     border: 1px solid var(--background-modifier-border);
@@ -705,6 +719,42 @@
 
 .ge-context-menu__label {
     @apply truncate;
+}
+
+/* ========================================
+   MINIMAP
+   ======================================== */
+
+.ge-minimap {
+    @apply flex flex-col rounded overflow-hidden;
+    border: 1px solid var(--background-modifier-border);
+    background-color: var(--background-primary);
+    opacity: 0.95;
+}
+
+.ge-minimap__header {
+    @apply flex items-center justify-between px-2 py-1 cursor-pointer;
+    border-bottom: 1px solid var(--background-modifier-border);
+    user-select: none;
+}
+
+.ge-minimap__title {
+    @apply text-xs font-medium;
+    color: var(--text-muted);
+}
+
+.ge-minimap__collapse-btn {
+    @apply text-xs;
+    color: var(--text-muted);
+    line-height: 1;
+}
+
+.ge-minimap__canvas {
+    @apply block cursor-crosshair;
+}
+
+.ge-minimap__canvas--hidden {
+    @apply hidden;
 }
 
 /* ========================================
