@@ -1,3 +1,9 @@
+---
+title: Overview
+nav_order: 1
+permalink: /
+---
+
 # Graph Explorer Base View
 
 An Obsidian plugin that renders notes from an [Obsidian Base](https://obsidian.md/bases) as an interactive force-directed graph. Visualize relationships between notes, track exploration progress, and navigate your knowledge base through an intuitive graph interface.
