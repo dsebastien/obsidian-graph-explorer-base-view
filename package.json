@@ -1,7 +1,7 @@
 {
     "name": "graph-explorer-base-view",
     "version": "0.6.0",
-    "description": "A custom Obsidian Bases view that renders notes as an interactive force-directed graph with explored/unexplored tracking",
+    "description": "A custom Bases view that renders notes as an interactive force-directed graph with explored/unexplored tracking.",
     "author": {
         "name": "Sébastien Dubois",
         "email": "sebastien@dsebastien.net",
@@ -53,7 +53,6 @@
         "release:update-version": "bun scripts/update-version.ts",
         "release:version-bump": "bun scripts/version-bump.ts",
         "release:changelog": "bun scripts/generate-changelog.ts",
-        "release:zip": "bun scripts/create-release-zip.ts",
         "release": "./scripts/release.sh",
         "validate": "bun run --parallel tsc test lint"
     },
