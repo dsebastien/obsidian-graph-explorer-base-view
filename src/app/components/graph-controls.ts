@@ -191,7 +191,7 @@ export class GraphControls extends Component {
             this.callbacks.onNodeSpacingChange(val)
         })
         this.registerDomEvent(this.spacingSlider, 'change', () => {
-            setTimeout(() => {
+            window.setTimeout(() => {
                 this.spacingValue.addClass('ge-controls__slider-value--hidden')
             }, 800)
         })
@@ -204,7 +204,7 @@ export class GraphControls extends Component {
             this.callbacks.onNodeScaleChange(val)
         })
         this.registerDomEvent(this.scaleSlider, 'change', () => {
-            setTimeout(() => {
+            window.setTimeout(() => {
                 this.scaleValue.addClass('ge-controls__slider-value--hidden')
             }, 800)
         })
@@ -217,7 +217,7 @@ export class GraphControls extends Component {
             this.callbacks.onTextScaleChange(val)
         })
         this.registerDomEvent(this.textSlider, 'change', () => {
-            setTimeout(() => {
+            window.setTimeout(() => {
                 this.textValue.addClass('ge-controls__slider-value--hidden')
             }, 800)
         })

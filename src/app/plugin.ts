@@ -89,6 +89,6 @@ export class GraphExplorerPlugin extends Plugin {
         await this.saveData(this.settings)
         log('Settings saved', 'debug', this.settings)
         // Notify active views to re-read settings
-        document.dispatchEvent(new CustomEvent('graph-explorer:settings-changed'))
+        activeDocument.dispatchEvent(new CustomEvent('graph-explorer:settings-changed'))
     }
 }

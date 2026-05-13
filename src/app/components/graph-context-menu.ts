@@ -52,7 +52,7 @@ export class GraphContextMenu extends Component {
         }
 
         // Adjust position if overflowing
-        requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
             const parent = this.menuEl.parentElement
             if (!parent) return
             const parentRect = parent.getBoundingClientRect()
@@ -72,9 +72,9 @@ export class GraphContextMenu extends Component {
                 this.hide()
             }
         }
-        setTimeout(() => {
+        window.setTimeout(() => {
             if (this.dismissHandler) {
-                document.addEventListener('click', this.dismissHandler)
+                activeDocument.addEventListener('click', this.dismissHandler)
             }
         }, 0)
     }
@@ -90,7 +90,7 @@ export class GraphContextMenu extends Component {
 
     private removeDismissHandler(): void {
         if (this.dismissHandler) {
-            document.removeEventListener('click', this.dismissHandler)
+            activeDocument.removeEventListener('click', this.dismissHandler)
             this.dismissHandler = null
         }
     }

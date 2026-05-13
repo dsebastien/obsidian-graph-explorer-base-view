@@ -111,18 +111,18 @@ export class GraphSidePanel extends Component {
         }
 
         const onMouseUp = () => {
-            document.removeEventListener('mousemove', onMouseMove)
-            document.removeEventListener('mouseup', onMouseUp)
-            document.body.removeClass('ge-resizing')
+            activeDocument.removeEventListener('mousemove', onMouseMove)
+            activeDocument.removeEventListener('mouseup', onMouseUp)
+            activeDocument.body.removeClass('ge-resizing')
         }
 
         handle.addEventListener('mousedown', (e: MouseEvent) => {
             e.preventDefault()
             startX = e.clientX
             startWidth = this.panelEl.getBoundingClientRect().width
-            document.body.addClass('ge-resizing')
-            document.addEventListener('mousemove', onMouseMove)
-            document.addEventListener('mouseup', onMouseUp)
+            activeDocument.body.addClass('ge-resizing')
+            activeDocument.addEventListener('mousemove', onMouseMove)
+            activeDocument.addEventListener('mouseup', onMouseUp)
         })
     }
 
@@ -287,7 +287,7 @@ export class GraphSidePanel extends Component {
                 if (this.currentMarkdown) {
                     void navigator.clipboard.writeText(this.currentMarkdown)
                     copyBtn.textContent = '\u2713 Copied!'
-                    setTimeout(() => {
+                    window.setTimeout(() => {
                         copyBtn.textContent = '\u2398 Copy md'
                     }, 1500)
                 }

@@ -33,12 +33,29 @@ const CATEGORICAL_PALETTE = [
 ]
 
 /**
+ * Minimal d3-force shapes for the three forces we configure. force-graph's
+ * `d3Force()` returns `ForceFn<N> | undefined`, whose body is `[key: string]: any`,
+ * so accessing `.strength` / `.distance` / `.distanceMax` would re-introduce
+ * unsafe-any. Narrowing to these local interfaces at the call site keeps the
+ * type system honest without pulling in `@types/d3-force`.
+ */
+interface ChargeForce {
+    strength(value: number): ChargeForce
+    distanceMax(value: number): ChargeForce
+}
+interface LinkForce {
+    distance(value: number): LinkForce
+}
+interface CenterForce {
+    strength(value: number): CenterForce
+}
+
+/**
  * Wraps force-graph Canvas renderer with custom node painting, shapes,
  * property-driven visualization, keyboard navigation, and batch selection.
  */
 export class GraphCanvas extends Component {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private graph: any = null
+    private graph: ForceGraph<GraphNode, GraphLink> | null = null
     private canvasContainerEl: HTMLElement
     private resizeObserver: ResizeObserver | null = null
     private hoveredNode: GraphNode | null = null
@@ -51,7 +68,7 @@ export class GraphCanvas extends Component {
     private isDark = false
     private searchMatchIds: Set<string> = new Set()
     private batchSelectedIds: Set<string> = new Set()
-    private zoomTimer: ReturnType<typeof setTimeout> | null = null
+    private zoomTimer: number | null = null
     private lastClickTime = 0
     private lastClickNodeId: string | null = null
 
@@ -84,16 +101,16 @@ export class GraphCanvas extends Component {
     override onload(): void {
         this.initGraph()
         this.setupResizeObserver()
-        this.registerDomEvent(document, 'keydown', (e) => {
+        this.registerDomEvent(activeDocument, 'keydown', (e) => {
             if (e.key === 'Shift') this.shiftHeld = true
         })
-        this.registerDomEvent(document, 'keyup', (e) => {
+        this.registerDomEvent(activeDocument, 'keyup', (e) => {
             if (e.key === 'Shift') this.shiftHeld = false
         })
     }
 
     override onunload(): void {
-        if (this.zoomTimer) clearTimeout(this.zoomTimer)
+        if (this.zoomTimer) window.clearTimeout(this.zoomTimer)
         this.resizeObserver?.disconnect()
         this.resizeObserver = null
         if (this.graph) {
@@ -227,23 +244,12 @@ export class GraphCanvas extends Component {
 
     private applyForceConfig(): void {
         if (!this.graph) return
-        const charge = this.graph.d3Force('charge')
-        if (charge && typeof charge.strength === 'function') {
-            charge.strength(-this.nodeSpacing)
-            if (typeof charge.distanceMax === 'function') {
-                charge.distanceMax(this.nodeSpacing * 3)
-            }
-        }
-        const link = this.graph.d3Force('link')
-        if (link && typeof link.distance === 'function') {
-            // Link distance must be large enough that connected nodes don't cluster
-            link.distance(Math.round(this.nodeSpacing * 0.5))
-        }
-        // Weaken centering force so nodes can spread more
-        const center = this.graph.d3Force('center')
-        if (center && typeof center.strength === 'function') {
-            center.strength(0.03)
-        }
+        const charge = this.graph.d3Force('charge') as ChargeForce | undefined
+        charge?.strength(-this.nodeSpacing).distanceMax(this.nodeSpacing * 3)
+        const link = this.graph.d3Force('link') as LinkForce | undefined
+        link?.distance(Math.round(this.nodeSpacing * 0.5))
+        const center = this.graph.d3Force('center') as CenterForce | undefined
+        center?.strength(0.03)
     }
 
     private setupResizeObserver(): void {
@@ -322,8 +328,8 @@ export class GraphCanvas extends Component {
         // Only zoom to fit on first load — subsequent updates preserve user's zoom
         if (!this.initialZoomDone) {
             this.initialZoomDone = true
-            if (this.zoomTimer) clearTimeout(this.zoomTimer)
-            this.zoomTimer = setTimeout(() => {
+            if (this.zoomTimer) window.clearTimeout(this.zoomTimer)
+            this.zoomTimer = window.setTimeout(() => {
                 this.graph?.zoomToFit(400, 40)
             }, 800)
         }
@@ -488,8 +494,8 @@ export class GraphCanvas extends Component {
 
     resetView(): void {
         this.graph?.centerAt(0, 0, 300)
-        if (this.zoomTimer) clearTimeout(this.zoomTimer)
-        this.zoomTimer = setTimeout(() => {
+        if (this.zoomTimer) window.clearTimeout(this.zoomTimer)
+        this.zoomTimer = window.setTimeout(() => {
             this.graph?.zoomToFit(400, 40)
         }, 350)
     }
@@ -521,7 +527,7 @@ export class GraphCanvas extends Component {
     // ── Node rendering ────────────────────────────────────────
 
     private paintNode(node: GraphNode, ctx: CanvasRenderingContext2D, globalScale: number): void {
-        this.isDark = document.body.classList.contains('theme-dark')
+        this.isDark = activeDocument.body.classList.contains('theme-dark')
 
         const x = node.x ?? 0
         const y = node.y ?? 0
@@ -1070,8 +1076,8 @@ export class GraphCanvas extends Component {
         height: number
     } | null {
         if (!this.graph) return null
-        const zoom = this.graph.zoom() as number
-        const center = this.graph.centerAt() as { x: number; y: number }
+        const zoom = this.graph.zoom()
+        const center = this.graph.centerAt()
         const w = this.canvasContainerEl.clientWidth
         const h = this.canvasContainerEl.clientHeight
         const nodes = this.nodeList.map((n) => ({

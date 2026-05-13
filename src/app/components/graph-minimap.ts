@@ -83,7 +83,7 @@ export class GraphMinimap extends Component {
                 this.handleMinimapClick(e)
             }
         })
-        this.registerDomEvent(document, 'mouseup', () => {
+        this.registerDomEvent(activeDocument, 'mouseup', () => {
             this.dragging = false
         })
 
@@ -92,7 +92,7 @@ export class GraphMinimap extends Component {
 
     override onunload(): void {
         if (this.animFrameId != null) {
-            cancelAnimationFrame(this.animFrameId)
+            window.cancelAnimationFrame(this.animFrameId)
             this.animFrameId = null
         }
         this.containerEl.remove()
@@ -106,9 +106,9 @@ export class GraphMinimap extends Component {
                 lastRender = time
                 this.render()
             }
-            this.animFrameId = requestAnimationFrame(loop)
+            this.animFrameId = window.requestAnimationFrame(loop)
         }
-        this.animFrameId = requestAnimationFrame(loop)
+        this.animFrameId = window.requestAnimationFrame(loop)
     }
 
     private render(): void {
@@ -119,7 +119,7 @@ export class GraphMinimap extends Component {
             return
         }
 
-        const isDark = document.body.classList.contains('theme-dark')
+        const isDark = activeDocument.body.classList.contains('theme-dark')
         const ctx = this.ctx
         const cw = MINIMAP_WIDTH * 2
         const ch = MINIMAP_HEIGHT * 2
@@ -198,7 +198,7 @@ export class GraphMinimap extends Component {
         const ctx = this.ctx
         const cw = MINIMAP_WIDTH * 2
         const ch = MINIMAP_HEIGHT * 2
-        const isDark = document.body.classList.contains('theme-dark')
+        const isDark = activeDocument.body.classList.contains('theme-dark')
         ctx.clearRect(0, 0, cw, ch)
         ctx.fillStyle = isDark ? BG_COLOR_DARK : BG_COLOR_LIGHT
         ctx.fillRect(0, 0, cw, ch)

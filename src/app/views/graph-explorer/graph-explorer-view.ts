@@ -191,7 +191,7 @@ export class GraphExplorerView extends BasesView {
 
         // Listen for plugin settings changes
         this.registerDomEvent(
-            document,
+            activeDocument,
             'graph-explorer:settings-changed' as keyof DocumentEventMap,
             () => {
                 this.syncConfigToCanvas()
