@@ -2,7 +2,7 @@
     "id": "graph-explorer-base-view",
     "name": "Graph Explorer Base View",
     "description": "A custom Bases view that renders notes as an interactive force-directed graph with explored/unexplored tracking.",
-    "version": "0.6.0",
+    "version": "1.0.0",
     "minAppVersion": "1.10.0",
     "isDesktopOnly": false,
     "author": "Sébastien Dubois",
