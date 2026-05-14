@@ -71,8 +71,15 @@
 }
 
 .ge-resizing {
-    cursor: col-resize !important;
+    cursor: col-resize;
     user-select: none;
+}
+
+/* Doubled-class descendant selector (specificity 0,2,1) so the drag cursor
+   wins over every child element's own `cursor: pointer` etc. while the
+   side-panel resize handle is being dragged. */
+.ge-resizing.ge-resizing * {
+    cursor: col-resize;
 }
 
 .ge-side-panel__header {
