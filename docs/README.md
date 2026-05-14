@@ -21,12 +21,40 @@ An Obsidian plugin that renders notes from an [Obsidian Base](https://obsidian.m
 - **Context menu** with quick actions (open, mark explored, copy wikilink, batch select)
 - **View presets** for common workflows (LLM Wiki Explorer, Exploration Progress, Role Overview)
 
+## Installation
+
+### Community plugins (recommended)
+
+1. In Obsidian, go to **Settings → Community plugins**.
+2. Disable **Restricted mode** if it's enabled.
+3. Select **Browse**, search for **Graph Explorer Base View**, install it, then enable it.
+
+You can also browse the catalog on the [Obsidian Community](https://community.obsidian.md/) website.
+
+### Manual installation
+
+If the plugin isn't listed in the community catalog yet (or you want a specific version):
+
+1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/dsebastien/obsidian-graph-explorer-base-view/releases).
+2. Copy them into `<Vault>/.obsidian/plugins/graph-explorer-base-view/`.
+3. Reload Obsidian and enable **Graph Explorer Base View** in **Settings → Community plugins**.
+
+### BRAT (bleeding edge)
+
+[BRAT](https://github.com/TfTHacker/obsidian42-brat) (Beta Reviewers Auto-update Tool) installs plugins straight from a GitHub repo and keeps them updated automatically. Use this if you want the latest commits — **things might break**.
+
+1. Install **Obsidian42 - BRAT** from **Settings → Community plugins → Browse** and enable it.
+2. Run **BRAT: Add a beta plugin for testing** from the command palette.
+3. Paste `https://github.com/dsebastien/obsidian-graph-explorer-base-view`.
+4. Select the latest version and confirm.
+5. Enable **Graph Explorer Base View** in **Settings → Community plugins**.
+
 ## Quick start
 
-1. Install the plugin from Obsidian's Community Plugins
-2. Create a new **Base** in your vault (or open an existing one)
-3. Select **Graph Explorer** as the view type
-4. Your notes appear as an interactive graph — click any node to see its content in the side panel
+1. Install the plugin (see [Installation](#installation) above).
+2. Create a new **Base** in your vault (or open an existing one).
+3. Select **Graph Explorer** as the view type.
+4. Your notes appear as an interactive graph — click any node to see its content in the side panel.
 
 ## About
 
