@@ -674,9 +674,17 @@ export class GraphCanvas extends Component {
             ctx.setLineDash([])
         }
 
-        // Only show labels for hovered, selected, focused, or their direct neighbors
+        // Index notes (diamond) always show their label — they're navigational
+        // anchors and the user needs to spot them at a glance. Other nodes only
+        // surface labels on hover / selection / focus or as direct neighbors.
+        const isIndex = node.wikiRole === 'index' && !node.frontier && !node.external
         const showLabel =
-            isSelected || isHovered || isNeighborOfHovered || isFocused || isNeighborOfSelected
+            isSelected ||
+            isHovered ||
+            isNeighborOfHovered ||
+            isFocused ||
+            isNeighborOfSelected ||
+            isIndex
         if (showLabel) {
             const isPrimary = isSelected || isHovered || isFocused
             const t = this.textScale / 100
