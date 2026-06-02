@@ -1,5 +1,19 @@
 # Release Notes
 
+## 1.1.0 (2026-06-02)
+
+### Features
+
+- **plugin:** always show labels for index notes
+
+### Bug Fixes
+
+- **plugin:** scope Tailwind CSS to avoid breaking other plugins
+
+### Performance Improvements
+
+- **plugin:** reduce graph flicker during Obsidian indexing
+
 ## 1.0.2 (2026-05-14)
 
 ## 1.0.1 (2026-05-13)

@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.0.2...1.1.0) (2026-06-02)
+
+### Features
+
+* **plugin:** always show labels for index notes ([1c82168](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/1c82168b2ef191c879cbca885165c0a901e5dd5a))
+
+### Bug Fixes
+
+* **plugin:** scope Tailwind CSS to avoid breaking other plugins ([da1afdb](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/da1afdb6a7e488941a92b0dffe19566abcb3da7a)), closes [#1](https://github.com/dsebastien/obsidian-graph-explorer-base-view/issues/1)
+
+### Performance Improvements
+
+* **plugin:** reduce graph flicker during Obsidian indexing ([8787ab7](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/8787ab728defdb848517391f7f63b4ac2802cb6f))
+
 ## [1.0.2](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.0.1...1.0.2) (2026-05-14)
 
 ## [1.0.1](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.0.0...1.0.1) (2026-05-13)
@@ -70,6 +84,7 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes
 
 * address code review issues (search highlight, theme reactivity, view option sync, cleanup) ([f3294ad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f3294adbf62c2d822dfbb064be309b8cc9686e9e))
+
 
 
 
