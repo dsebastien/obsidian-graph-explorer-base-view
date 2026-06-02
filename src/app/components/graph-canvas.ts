@@ -77,6 +77,12 @@ export class GraphCanvas extends Component {
     private lastFrameTimeMs = 0
     private static readonly FADE_SPEED = 7 // exponential convergence rate
 
+    // Topology fingerprint of the last setData() call. Used to detect
+    // property-only updates (Obsidian indexing storm, frontmatter edits) so we
+    // can skip the alpha reset + force-simulation reheat that would otherwise
+    // cause visible flicker on every metadata change.
+    private lastTopologyKey: string | null = null
+
     // Group drag state (Shift+drag moves neighbors)
     private shiftHeld = false
     private dragNeighborOffsets: Map<string, { dx: number; dy: number }> | null = null
@@ -290,11 +296,9 @@ export class GraphCanvas extends Component {
             }
         }
 
-        // Reset fade state for new data
-        this.nodeAlphas.clear()
-
         // Build adjacency map
         this.adjacencyMap.clear()
+        const linkPairs: string[] = []
         for (const link of data.links) {
             const rawSource = link.source as string | GraphNode
             const rawTarget = link.target as string | GraphNode
@@ -306,6 +310,30 @@ export class GraphCanvas extends Component {
             if (!this.adjacencyMap.has(targetId)) this.adjacencyMap.set(targetId, new Set())
             this.adjacencyMap.get(sourceId)!.add(targetId)
             this.adjacencyMap.get(targetId)!.add(sourceId)
+            // Normalize so (a,b) and (b,a) hash to the same pair.
+            linkPairs.push(
+                sourceId < targetId ? `${sourceId}\t${targetId}` : `${targetId}\t${sourceId}`
+            )
+        }
+
+        // Topology fingerprint: sorted node IDs + sorted unique link pairs.
+        // Identical across calls iff the structure of the graph is unchanged
+        // (only properties — colors, sizes, frontmatter — differ).
+        const nodeKey = [...data.nodes]
+            .map((n) => n.id)
+            .sort()
+            .join('\n')
+        const linkKey = [...new Set(linkPairs)].sort().join('\n')
+        const topologyKey = `${nodeKey}␟${linkKey}`
+        const topologyUnchanged = this.lastTopologyKey === topologyKey
+        this.lastTopologyKey = topologyKey
+
+        // Reset fade state only when topology actually changed. Otherwise the
+        // alphas keyed by node ID stay valid and we avoid the visible flash
+        // that would otherwise fire on every property-only update (e.g. during
+        // Obsidian's indexing storms).
+        if (!topologyUnchanged) {
+            this.nodeAlphas.clear()
         }
 
         // Build node lookup
@@ -321,9 +349,13 @@ export class GraphCanvas extends Component {
 
         this.graph.graphData(data)
 
-        // Apply force config after data load
+        // Apply force config after data load. Only reheat the simulation when
+        // topology changed — reheating on every property tick is what makes
+        // the canvas flicker during indexing.
         this.applyForceConfig()
-        this.graph.d3ReheatSimulation()
+        if (!topologyUnchanged) {
+            this.graph.d3ReheatSimulation()
+        }
 
         // Only zoom to fit on first load — subsequent updates preserve user's zoom
         if (!this.initialZoomDone) {

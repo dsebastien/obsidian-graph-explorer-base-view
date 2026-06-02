@@ -55,9 +55,12 @@ export class GraphExplorerView extends BasesView {
         super(controller)
         this.scrollEl = scrollEl
         this.plugin = plugin
+        // 250ms debounce coalesces Obsidian's indexing storms (note creation,
+        // metadata cache refreshes) into a single rebuild. 50ms was too tight
+        // and let bursts through, causing visible flicker.
         this.debouncedUpdate = debounce(() => {
             this.rebuildGraph()
-        }, 50)
+        }, 250)
     }
 
     override onload(): void {
