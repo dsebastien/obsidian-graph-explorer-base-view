@@ -1,4 +1,20 @@
-@import 'tailwindcss';
+/*
+ * Import Tailwind v4 WITHOUT the `base` layer (Preflight).
+ *
+ * Preflight is a global CSS reset that targets bare selectors like
+ * `input`, `button`, `select`, `ul`, `h1`-`h6`, `img`, `::-webkit-datetime-edit*`,
+ * etc. In a normal app this is fine because the stylesheet is scoped to the
+ * app's DOM. Obsidian, however, loads every plugin's `styles.css` globally,
+ * so Preflight ends up resetting elements rendered by Obsidian itself and by
+ * every other installed plugin (see issue #1: datepicker plugin date-input
+ * visuals get clobbered). Importing the theme + utilities layers only — and
+ * skipping `base` — keeps our utility classes working while leaving the rest
+ * of the app untouched. Our own components set their own borders/backgrounds
+ * explicitly in the `.ge-*` classes below, so we don't depend on Preflight.
+ */
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
 
 /* ========================================
    SUPPORT & UI SECTIONS
