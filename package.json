@@ -80,5 +80,26 @@
         "force-graph": "1.51.2",
         "immer": "11.0.1",
         "zod": "^4.1.13"
+    },
+    "resolutions": {
+        "obsidian": "1.10.3",
+        "zod": "4.1.13",
+        "@conventional-changelog/git-client": "2.7.0",
+        "tmp": "0.2.7",
+        "lodash": "4.18.1",
+        "handlebars": "4.7.9",
+        "flatted": "3.4.2",
+        "yaml": "2.9.0",
+        "fast-uri": "3.1.2",
+        "brace-expansion": "2.0.3",
+        "minimatch": "9.0.9",
+        "eslint/ajv": "6.15.0",
+        "@eslint/eslintrc/ajv": "6.15.0",
+        "@commitlint/config-validator/ajv": "8.20.0",
+        "eslint-plugin-json-schema-validator/ajv": "8.20.0",
+        "json-schema-migrate/ajv": "8.20.0",
+        "fdir/picomatch": "4.0.4",
+        "tinyglobby/picomatch": "4.0.4",
+        "micromatch/picomatch": "2.3.2"
     }
 }
