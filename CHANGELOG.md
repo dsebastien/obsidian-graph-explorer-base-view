@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.2](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.1.1...1.1.2) (2026-07-17)
+
 ## [1.1.1](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.1.0...1.1.1) (2026-06-17)
 
 ## [1.1.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.0.2...1.1.0) (2026-06-02)
@@ -86,6 +88,7 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes
 
 * address code review issues (search highlight, theme reactivity, view option sync, cleanup) ([f3294ad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f3294adbf62c2d822dfbb064be309b8cc9686e9e))
+
 
 
 
