@@ -1,4 +1,9 @@
-import type { BasesDropdownOption, BasesTextOption, BasesToggleOption, BasesAllOptions } from 'obsidian'
+import type {
+    BasesDropdownOption,
+    BasesTextOption,
+    BasesToggleOption,
+    BasesAllOptions
+} from 'obsidian'
 import type { PluginSettings } from '../../types/plugin-settings.intf'
 import { DEFAULT_SETTINGS } from '../../types/plugin-settings.intf'
 

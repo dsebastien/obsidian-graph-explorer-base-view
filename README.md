@@ -11,6 +11,7 @@ Where Obsidian's built-in graph shows the whole vault, Graph Explorer works on t
 - **Maturity tracking** — track the evolution of each note through maturity levels, with a "graduated notes" concept for notes that have matured into dedicated standalone notes.
 - **Rich visual language** — node shape encodes the note's role (article, index, log, source summary); borders, rings and a small indicator dot encode explored state, maturity, confidence and whether the note has graduated children.
 - **Per-view configuration** — every Base using this view has its own independent settings: explored property name, color mode, size mode, filters, external/frontier toggles, preset.
+- **What's new after updates.** After a plugin update, a one-time dialog shows the release notes you just received (including skipped versions) with ways to support development. Never shown on fresh installs or regular restarts.
 
 ## Main features
 
