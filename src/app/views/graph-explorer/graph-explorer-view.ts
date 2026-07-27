@@ -214,7 +214,7 @@ export class GraphExplorerView extends BasesView {
 
         this.graphCanvas?.setColorBy(colorBy)
         this.graphCanvas?.setSizeBy(sizeBy)
-        this.graphCanvas?.setNodeSpacing(this.plugin.settings.nodeSpacing) // nodeSpacing stays in plugin settings (no slider ViewOption type)
+        this.graphCanvas?.setNodeSpacing(this.plugin.settings.nodeSpacing) // nodeSpacing stays in plugin settings (no slider BasesAllOptions type)
         this.legend?.update(this.getLegendConfig(colorBy))
 
         // Handle preset changes
