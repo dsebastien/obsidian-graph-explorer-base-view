@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.3.0 (2026-07-29)
+
+### Bug Fixes
+
+- **plugin:** move to obsidian 1.13.1 typings and expose node spacing as a Bases slider option
+
 ## 1.2.0 (2026-07-27)
 
 ### Features

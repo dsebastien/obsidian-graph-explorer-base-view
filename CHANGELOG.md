@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.2.0...1.3.0) (2026-07-29)
+
+### Bug Fixes
+
+* **plugin:** move to obsidian 1.13.1 typings and expose node spacing as a Bases slider option ([7b703f3](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/7b703f3791a3570d18dd8a504bb4d468659d8434)), closes [#2](https://github.com/dsebastien/obsidian-graph-explorer-base-view/issues/2)
+
 ## [1.2.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.1.2...1.2.0) (2026-07-27)
 
 ### Features
@@ -94,6 +100,7 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes
 
 * address code review issues (search highlight, theme reactivity, view option sync, cleanup) ([f3294ad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f3294adbf62c2d822dfbb064be309b8cc9686e9e))
+
 
 
 
