@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.4.0...1.5.0) (2026-07-29)
+
+### Features
+
+* **plugin:** aggregate what's new dialogs across simultaneously updated plugins ([3739ab5](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/3739ab5132eee337d935de8f2fef18ec40971d04))
+
 ## [1.4.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.3.0...1.4.0) (2026-07-29)
 
 ### Features
@@ -106,6 +112,7 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes
 
 * address code review issues (search highlight, theme reactivity, view option sync, cleanup) ([f3294ad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f3294adbf62c2d822dfbb064be309b8cc9686e9e))
+
 
 
 
