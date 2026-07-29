@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.3.0...1.4.0) (2026-07-29)
+
+### Features
+
+* **plugin:** add Knowii community to the what's new dialog and harden it ([54bf63e](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/54bf63e6c32b1f0e2e7e6ea88f76d42efb3ad34f))
+
 ## [1.3.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.2.0...1.3.0) (2026-07-29)
 
 ### Bug Fixes
@@ -100,6 +106,7 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes
 
 * address code review issues (search highlight, theme reactivity, view option sync, cleanup) ([f3294ad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f3294adbf62c2d822dfbb064be309b8cc9686e9e))
+
 
 
 
