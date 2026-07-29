@@ -45,7 +45,7 @@ The controls panel (top-left) provides:
 - **Progress bar** — exploration coverage percentage
 - **Confidence distribution** — colored dots showing the breakdown of confidence levels
 - **Maturity distribution** — colored dots showing the breakdown of maturity levels and graduated count
-- **Sliders** — adjust node spacing (200–5000), node size (20–300%), and text size (20–300%)
+- **Sliders** — adjust node spacing (200–5000, saved per view), node size (20–300%), and text size (20–300%)
 - **Filter buttons** — show All, Explored only, or New (unexplored) only
 - **Batch actions** — appears when nodes are batch-selected; toggle explored status or set maturity on all
 

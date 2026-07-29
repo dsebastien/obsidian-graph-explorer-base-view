@@ -1,6 +1,7 @@
 import { App, PluginSettingTab, Setting } from 'obsidian'
 import type { GraphExplorerPlugin } from '../plugin'
 import { BUY_ME_A_COFFEE_BADGE_DATA_URL } from '../assets/buy-me-a-coffee'
+import { NODE_SPACING_MAX, NODE_SPACING_MIN, NODE_SPACING_STEP } from '../types/graph-types'
 
 export class GraphExplorerSettingTab extends PluginSettingTab {
     plugin: GraphExplorerPlugin
@@ -10,7 +11,7 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
         this.plugin = plugin
     }
 
-    display(): void {
+    override display(): void {
         const { containerEl } = this
         containerEl.empty()
 
@@ -161,13 +162,13 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
             )
 
         new Setting(containerEl)
-            .setName('Node spacing')
+            .setName('Default node spacing')
             .setDesc(
-                'Controls how far apart nodes spread. Higher values = more space between nodes. (200–5000, default 1500)'
+                'Controls how far apart nodes spread. Higher values = more space between nodes. Can be overridden per view. (200–5000, default 1500)'
             )
             .addSlider((slider) =>
                 slider
-                    .setLimits(200, 5000, 100)
+                    .setLimits(NODE_SPACING_MIN, NODE_SPACING_MAX, NODE_SPACING_STEP)
                     .setValue(this.plugin.settings.nodeSpacing)
                     .setDynamicTooltip()
                     .onChange(async (value) => {

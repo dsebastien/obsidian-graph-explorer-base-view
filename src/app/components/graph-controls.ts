@@ -6,6 +6,7 @@ import type {
     ConfidenceLevel,
     MaturityLevel
 } from '../types/graph-types'
+import { NODE_SPACING_MAX, NODE_SPACING_MIN, NODE_SPACING_STEP } from '../types/graph-types'
 
 export interface GraphControlsCallbacks {
     onSearchChange: (query: string) => void
@@ -90,7 +91,12 @@ export class GraphControls extends Component {
         this.spacingSlider = spacingRow.createEl('input', {
             type: 'range',
             cls: 'ge-controls__slider',
-            attr: { min: '200', max: '5000', step: '100', title: 'Node spacing' }
+            attr: {
+                min: String(NODE_SPACING_MIN),
+                max: String(NODE_SPACING_MAX),
+                step: String(NODE_SPACING_STEP),
+                title: 'Node spacing'
+            }
         })
         this.spacingSlider.value = '1500'
 

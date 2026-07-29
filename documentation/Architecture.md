@@ -137,7 +137,7 @@ Graph Explorer Base View is an Obsidian plugin that registers a custom Base view
 
 Plugin settings define defaults for new views. When a Base view is created, `getGraphExplorerViewOptions(this.settings)` generates view options with current plugin settings as default values. After creation, the view reads only from its own `config` — plugin settings and view settings are fully independent.
 
-The only exception is `nodeSpacing`, which remains in plugin settings because Obsidian's Bases view options don't support a slider type.
+`nodeSpacing` follows the same rule: the plugin setting is the default, and each view stores its own value under the `nodeSpacing` slider option (`BasesSliderOption`). The in-graph spacing slider writes to the view config, so the toolbar option and the canvas slider stay in sync.
 
 ## File Structure
 

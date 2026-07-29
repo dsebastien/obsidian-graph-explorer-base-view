@@ -1,9 +1,5 @@
-import type {
-    BasesDropdownOption,
-    BasesTextOption,
-    BasesToggleOption,
-    BasesAllOptions
-} from 'obsidian'
+import type { BasesAllOptions } from 'obsidian'
+import { NODE_SPACING_MAX, NODE_SPACING_MIN, NODE_SPACING_STEP } from '../../types/graph-types'
 import type { PluginSettings } from '../../types/plugin-settings.intf'
 import { DEFAULT_SETTINGS } from '../../types/plugin-settings.intf'
 
@@ -15,31 +11,31 @@ export function getGraphExplorerViewOptions(settings?: PluginSettings): BasesAll
             key: 'exploredProperty',
             displayName: 'Explored property name',
             default: s.exploredPropertyName
-        } as BasesTextOption,
+        },
         {
             type: 'text',
             key: 'maturityProperty',
             displayName: 'Maturity property name',
             default: s.maturityPropertyName
-        } as BasesTextOption,
+        },
         {
             type: 'text',
             key: 'graduatedNotesProperty',
             displayName: 'Graduated notes property name',
             default: s.graduatedNotesPropertyName
-        } as BasesTextOption,
+        },
         {
             type: 'toggle',
             key: 'showExternalNodes',
             displayName: 'Show linked notes outside the base',
             default: s.showExternalNodesDefault
-        } as BasesToggleOption,
+        },
         {
             type: 'toggle',
             key: 'showFrontier',
             displayName: 'Show frontier nodes (unresolved links)',
             default: s.showFrontierDefault
-        } as BasesToggleOption,
+        },
         {
             type: 'dropdown',
             key: 'exploredFilter',
@@ -50,7 +46,7 @@ export function getGraphExplorerViewOptions(settings?: PluginSettings): BasesAll
                 explored: 'Explored only',
                 unexplored: 'Unexplored only'
             }
-        } as BasesDropdownOption,
+        },
         {
             type: 'dropdown',
             key: 'colorBy',
@@ -64,7 +60,7 @@ export function getGraphExplorerViewOptions(settings?: PluginSettings): BasesAll
                 tags: 'First tag',
                 maturity: 'Maturity level'
             }
-        } as BasesDropdownOption,
+        },
         {
             type: 'dropdown',
             key: 'sizeBy',
@@ -74,7 +70,16 @@ export function getGraphExplorerViewOptions(settings?: PluginSettings): BasesAll
                 connections: 'Connection count',
                 uniform: 'Uniform size'
             }
-        } as BasesDropdownOption,
+        },
+        {
+            type: 'slider',
+            key: 'nodeSpacing',
+            displayName: 'Node spacing',
+            default: s.nodeSpacing,
+            min: NODE_SPACING_MIN,
+            max: NODE_SPACING_MAX,
+            step: NODE_SPACING_STEP
+        },
         {
             type: 'dropdown',
             key: 'preset',
@@ -87,6 +92,6 @@ export function getGraphExplorerViewOptions(settings?: PluginSettings): BasesAll
                 'role-overview': 'Roles — article types & structure',
                 'maturity-pipeline': 'Maturity — writing depth pipeline'
             }
-        } as BasesDropdownOption
+        }
     ]
 }

@@ -15,6 +15,16 @@ export type ExploredFilter = 'all' | 'explored' | 'unexplored'
 /** Layout algorithm for the graph */
 export type GraphLayout = 'force' | 'dag-td' | 'dag-lr' | 'dag-radialout'
 
+/** Bounds of the node repulsion strength, shared by the view option, the in-graph slider and the settings tab */
+export const NODE_SPACING_MIN = 200
+export const NODE_SPACING_MAX = 5000
+export const NODE_SPACING_STEP = 100
+
+/** Clamps a node spacing value to the supported range */
+export function clampNodeSpacing(spacing: number): number {
+    return Math.max(NODE_SPACING_MIN, Math.min(NODE_SPACING_MAX, spacing))
+}
+
 /**
  * A node in the graph representing a vault note.
  */

@@ -23,7 +23,7 @@ import type {
     MaturityLevel,
     ViewPreset
 } from '../../types/graph-types'
-import { VIEW_PRESETS } from '../../types/graph-types'
+import { VIEW_PRESETS, clampNodeSpacing } from '../../types/graph-types'
 import { log } from '../../../utils/log'
 
 /**
@@ -34,7 +34,7 @@ import { log } from '../../../utils/log'
 export class GraphExplorerView extends BasesView {
     override type = GRAPH_EXPLORER_VIEW_TYPE
 
-    private scrollEl: HTMLElement
+    private containerEl: HTMLElement
     private viewEl: HTMLElement | null = null
     private graphCanvas: GraphCanvas | null = null
     private sidePanel: GraphSidePanel | null = null
@@ -51,9 +51,13 @@ export class GraphExplorerView extends BasesView {
 
     private plugin: GraphExplorerPlugin
 
-    constructor(controller: QueryController, scrollEl: HTMLElement, plugin: GraphExplorerPlugin) {
+    constructor(
+        controller: QueryController,
+        containerEl: HTMLElement,
+        plugin: GraphExplorerPlugin
+    ) {
         super(controller)
-        this.scrollEl = scrollEl
+        this.containerEl = containerEl
         this.plugin = plugin
         // 250ms debounce coalesces Obsidian's indexing storms (note creation,
         // metadata cache refreshes) into a single rebuild. 50ms was too tight
@@ -97,7 +101,7 @@ export class GraphExplorerView extends BasesView {
     // ── UI Setup ──────────────────────────────────────────────
 
     private buildUI(): void {
-        this.viewEl = this.scrollEl.createDiv({ cls: 'ge-view' })
+        this.viewEl = this.containerEl.createDiv({ cls: 'ge-view' })
         this.viewEl.tabIndex = 0 // focusable for keyboard events
 
         // Graph canvas area
@@ -128,6 +132,8 @@ export class GraphExplorerView extends BasesView {
             onBatchSetMaturity: (maturity) => void this.handleBatchSetMaturity(maturity),
             onNodeSpacingChange: (spacing) => {
                 this.graphCanvas?.setNodeSpacing(spacing)
+                // Persist per view so the in-graph slider and the Bases option stay in sync
+                this.config?.set('nodeSpacing', clampNodeSpacing(spacing))
             },
             onNodeScaleChange: (scale) => {
                 this.graphCanvas?.setNodeScale(scale)
@@ -138,8 +144,8 @@ export class GraphExplorerView extends BasesView {
         })
         this.addChild(this.controls)
 
-        // Initialize spacing slider from config (defaults come from plugin settings via view options)
-        this.controls.setSpacingValue(this.plugin.settings.nodeSpacing) // TODO: nodeSpacing not yet in view config (slider-type not supported by Bases)
+        // Initialize spacing slider from the view config, falling back to the plugin default
+        this.controls.setSpacingValue(this.getNodeSpacing())
 
         // Restore saved filter from config
         const savedFilter = this.config?.get('exploredFilter') as ExploredFilter | undefined
@@ -208,13 +214,26 @@ export class GraphExplorerView extends BasesView {
 
     // ── Config sync ───────────────────────────────────────────
 
+    /**
+     * Node spacing comes from the view config (Bases slider option); the plugin
+     * setting only provides the default for views that never set it.
+     */
+    private getNodeSpacing(): number {
+        const configured = this.config?.get('nodeSpacing')
+        return clampNodeSpacing(
+            typeof configured === 'number' ? configured : this.plugin.settings.nodeSpacing
+        )
+    }
+
     private syncConfigToCanvas(): void {
         const colorBy = (this.config?.get('colorBy') as string) || 'explored'
         const sizeBy = (this.config?.get('sizeBy') as string) || 'connections'
 
         this.graphCanvas?.setColorBy(colorBy)
         this.graphCanvas?.setSizeBy(sizeBy)
-        this.graphCanvas?.setNodeSpacing(this.plugin.settings.nodeSpacing) // nodeSpacing stays in plugin settings (no slider BasesAllOptions type)
+        const spacing = this.getNodeSpacing()
+        this.graphCanvas?.setNodeSpacing(spacing)
+        this.controls?.setSpacingValue(spacing)
         this.legend?.update(this.getLegendConfig(colorBy))
 
         // Handle preset changes

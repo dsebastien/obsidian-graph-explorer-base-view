@@ -15,7 +15,7 @@ Plugin settings define defaults for new views. After a view is created, its sett
 | Show external by default  | boolean | `false`           | Whether new views show external nodes                                                 |
 | Default explored filter   | string  | `all`             | Default explored filter (all, explored, unexplored)                                   |
 | Default preset            | string  | `""`              | View preset key (empty = custom)                                                      |
-| Node spacing              | number  | `1500`            | Force repulsion strength (200–5000)                                                   |
+| Default node spacing      | number  | `1500`            | Force repulsion strength in new views (200–5000)                                      |
 
 ## View Options (per Base instance)
 
@@ -31,15 +31,16 @@ Each view inherits plugin settings as initial defaults, then operates independen
 | Filter by explored status              | dropdown | from plugin | All / Explored only / Unexplored only                |
 | Color nodes by                         | dropdown | from plugin | Property for node coloring                           |
 | Size nodes by                          | dropdown | from plugin | Property for node sizing                             |
+| Node spacing                           | slider   | from plugin | Force repulsion strength (200–5000)                  |
 | View preset                            | dropdown | from plugin | Apply a built-in preset                              |
 
-## Canvas Controls (runtime, not persisted)
+## Canvas Controls
 
-| Control        | Range    | Default | Description             |
-| -------------- | -------- | ------- | ----------------------- |
-| Spacing slider | 200–5000 | 1500    | Node repulsion distance |
-| Size slider    | 20–300%  | 100%    | Node scale multiplier   |
-| Text slider    | 20–300%  | 100%    | Label scale multiplier  |
+| Control        | Range    | Default | Description                                                           |
+| -------------- | -------- | ------- | --------------------------------------------------------------------- |
+| Spacing slider | 200–5000 | 1500    | Node repulsion distance; persisted to the view's `nodeSpacing` option |
+| Size slider    | 20–300%  | 100%    | Node scale multiplier                                                 |
+| Text slider    | 20–300%  | 100%    | Label scale multiplier                                                |
 
 ## Persisted View State
 

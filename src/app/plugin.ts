@@ -6,12 +6,14 @@ import { GraphExplorerSettingTab } from './settings/settings-tab'
 import { GraphExplorerView } from './views/graph-explorer/graph-explorer-view'
 import { getGraphExplorerViewOptions } from './views/graph-explorer/graph-explorer-options'
 import { GRAPH_EXPLORER_VIEW_TYPE } from './views/graph-explorer/graph-explorer.constants'
+import { clampNodeSpacing } from './types/graph-types'
 import { log } from '../utils/log'
 import { produce } from 'immer'
 import type { Draft } from 'immer'
 
 export class GraphExplorerPlugin extends Plugin {
-    settings: PluginSettings = produce(DEFAULT_SETTINGS, () => DEFAULT_SETTINGS)
+    // 1.13.0 added `settings?: unknown` on Plugin; we narrow it to our concrete type
+    override settings: PluginSettings = produce(DEFAULT_SETTINGS, () => DEFAULT_SETTINGS)
 
     override async onload(): Promise<void> {
         // Must run before anything can call saveData (fresh-install detection)
@@ -74,7 +76,7 @@ export class GraphExplorerPlugin extends Plugin {
                 draft.defaultExploredFilter = loadedSettings.defaultExploredFilter
             }
             if (typeof loadedSettings.nodeSpacing === 'number') {
-                draft.nodeSpacing = Math.max(200, Math.min(5000, loadedSettings.nodeSpacing))
+                draft.nodeSpacing = clampNodeSpacing(loadedSettings.nodeSpacing)
             }
             if (typeof loadedSettings.maturityPropertyName === 'string') {
                 draft.maturityPropertyName = loadedSettings.maturityPropertyName

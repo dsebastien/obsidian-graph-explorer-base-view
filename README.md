@@ -37,7 +37,7 @@ Where Obsidian's built-in graph shows the whole vault, Graph Explorer works on t
 - Debounced search with live filtering.
 - Stats: total nodes, links, explored count, frontier count, coverage %.
 - Confidence and maturity distribution indicators.
-- Spacing, node size and text size sliders.
+- Spacing (saved per view), node size and text size sliders.
 - Filter by explored / unexplored / all.
 - Batch actions: select multiple nodes and toggle explored or set maturity in one go.
 

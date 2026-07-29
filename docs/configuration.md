@@ -19,7 +19,7 @@ Global settings available in **Settings > Community plugins > Graph Explorer Bas
 | Show frontier by default  | toggle   | `false`           | Whether new views show frontier (unresolved link) nodes                                       |
 | Show external by default  | toggle   | `false`           | Whether new views show external (linked but outside Base) nodes                               |
 | Default explored filter   | dropdown | `all`             | Default filter for explored status in new views                                               |
-| Node spacing              | slider   | `1500`            | Force repulsion strength between nodes (200–5000)                                             |
+| Default node spacing      | slider   | `1500`            | Force repulsion strength between nodes in new views (200–5000)                                |
 
 ## View options
 
@@ -35,6 +35,7 @@ Each Base view instance has its own settings, initialized from plugin defaults a
 | Filter by explored status              | dropdown | from plugin | Show all notes, explored only, or unexplored only             |
 | Color nodes by                         | dropdown | from plugin | Property used for node coloring                               |
 | Size nodes by                          | dropdown | from plugin | Property used for node sizing                                 |
+| Node spacing                           | slider   | from plugin | Force repulsion strength between nodes (200–5000)             |
 | View preset                            | dropdown | from plugin | Apply a built-in preset configuration                         |
 
 All view options inherit their initial value from plugin settings. After that, they are independent — changing plugin settings does not affect existing views.

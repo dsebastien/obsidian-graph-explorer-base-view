@@ -8,6 +8,7 @@ import type {
     WikiRole,
     MaturityLevel
 } from '../types/graph-types'
+import { clampNodeSpacing } from '../types/graph-types'
 
 export interface GraphCanvasCallbacks {
     onNodeClick: (node: GraphNode) => void
@@ -235,7 +236,7 @@ export class GraphCanvas extends Component {
     }
 
     setNodeSpacing(spacing: number): void {
-        this.nodeSpacing = Math.max(200, Math.min(5000, spacing))
+        this.nodeSpacing = clampNodeSpacing(spacing)
         this.applyForceConfig()
         this.graph?.d3ReheatSimulation()
     }
