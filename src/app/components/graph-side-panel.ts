@@ -279,8 +279,8 @@ export class GraphSidePanel extends Component {
                 text: '\u2398 Copy md',
                 cls: 'ge-side-panel__copy-btn',
                 attr: {
-                    'aria-label': 'Copy note content as markdown',
-                    'title': 'Copy note content as markdown'
+                    'aria-label': 'Copy note content as Markdown',
+                    'title': 'Copy note content as Markdown'
                 }
             })
             this.registerDomEvent(copyBtn, 'click', () => {

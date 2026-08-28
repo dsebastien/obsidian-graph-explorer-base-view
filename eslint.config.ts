@@ -3,8 +3,20 @@ import tseslint from 'typescript-eslint'
 import eslintConfigPrettier from 'eslint-config-prettier'
 import globals from 'globals'
 import obsidianmd from 'eslint-plugin-obsidianmd'
+// Passing `brands` REPLACES the plugin's default list rather than extending it
+// (see sentenceCaseUtil.js: `options?.brands ?? DEFAULT_BRANDS`). Listing only
+// this plugin's own names would therefore silently strip "Obsidian", "Git",
+// "Markdown", "GitHub", "Windows" and the other 40-odd defaults — and the
+// community catalog reviewer, which runs the plugin's own ruleset, would keep
+// enforcing every one of them. The loss shows up as findings you never see
+// locally, not as findings that go away.
+// Deep path because the package exports only its default plugin object; it is
+// pinned exactly, and a break here is a loud module-resolution error, never a
+// silent shrinking of the list.
+import { DEFAULT_BRANDS } from 'eslint-plugin-obsidianmd/dist/lib/rules/ui/brands.js'
+import { defineConfig } from 'eslint/config'
 
-export default tseslint.config(
+export default defineConfig([
     eslint.configs.recommended,
     ...tseslint.configs.recommended,
     // @ts-expect-error - obsidianmd types are incomplete but the config works at runtime
@@ -26,6 +38,8 @@ export default tseslint.config(
             globals: {
                 ...globals.node,
                 ...globals.browser,
+                // Tests and build tooling run under the Bun runtime
+                Bun: 'readonly',
                 // Obsidian global functions
                 createDiv: 'readonly',
                 createEl: 'readonly',
@@ -42,7 +56,11 @@ export default tseslint.config(
         },
         rules: {
             '@typescript-eslint/no-require-imports': 'off',
-            '@typescript-eslint/no-explicit-any': 'warn',
+            // The community-plugin reviewer treats both the rule violation
+            // and any `eslint-disable @typescript-eslint/no-explicit-any` as
+            // an ERROR that blocks the scorecard. Catch locally as error,
+            // not warn. See AGENTS.md "Community catalog review".
+            '@typescript-eslint/no-explicit-any': 'error',
             '@typescript-eslint/no-unused-vars': [
                 'error',
                 { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
@@ -58,8 +76,40 @@ export default tseslint.config(
             'no-prototype-builtins': 'off',
             // Allow confirm for delete confirmations
             'no-alert': 'off',
-            // Disable sentence case rule - it has false positives for already-correct text
-            'obsidianmd/ui/sentence-case': 'off'
+            // Never disable obsidianmd/* rules here: the community catalog
+            // reviewer runs its own ruleset against the git archive, so a
+            // local disable only hides the finding until submission.
+            // Brand names are the supported escape hatch for sentence-case.
+            'obsidianmd/ui/sentence-case': [
+                'error',
+                {
+                    brands: [
+                        ...DEFAULT_BRANDS,
+                        // Author and funding links. Add this plugin's own
+                        // product names here; do NOT add ordinary UI words such
+                        // as 'Settings' — as a brand it makes every lowercase
+                        // occurrence a violation.
+                        'Knowii',
+                        'GitHub Sponsors',
+                        'Sébastien Dubois',
+                        'dSebastien'
+                    ],
+                    // A matching regex exempts the ENTIRE string
+                    // (shouldIgnoreByRegex runs regex.test on the whole text),
+                    // so every pattern is anchored to the one literal it
+                    // excuses. The symbol-prefixed button labels trip a rule
+                    // quirk (a leading ⎘/✓ makes it treat the verb as
+                    // mid-sentence and demand lowercase); the bare lowercase
+                    // strings are frontmatter property-name placeholders.
+                    ignoreRegex: [
+                        '^⎘ Copy md$',
+                        '^✓ Copied!$',
+                        '^explored$',
+                        '^maturity$',
+                        '^graduated_notes$'
+                    ]
+                }
+            ]
         }
     }
-)
+])
