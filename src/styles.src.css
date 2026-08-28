@@ -13,6 +13,17 @@
  * explicitly in the `.ge-*` classes below, so we don't depend on Preflight.
  */
 @layer theme, base, components, utilities;
+
+/*
+ * Row hosting the embedded support section. `.setting-item` is a flex ROW in
+ * Obsidian's own stylesheet, which is UNLAYERED — and unlayered CSS beats
+ * layered CSS regardless of specificity. This rule must therefore stay
+ * OUTSIDE the @layer blocks above (this stylesheet is layered, unlike most of
+ * the fleet), and the compound selector outranks the app rule at equal layer.
+ */
+.setting-item.ge-settings-embed {
+    display: block;
+}
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 

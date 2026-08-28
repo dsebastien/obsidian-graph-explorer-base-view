@@ -89,6 +89,41 @@ export class GraphExplorerPlugin extends Plugin {
         log('Settings loaded', 'debug', loadedSettings)
     }
 
+    /** Serializes settings writes; see updateSettings. */
+    private settingsWriteChain: Promise<void> = Promise.resolve()
+
+    /**
+     * Apply a mutation to the settings (via immer) and persist the result.
+     * The single write path — the declarative settings tab routes every
+     * control edit through here so persistence happens in exactly one place.
+     */
+    updateSettings(mutator: (draft: Draft<PluginSettings>) => void): Promise<void> {
+        // Persist-then-commit: swap memory only after saveData() succeeds, so
+        // a rejected write rolls the control back to the on-disk truth.
+        // Serialized: writes queue and each mutation derives from the
+        // previous COMMITTED state — without this, overlapping calls produce
+        // from the same base across the save await and the second commit
+        // silently drops the first edit.
+        const run = async (): Promise<void> => {
+            const next = produce(this.settings, mutator)
+            await this.saveData(next)
+            this.settings = next
+            // Notify active views to re-read settings — only after the write
+            // has landed, so a view never re-reads state that was rolled back.
+            activeDocument.dispatchEvent(new CustomEvent('graph-explorer:settings-changed'))
+        }
+        const p = this.settingsWriteChain.then(run, run)
+        this.settingsWriteChain = p.catch(() => {})
+        return p
+    }
+
+    /**
+     * Save the plugin settings.
+     *
+     * Load-time use only (persisting migrations applied by loadSettings).
+     * Every user-driven write goes through updateSettings, which serializes
+     * and persists before committing to memory.
+     */
     async saveSettings(): Promise<void> {
         log('Saving settings', 'debug', this.settings)
         await this.saveData(this.settings)
