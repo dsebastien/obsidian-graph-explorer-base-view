@@ -157,6 +157,10 @@ describe('setControlValue', () => {
 
         await expectRejection(tab.setControlValue('defaultColorBy', 'rainbow'), 'options')
         await expectRejection(tab.setControlValue('defaultExploredFilter', 'some'), 'options')
+        // Inherited properties are not options: `in` would accept these and
+        // persist an undeclared mode.
+        await expectRejection(tab.setControlValue('defaultColorBy', 'constructor'), 'options')
+        await expectRejection(tab.setControlValue('defaultSizeBy', 'toString'), 'options')
         expect(saveData).not.toHaveBeenCalled()
         expect(plugin.settings.defaultColorBy).toBe(DEFAULT_SETTINGS.defaultColorBy)
     })

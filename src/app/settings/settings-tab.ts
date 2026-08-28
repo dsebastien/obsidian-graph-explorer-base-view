@@ -312,7 +312,9 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
 
     /** Rejects any value that is not one of the dropdown's declared options. */
     private expectOption(key: string, value: unknown, options: Record<string, string>): string {
-        if (typeof value !== 'string' || !(value in options)) {
+        // Object.hasOwn, not `in`: the prototype chain would accept values
+        // like 'constructor' and persist an undeclared mode.
+        if (typeof value !== 'string' || !Object.hasOwn(options, value)) {
             throw new Error(`Setting "${key}" expects one of the declared options.`)
         }
         return value

@@ -62,7 +62,7 @@ Explored and maturity state live in the note's frontmatter, so the data is porta
 
 ## Requirements
 
-- Obsidian `1.10.0` or later (Bases API).
+- Obsidian `1.13.0` or later (Bases API and the declarative settings API).
 - Desktop and mobile compatible.
 
 ## Installation

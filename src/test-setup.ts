@@ -10,7 +10,7 @@ import { mock } from 'bun:test'
 // bun:test. Any spec that imports the plugin (settings-write.spec.ts) pulls it
 // in transitively, so stub the module before anything can load it.
 void mock.module('force-graph', () => ({
-    default: () => ({})
+    default: (): Record<string, never> => ({})
 }))
 
 void mock.module('obsidian', () => ({
