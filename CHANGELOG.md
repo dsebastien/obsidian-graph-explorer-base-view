@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.5.0...2.0.0) (2026-08-29)
+
+### ⚠ BREAKING CHANGES
+
+* **plugin:** minAppVersion is now 1.13.0 (was 1.10.0). The settings pane
+uses the declarative settings API introduced in Obsidian 1.13.
+
+- getSettingDefinitions() replaces display(): 3 property-name text controls
+  (falling back to their defaults when cleared, as before), 2 dropdowns
+  validated against their declared option sets, 2 toggles, and the node
+  spacing slider (bounds validated in setControlValue, no defaultValue),
+  all indexed by the settings search. Follow button and support block are
+  render: rows.
+- updateSettings becomes the serialized persist-then-commit write path; the
+  graph-explorer:settings-changed event now fires strictly AFTER the write
+  lands, so views never re-read state a failed write rolled back.
+  saveSettings is documented as load-time-only.
+- The support block gets block layout via .setting-item.ge-settings-embed —
+  placed OUTSIDE the stylesheet's @layer blocks, because unlayered app CSS
+  beats layered CSS regardless of specificity.
+- Tests: settings-guard.spec.ts + settings-write.spec.ts (10 behavioral
+  tests: queue, rollback, event ordering, option/range rejection;
+  mutation-checked against an optimistic commit, an unserialized chain, and
+  a dropped event — each breaks tests). test-setup stubs force-graph, which
+  reads window at module-load time under bun:test.
+- README states the 1.13 requirement; AGENTS.md gains the
+  declarative-settings section with the repo-specific notes.
+
+### Features
+
+* **plugin:** declare the settings tab (Obsidian 1.13 declarative settings) ([dae1306](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/dae1306e9577cac56f713b9666591944ded65583))
+* **plugin:** show what's new in a tab instead of a modal dialog ([3666c11](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/3666c11db7285126a8f4ae2bdb7e557f284a3d9d))
+* **plugin:** surface support CTAs everywhere users can see them ([638d99a](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/638d99a8f3a42fc0d61f41aa1249197e2cca1144))
+
+### Bug Fixes
+
+* **build:** align with the catalog reviewer's archive, ruleset and audit ([b4506f2](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/b4506f2006116ff7fdb84ad77dbf3ff90eb3a5c6))
+* **plugin:** harden after adversarial review ([05d1b78](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/05d1b787f1d0c6916f0f4ad5c15ac42245ab1353))
+* **release:** dispatch the workflow at the pushed branch ([fa78e56](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/fa78e569b46288833772edc69c8efdbf86299816))
+
 ## [1.5.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.4.0...1.5.0) (2026-07-29)
 
 ### Features
@@ -112,6 +152,7 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes
 
 * address code review issues (search highlight, theme reactivity, view option sync, cleanup) ([f3294ad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f3294adbf62c2d822dfbb064be309b8cc9686e9e))
+
 
 
 

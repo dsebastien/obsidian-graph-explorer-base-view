@@ -1,5 +1,45 @@
 # Release Notes
 
+## 2.0.0 (2026-08-29)
+
+### ⚠ BREAKING CHANGES
+
+- **plugin:** minAppVersion is now 1.13.0 (was 1.10.0). The settings pane
+  uses the declarative settings API introduced in Obsidian 1.13.
+
+* getSettingDefinitions() replaces display(): 3 property-name text controls
+  (falling back to their defaults when cleared, as before), 2 dropdowns
+  validated against their declared option sets, 2 toggles, and the node
+  spacing slider (bounds validated in setControlValue, no defaultValue),
+  all indexed by the settings search. Follow button and support block are
+  render: rows.
+* updateSettings becomes the serialized persist-then-commit write path; the
+  graph-explorer:settings-changed event now fires strictly AFTER the write
+  lands, so views never re-read state a failed write rolled back.
+  saveSettings is documented as load-time-only.
+* The support block gets block layout via .setting-item.ge-settings-embed —
+  placed OUTSIDE the stylesheet's @layer blocks, because unlayered app CSS
+  beats layered CSS regardless of specificity.
+* Tests: settings-guard.spec.ts + settings-write.spec.ts (10 behavioral
+  tests: queue, rollback, event ordering, option/range rejection;
+  mutation-checked against an optimistic commit, an unserialized chain, and
+  a dropped event — each breaks tests). test-setup stubs force-graph, which
+  reads window at module-load time under bun:test.
+* README states the 1.13 requirement; AGENTS.md gains the
+  declarative-settings section with the repo-specific notes.
+
+### Features
+
+- **plugin:** declare the settings tab (Obsidian 1.13 declarative settings)
+- **plugin:** show what's new in a tab instead of a modal dialog
+- **plugin:** surface support CTAs everywhere users can see them
+
+### Bug Fixes
+
+- **build:** align with the catalog reviewer's archive, ruleset and audit
+- **plugin:** harden after adversarial review
+- **release:** dispatch the workflow at the pushed branch
+
 ## 1.5.0 (2026-07-29)
 
 ### Features
