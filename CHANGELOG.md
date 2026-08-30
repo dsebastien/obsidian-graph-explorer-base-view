@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/2.0.0...2.0.1) (2026-08-30)
+
+### Features
+
+* **build:** make the rule floor check that it is still wired in ([93f498b](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/93f498b6dbf090b8b93478e9569b4e0f7b59b20e))
+* **build:** refuse commits that loosen the rules instead of fixing the finding ([ea1ebc9](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/ea1ebc99f0e6287b35e5d08298ed4f0a1341644f))
+
+### Bug Fixes
+
+* **deps:** drop the dead resolutions block that contradicted overrides ([bc73312](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/bc733128985e5f5620b1a38fcd23b64d67b902f2))
+
 ## [2.0.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/1.5.0...2.0.0) (2026-08-29)
 
 ### ⚠ BREAKING CHANGES
@@ -152,6 +163,7 @@ uses the declarative settings API introduced in Obsidian 1.13.
 ### Bug Fixes
 
 * address code review issues (search highlight, theme reactivity, view option sync, cleanup) ([f3294ad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f3294adbf62c2d822dfbb064be309b8cc9686e9e))
+
 
 
 

@@ -1,5 +1,16 @@
 # Release Notes
 
+## 2.0.1 (2026-08-30)
+
+### Features
+
+- **build:** make the rule floor check that it is still wired in
+- **build:** refuse commits that loosen the rules instead of fixing the finding
+
+### Bug Fixes
+
+- **deps:** drop the dead resolutions block that contradicted overrides
+
 ## 2.0.0 (2026-08-29)
 
 ### ⚠ BREAKING CHANGES
