@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.2](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/2.0.1...2.0.2) (2026-08-30)
+
+### Features
+
+* **build:** fail the build on a lockfile the catalog review cannot parse ([994907b](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/994907ba162ebdb54f2fcea3114e6910b0b84a02))
+
+### Bug Fixes
+
+* **deps:** regenerate bun.lock as lockfileVersion 1 ([9072352](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/9072352c55911f1c2fbc1dd4c17a47a619d4ea6f))
+
 ## [2.0.1](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/2.0.0...2.0.1) (2026-08-30)
 
 ### Features
@@ -163,6 +173,7 @@ uses the declarative settings API introduced in Obsidian 1.13.
 ### Bug Fixes
 
 * address code review issues (search highlight, theme reactivity, view option sync, cleanup) ([f3294ad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f3294adbf62c2d822dfbb064be309b8cc9686e9e))
+
 
 
 

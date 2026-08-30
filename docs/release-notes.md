@@ -1,5 +1,15 @@
 # Release Notes
 
+## 2.0.2 (2026-08-30)
+
+### Features
+
+- **build:** fail the build on a lockfile the catalog review cannot parse
+
+### Bug Fixes
+
+- **deps:** regenerate bun.lock as lockfileVersion 1
+
 ## 2.0.1 (2026-08-30)
 
 ### Features
