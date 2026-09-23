@@ -46,10 +46,11 @@ describe('isNoteExplored', () => {
 describe('setNoteExplored', () => {
     test('calls processFrontMatter with correct arguments', async () => {
         const processFrontMatter = mock(
-            async (_file: unknown, cb: (fm: Record<string, unknown>) => void) => {
+            (_file: unknown, cb: (fm: Record<string, unknown>) => void): Promise<void> => {
                 const fm: Record<string, unknown> = {}
                 cb(fm)
                 expect(fm['explored']).toBe(true)
+                return Promise.resolve()
             }
         )
         const app = {
@@ -63,10 +64,11 @@ describe('setNoteExplored', () => {
 
     test('sets property to false', async () => {
         const processFrontMatter = mock(
-            async (_file: unknown, cb: (fm: Record<string, unknown>) => void) => {
+            (_file: unknown, cb: (fm: Record<string, unknown>) => void): Promise<void> => {
                 const fm: Record<string, unknown> = { explored: true }
                 cb(fm)
                 expect(fm['explored']).toBe(false)
+                return Promise.resolve()
             }
         )
         const app = {
@@ -221,10 +223,11 @@ describe('getNoteGraduatedNotes', () => {
 describe('setNoteMaturity', () => {
     test('sets maturity level in frontmatter', async () => {
         const processFrontMatter = mock(
-            async (_file: unknown, cb: (fm: Record<string, unknown>) => void) => {
+            (_file: unknown, cb: (fm: Record<string, unknown>) => void): Promise<void> => {
                 const fm: Record<string, unknown> = {}
                 cb(fm)
                 expect(fm['maturity']).toBe('draft')
+                return Promise.resolve()
             }
         )
         const app = {
@@ -238,10 +241,11 @@ describe('setNoteMaturity', () => {
 
     test('removes property when set to unknown', async () => {
         const processFrontMatter = mock(
-            async (_file: unknown, cb: (fm: Record<string, unknown>) => void) => {
+            (_file: unknown, cb: (fm: Record<string, unknown>) => void): Promise<void> => {
                 const fm: Record<string, unknown> = { maturity: 'draft' }
                 cb(fm)
                 expect('maturity' in fm).toBe(false)
+                return Promise.resolve()
             }
         )
         const app = {
@@ -255,10 +259,11 @@ describe('setNoteMaturity', () => {
 
     test('uses custom property name', async () => {
         const processFrontMatter = mock(
-            async (_file: unknown, cb: (fm: Record<string, unknown>) => void) => {
+            (_file: unknown, cb: (fm: Record<string, unknown>) => void): Promise<void> => {
                 const fm: Record<string, unknown> = {}
                 cb(fm)
                 expect(fm['depth']).toBe('mature')
+                return Promise.resolve()
             }
         )
         const app = {

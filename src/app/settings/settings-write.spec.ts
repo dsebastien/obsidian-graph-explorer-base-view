@@ -38,7 +38,7 @@ function createHarness(options?: { saveData?: () => Promise<void> }): Harness {
         }
     })
     const dispatched: string[] = []
-    const g = globalThis as unknown as Record<string, unknown>
+    const g = self as unknown as Record<string, unknown>
     g['activeDocument'] = {
         dispatchEvent: (e: { type: string }) => {
             dispatched.push(e.type)
