@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.3](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/2.0.2...2.0.3) (2026-09-23)
+
+### Bug Fixes
+
+* **build:** exclude bun-types alongside @types/bun from the release-age gate ([afefb6b](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/afefb6b5e04271e20bd6ba66ba0dbae73b1ab181))
+* **build:** harden the release path from the template ([f43eb7d](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f43eb7d79f10b5ea767e207ade0bdcd302ca7f35))
+* **build:** rebuild versions.json from the published releases ([6864747](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/686474751a331f6352a8afcefea793f4816a9955))
+* **deps:** move the fast-uri override off the vulnerable line ([26f2513](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/26f2513756c8564b92853a1b3b8f38451e31a5ad))
+
 ## [2.0.2](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/2.0.1...2.0.2) (2026-08-30)
 
 ### Features
@@ -173,6 +182,7 @@ uses the declarative settings API introduced in Obsidian 1.13.
 ### Bug Fixes
 
 * address code review issues (search highlight, theme reactivity, view option sync, cleanup) ([f3294ad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f3294adbf62c2d822dfbb064be309b8cc9686e9e))
+
 
 
 

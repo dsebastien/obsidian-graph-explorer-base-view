@@ -1,5 +1,14 @@
 # Release Notes
 
+## 2.0.3 (2026-09-23)
+
+### Bug Fixes
+
+- **build:** exclude bun-types alongside @types/bun from the release-age gate
+- **build:** harden the release path from the template
+- **build:** rebuild versions.json from the published releases
+- **deps:** move the fast-uri override off the vulnerable line
+
 ## 2.0.2 (2026-08-30)
 
 ### Features
