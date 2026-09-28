@@ -1,6 +1,6 @@
 import { registerWhatsNewView } from './whats-new'
 import { Plugin } from 'obsidian'
-import { DEFAULT_SETTINGS } from './types/plugin-settings.intf'
+import { createDefaultSettings } from './types/plugin-settings.intf'
 import type { PluginSettings } from './types/plugin-settings.intf'
 import { GraphExplorerSettingTab } from './settings/settings-tab'
 import { GraphExplorerView } from './views/graph-explorer/graph-explorer-view'
@@ -13,7 +13,7 @@ import type { Draft } from 'immer'
 
 export class GraphExplorerPlugin extends Plugin {
     // 1.13.0 added `settings?: unknown` on Plugin; we narrow it to our concrete type
-    override settings: PluginSettings = produce(DEFAULT_SETTINGS, () => DEFAULT_SETTINGS)
+    override settings: PluginSettings = produce(createDefaultSettings(), () => {})
 
     override async onload(): Promise<void> {
         // Must run before anything can call saveData (fresh-install detection)

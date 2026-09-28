@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { produce } from 'immer'
 import { GraphExplorerPlugin } from '../plugin'
 import { GraphExplorerSettingTab } from './settings-tab'
-import { DEFAULT_SETTINGS } from '../types/plugin-settings.intf'
+import { createDefaultSettings } from '../types/plugin-settings.intf'
 import { NODE_SPACING_MAX, NODE_SPACING_MIN, NODE_SPACING_STEP } from '../types/graph-types'
 
 /**
@@ -31,8 +31,8 @@ interface Def {
 function createTab(): GraphExplorerSettingTab {
     const plugin = Object.create(GraphExplorerPlugin.prototype) as GraphExplorerPlugin
     ;(plugin as unknown as Record<string, unknown>)['settings'] = produce(
-        DEFAULT_SETTINGS,
-        () => DEFAULT_SETTINGS
+        createDefaultSettings(),
+        () => {}
     )
     const tab = Object.create(GraphExplorerSettingTab.prototype) as GraphExplorerSettingTab
     ;(tab as unknown as Record<string, unknown>)['plugin'] = plugin

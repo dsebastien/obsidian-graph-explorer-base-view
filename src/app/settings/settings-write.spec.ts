@@ -1,8 +1,9 @@
 import { describe, expect, test, mock } from 'bun:test'
 import { produce } from 'immer'
+import type { App, PluginManifest } from 'obsidian'
 import { GraphExplorerPlugin } from '../plugin'
 import { GraphExplorerSettingTab } from './settings-tab'
-import { DEFAULT_SETTINGS } from '../types/plugin-settings.intf'
+import { DEFAULT_SETTINGS, createDefaultSettings } from '../types/plugin-settings.intf'
 import { NODE_SPACING_MAX } from '../types/graph-types'
 
 /**
@@ -56,7 +57,7 @@ function createHarness(options?: { saveData?: () => Promise<void> }): Harness {
 
     const plugin = Object.create(GraphExplorerPlugin.prototype) as GraphExplorerPlugin
     const internals = plugin as unknown as Record<string, unknown>
-    internals['settings'] = produce(DEFAULT_SETTINGS, () => DEFAULT_SETTINGS)
+    internals['settings'] = produce(createDefaultSettings(), () => {})
     internals['settingsWriteChain'] = Promise.resolve()
     internals['saveData'] = saveData
 
@@ -224,5 +225,41 @@ describe('setControlValue', () => {
             )
         }
         expect(tab.getControlValue('nope')).toBeUndefined()
+    })
+})
+
+describe('default settings', () => {
+    test('constructing the plugin never freezes the shared defaults', () => {
+        const plugin = new GraphExplorerPlugin({} as App, {} as PluginManifest)
+        expect(Object.isFrozen(plugin.settings)).toBe(true)
+        expect(Object.isFrozen(DEFAULT_SETTINGS)).toBe(false)
+    })
+
+    test('loadSettings never freezes the shared defaults', async () => {
+        // Built without the constructor: its field initializer is the other
+        // test's case. An empty store changes nothing, so the produced
+        // settings would BE the base if it were the shared constant.
+        for (const stored of [null, {}]) {
+            const { plugin } = createHarness()
+            const settings = plugin.settings
+            Object.assign(plugin, {
+                loadData: (): Promise<unknown> => Promise.resolve(stored)
+            })
+
+            await plugin.loadSettings()
+
+            // Immer deep-freezes what produce returns, including subtrees
+            // shared with its base: producing from DEFAULT_SETTINGS froze the
+            // constant for the rest of the process.
+            expect(plugin.settings).toBe(settings)
+            expect(Object.isFrozen(DEFAULT_SETTINGS)).toBe(false)
+        }
+    })
+
+    test('each default settings object is an independent copy', () => {
+        const one = createDefaultSettings()
+        one.nodeSpacing = 42
+        expect(createDefaultSettings().nodeSpacing).toBe(DEFAULT_SETTINGS.nodeSpacing)
+        expect(DEFAULT_SETTINGS.nodeSpacing).not.toBe(42)
     })
 })
