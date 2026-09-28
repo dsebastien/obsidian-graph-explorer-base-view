@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.4](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/2.0.3...2.0.4) (2026-09-28)
+
+### Bug Fixes
+
+* **plugin:** keep the support block from stacking on every settings refresh ([fa17786](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/fa177869c1f1ffde665ef441a1d7d5bb083bae03))
+
 ## [2.0.3](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/2.0.2...2.0.3) (2026-09-23)
 
 ### Bug Fixes
@@ -182,6 +188,7 @@ uses the declarative settings API introduced in Obsidian 1.13.
 ### Bug Fixes
 
 * address code review issues (search highlight, theme reactivity, view option sync, cleanup) ([f3294ad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f3294adbf62c2d822dfbb064be309b8cc9686e9e))
+
 
 
 
