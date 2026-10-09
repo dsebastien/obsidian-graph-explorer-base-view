@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/2.0.4...2.1.0) (2026-10-09)
+
+### New: choose which links draw edges
+
+A new view option, **Draw edges from**, controls where the graph's edges come from:
+
+- **All links** (default): every link, exactly as before.
+- **Frontmatter links only**: only links declared in properties, such as `grounds: "[[Target]]"`. Useful when your properties are typed relations and body links are prose citations.
+- **Body links only**: only links and embeds in the note body.
+
+Frontier nodes follow the same choice. Set the default for new views under **Settings → Graph Explorer Base View → Default edge source**.
+
+Thanks to (RE)DÉ for the suggestion (#12).
+
 ## [2.0.4](https://github.com/dsebastien/obsidian-graph-explorer-base-view/compare/2.0.3...2.0.4) (2026-09-28)
 
 ### Bug Fixes
@@ -188,6 +202,7 @@ uses the declarative settings API introduced in Obsidian 1.13.
 ### Bug Fixes
 
 * address code review issues (search highlight, theme reactivity, view option sync, cleanup) ([f3294ad](https://github.com/dsebastien/obsidian-graph-explorer-base-view/commit/f3294adbf62c2d822dfbb064be309b8cc9686e9e))
+
 
 
 
