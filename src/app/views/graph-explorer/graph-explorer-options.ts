@@ -38,6 +38,17 @@ export function getGraphExplorerViewOptions(settings?: PluginSettings): BasesAll
         },
         {
             type: 'dropdown',
+            key: 'edgeSource',
+            displayName: 'Draw edges from',
+            default: s.defaultEdgeSource,
+            options: {
+                all: 'All links',
+                frontmatter: 'Frontmatter links only',
+                body: 'Body links only'
+            }
+        },
+        {
+            type: 'dropdown',
             key: 'exploredFilter',
             displayName: 'Filter by explored status',
             default: s.defaultExploredFilter,

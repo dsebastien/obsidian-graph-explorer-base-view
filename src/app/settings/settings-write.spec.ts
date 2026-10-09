@@ -158,6 +158,7 @@ describe('setControlValue', () => {
 
         await expectRejection(tab.setControlValue('defaultColorBy', 'rainbow'), 'options')
         await expectRejection(tab.setControlValue('defaultExploredFilter', 'some'), 'options')
+        await expectRejection(tab.setControlValue('defaultEdgeSource', 'yaml'), 'options')
         // Inherited properties are not options: `in` would accept these and
         // persist an undeclared mode.
         await expectRejection(tab.setControlValue('defaultColorBy', 'constructor'), 'options')
@@ -193,6 +194,7 @@ describe('setControlValue', () => {
         await tab.setControlValue('showFrontierDefault', true)
         await tab.setControlValue('showExternalNodesDefault', true)
         await tab.setControlValue('defaultExploredFilter', 'unexplored')
+        await tab.setControlValue('defaultEdgeSource', 'frontmatter')
         await tab.setControlValue('nodeSpacing', 2400)
 
         expect(plugin.settings).toMatchObject({
@@ -202,6 +204,7 @@ describe('setControlValue', () => {
             showFrontierDefault: true,
             showExternalNodesDefault: true,
             defaultExploredFilter: 'unexplored',
+            defaultEdgeSource: 'frontmatter',
             nodeSpacing: 2400
         })
     })
@@ -218,6 +221,7 @@ describe('setControlValue', () => {
             'showFrontierDefault',
             'showExternalNodesDefault',
             'defaultExploredFilter',
+            'defaultEdgeSource',
             'nodeSpacing'
         ]) {
             expect(tab.getControlValue(key)).toBe(

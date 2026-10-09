@@ -105,7 +105,7 @@ Graph Explorer Base View is an Obsidian plugin that registers a custom Base view
 - Reads explored status from configurable frontmatter property
 - Extracts confidence, wiki_role, maturity, graduated_notes, created date, tags, and all frontmatter
 - Maturity and graduated_notes property names are configurable (passed from view config)
-- Builds links from `metadataCache.resolvedLinks`
+- Builds links from `metadataCache.resolvedLinks` (edge source `all`), or from the note's own `frontmatterLinks` (`frontmatter`) or `links` + `embeds` (`body`), each resolved with `getFirstLinkpathDest`
 - Deduplicates bidirectional links
 - Optionally includes external nodes (linked but outside Base filter)
 - Optionally includes frontier nodes (unresolved link targets)
@@ -115,7 +115,7 @@ Graph Explorer Base View is an Obsidian plugin that registers a custom Base view
 
 - Defines per-view configurable options via `getGraphExplorerViewOptions(settings)`
 - Accepts `PluginSettings` to use as defaults for new views
-- Options: explored property, maturity property, graduated notes property, show external, show frontier, explored filter, color by, size by, preset
+- Options: explored property, maturity property, graduated notes property, show external, show frontier, edge source, explored filter, color by, size by, preset
 
 ## Data Flow
 

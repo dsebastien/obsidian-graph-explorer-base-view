@@ -11,6 +11,8 @@ export interface PluginSettings {
     showExternalNodesDefault: boolean
     /** Default explored filter */
     defaultExploredFilter: string
+    /** Default edge source (all, frontmatter, body) */
+    defaultEdgeSource: string
     /** Default view preset key (empty = custom) */
     defaultPreset: string
     /** Node repulsion strength (higher = more spread out). Range 200-5000. */
@@ -39,6 +41,7 @@ export function createDefaultSettings(): PluginSettings {
         showFrontierDefault: false,
         showExternalNodesDefault: false,
         defaultExploredFilter: 'all',
+        defaultEdgeSource: 'all',
         defaultPreset: '',
         nodeSpacing: 1500,
         maturityPropertyName: 'maturity',

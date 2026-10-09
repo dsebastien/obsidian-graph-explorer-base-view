@@ -14,6 +14,7 @@ Plugin settings define defaults for new views. After a view is created, its sett
 | Show frontier by default  | boolean | `false`           | Whether new views show frontier nodes                                                 |
 | Show external by default  | boolean | `false`           | Whether new views show external nodes                                                 |
 | Default explored filter   | string  | `all`             | Default explored filter (all, explored, unexplored)                                   |
+| Default edge source       | string  | `all`             | Which links draw edges in new views (all, frontmatter, body)                          |
 | Default preset            | string  | `""`              | View preset key (empty = custom)                                                      |
 | Default node spacing      | number  | `1500`            | Force repulsion strength in new views (200–5000)                                      |
 
@@ -28,6 +29,7 @@ Each view inherits plugin settings as initial defaults, then operates independen
 | Graduated notes property name          | text     | from plugin | Frontmatter property for graduated notes list        |
 | Show linked notes outside the base     | toggle   | from plugin | Include external linked nodes                        |
 | Show frontier nodes (unresolved links) | toggle   | from plugin | Show placeholder nodes for non-existent link targets |
+| Draw edges from                        | dropdown | from plugin | All / Frontmatter links only / Body links only       |
 | Filter by explored status              | dropdown | from plugin | All / Explored only / Unexplored only                |
 | Color nodes by                         | dropdown | from plugin | Property for node coloring                           |
 | Size nodes by                          | dropdown | from plugin | Property for node sizing                             |

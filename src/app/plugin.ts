@@ -75,6 +75,9 @@ export class GraphExplorerPlugin extends Plugin {
             if (typeof loadedSettings.defaultExploredFilter === 'string') {
                 draft.defaultExploredFilter = loadedSettings.defaultExploredFilter
             }
+            if (typeof loadedSettings.defaultEdgeSource === 'string') {
+                draft.defaultEdgeSource = loadedSettings.defaultEdgeSource
+            }
             if (typeof loadedSettings.nodeSpacing === 'number') {
                 draft.nodeSpacing = clampNodeSpacing(loadedSettings.nodeSpacing)
             }

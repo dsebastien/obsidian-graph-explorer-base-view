@@ -268,3 +268,102 @@ describe('buildGraphData', () => {
         expect(node?.id).toBe('a.md')
     })
 })
+
+describe('buildGraphData edge source', () => {
+    // a.md declares b.md in frontmatter and mentions c.md (and a missing note)
+    // in its body; resolvedLinks merges all of them, as Obsidian does.
+    const vault = new Set(['a.md', 'b.md', 'c.md', 'd.md'])
+    const fileCaches: Record<string, Record<string, unknown>> = {
+        'a.md': {
+            frontmatterLinks: [
+                { key: 'grounds', link: 'b', original: '[[b]]' },
+                { key: 'poles.0.target', link: 'Missing Pole', original: '[[Missing Pole]]' }
+            ],
+            links: [
+                { link: 'c#Heading', original: '[[c#Heading]]' },
+                { link: 'b', original: '[[b]]' },
+                { link: 'Missing Prose', original: '[[Missing Prose]]' }
+            ],
+            embeds: [{ link: 'd', original: '![[d]]' }]
+        }
+    }
+
+    function makeCache() {
+        return {
+            resolvedLinks: { 'a.md': { 'b.md': 2, 'c.md': 1, 'd.md': 1 } },
+            unresolvedLinks: { 'a.md': { 'Missing Pole': 1, 'Missing Prose': 1 } },
+            getFileCache: (file: { path: string }) => fileCaches[file.path] ?? null,
+            getFirstLinkpathDest: (linkpath: string) => {
+                const path = `${linkpath}.md`
+                return vault.has(path) ? { path } : null
+            }
+        }
+    }
+
+    const entries = [
+        makeEntry('a.md', 'a'),
+        makeEntry('b.md', 'b'),
+        makeEntry('c.md', 'c'),
+        makeEntry('d.md', 'd')
+    ]
+
+    function targetsOf(edgeSource: 'all' | 'frontmatter' | 'body', showFrontier = false) {
+        const result = buildGraphData(
+            entries,
+            makeCache() as never,
+            'explored',
+            false,
+            'all',
+            showFrontier,
+            'maturity',
+            'graduated_notes',
+            edgeSource
+        )
+        return result.links.map((l) => String(l.target)).sort()
+    }
+
+    test('all keeps every resolved link (default behavior)', () => {
+        expect(targetsOf('all')).toEqual(['b.md', 'c.md', 'd.md'])
+    })
+
+    test('defaults to all when the edge source is omitted', () => {
+        const result = buildGraphData(
+            entries,
+            makeCache() as never,
+            'explored',
+            false,
+            'all',
+            false
+        )
+        expect(result.links.map((l) => String(l.target)).sort()).toEqual(['b.md', 'c.md', 'd.md'])
+    })
+
+    test('frontmatter keeps only links declared in properties', () => {
+        expect(targetsOf('frontmatter')).toEqual(['b.md'])
+    })
+
+    test('body keeps links and embeds from the note body, stripping subpaths', () => {
+        expect(targetsOf('body')).toEqual(['b.md', 'c.md', 'd.md'])
+    })
+
+    test('frontier nodes follow the edge source', () => {
+        expect(targetsOf('frontmatter', true)).toEqual(['b.md', 'frontier:Missing Pole'])
+        expect(targetsOf('body', true)).toEqual(['b.md', 'c.md', 'd.md', 'frontier:Missing Prose'])
+    })
+
+    test('connection counts reflect only the kept edges', () => {
+        const result = buildGraphData(
+            entries,
+            makeCache() as never,
+            'explored',
+            false,
+            'all',
+            false,
+            'maturity',
+            'graduated_notes',
+            'frontmatter'
+        )
+        const counts = Object.fromEntries(result.nodes.map((n) => [n.id, n.connectionCount]))
+        expect(counts).toEqual({ 'a.md': 1, 'b.md': 1, 'c.md': 0, 'd.md': 0 })
+    })
+})

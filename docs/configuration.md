@@ -19,6 +19,7 @@ Global settings available in **Settings > Community plugins > Graph Explorer Bas
 | Show frontier by default  | toggle   | `false`           | Whether new views show frontier (unresolved link) nodes                                       |
 | Show external by default  | toggle   | `false`           | Whether new views show external (linked but outside Base) nodes                               |
 | Default explored filter   | dropdown | `all`             | Default filter for explored status in new views                                               |
+| Default edge source       | dropdown | `all`             | Which links draw edges in new views (all, frontmatter, body)                                  |
 | Default node spacing      | slider   | `1500`            | Force repulsion strength between nodes in new views (200–5000)                                |
 
 ## View options
@@ -32,6 +33,7 @@ Each Base view instance has its own settings, initialized from plugin defaults a
 | Graduated notes property name          | text     | from plugin | Frontmatter property for graduated notes list                 |
 | Show linked notes outside the base     | toggle   | from plugin | Include nodes linked from the Base but not matching its query |
 | Show frontier nodes (unresolved links) | toggle   | from plugin | Show placeholder nodes for links to non-existent notes        |
+| Draw edges from                        | dropdown | from plugin | All links, frontmatter links only, or body links only         |
 | Filter by explored status              | dropdown | from plugin | Show all notes, explored only, or unexplored only             |
 | Color nodes by                         | dropdown | from plugin | Property used for node coloring                               |
 | Size nodes by                          | dropdown | from plugin | Property used for node sizing                                 |

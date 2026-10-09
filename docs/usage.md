@@ -142,6 +142,16 @@ Frontier nodes represent unresolved links — references to notes that don't exi
 
 External nodes are notes linked from within the Base but not matching the Base query themselves. Enable them via **Show linked notes outside the base**. They appear with a dashed outline in muted colors.
 
+## Edge source
+
+The view option **Draw edges from** picks which links become edges:
+
+- **All links** (default) — every link, as in the core graph.
+- **Frontmatter links only** — links declared in properties (e.g. `grounds: "[[Target]]"`). Use it when properties are your typed relations and body links are prose citations.
+- **Body links only** — links and embeds in the note body.
+
+Frontier nodes follow the same choice. External nodes appear only if a kept edge reaches them.
+
 ## Batch operations
 
 1. Right-click a node and select **Add to batch selection**, or press **Shift+Enter** on a focused node

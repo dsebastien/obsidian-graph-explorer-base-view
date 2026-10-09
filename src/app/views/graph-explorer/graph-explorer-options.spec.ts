@@ -40,6 +40,7 @@ describe('getGraphExplorerViewOptions', () => {
         const options = getOptions({
             ...DEFAULT_SETTINGS,
             exploredPropertyName: 'reviewed',
+            defaultEdgeSource: 'frontmatter',
             nodeSpacing: 3000
         })
         expect(options.find((option) => option.key === 'exploredProperty')).toMatchObject({
@@ -47,6 +48,10 @@ describe('getGraphExplorerViewOptions', () => {
         })
         expect(options.find((option) => option.key === 'nodeSpacing')).toMatchObject({
             default: 3000
+        })
+        expect(options.find((option) => option.key === 'edgeSource')).toMatchObject({
+            type: 'dropdown',
+            default: 'frontmatter'
         })
     })
 })

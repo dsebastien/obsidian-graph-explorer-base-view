@@ -14,6 +14,7 @@ import type { LegendConfig, LegendSection } from '../../components/graph-legend'
 import { buildGraphData } from '../../services/graph-data-builder'
 import { setNoteExplored, setNoteMaturity } from '../../utils/frontmatter-utils'
 import type {
+    EdgeSource,
     ExploredFilter,
     GraphData,
     GraphNode,
@@ -352,6 +353,7 @@ export class GraphExplorerView extends BasesView {
         const maturityProperty = (this.config?.get('maturityProperty') as string) || 'maturity'
         const graduatedNotesProperty =
             (this.config?.get('graduatedNotesProperty') as string) || 'graduated_notes'
+        const edgeSource = (this.config?.get('edgeSource') as EdgeSource) || 'all'
 
         this.currentGraphData = buildGraphData(
             entries,
@@ -361,7 +363,8 @@ export class GraphExplorerView extends BasesView {
             exploredFilter,
             showFrontier,
             maturityProperty,
-            graduatedNotesProperty
+            graduatedNotesProperty,
+            edgeSource
         )
 
         if (this.currentGraphData.nodes.length === 0) {

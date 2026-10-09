@@ -12,6 +12,9 @@ export type MaturityLevel = 'stub' | 'draft' | 'substantial' | 'mature' | 'unkno
 /** Filter mode for explored status */
 export type ExploredFilter = 'all' | 'explored' | 'unexplored'
 
+/** Which links produce edges: every link, frontmatter links only, or body links only */
+export type EdgeSource = 'all' | 'frontmatter' | 'body'
+
 /** Layout algorithm for the graph */
 export type GraphLayout = 'force' | 'dag-td' | 'dag-lr' | 'dag-radialout'
 

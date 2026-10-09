@@ -61,6 +61,7 @@ describe('setting definitions', () => {
                 ['showFrontierDefault', 'toggle'],
                 ['showExternalNodesDefault', 'toggle'],
                 ['defaultExploredFilter', 'dropdown'],
+                ['defaultEdgeSource', 'dropdown'],
                 ['nodeSpacing', 'slider']
             ].sort()
         )
@@ -83,6 +84,11 @@ describe('setting definitions', () => {
             all: 'All',
             explored: 'Explored only',
             unexplored: 'Unexplored only'
+        })
+        expect(controls.get('defaultEdgeSource')!.control!.options).toEqual({
+            all: 'All links',
+            frontmatter: 'Frontmatter links only',
+            body: 'Body links only'
         })
     })
 

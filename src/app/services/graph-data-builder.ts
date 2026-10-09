@@ -1,5 +1,6 @@
-import type { BasesEntry, MetadataCache, CachedMetadata } from 'obsidian'
+import type { BasesEntry, MetadataCache, CachedMetadata, Reference } from 'obsidian'
 import type {
+    EdgeSource,
     GraphData,
     GraphNode,
     GraphLink,
@@ -29,7 +30,8 @@ export function buildGraphData(
     exploredFilter: ExploredFilter,
     showFrontier: boolean,
     maturityProperty = 'maturity',
-    graduatedNotesProperty = 'graduated_notes'
+    graduatedNotesProperty = 'graduated_notes',
+    edgeSource: EdgeSource = 'all'
 ): GraphData {
     const entryPaths = new Set<string>(entries.map((e) => e.file.path))
     const entryMap = new Map<string, BasesEntry>(entries.map((e) => [e.file.path, e]))
@@ -64,17 +66,25 @@ export function buildGraphData(
     const filteredPaths = new Set<string>(nodes.map((n) => n.id))
     const nodeRoleMap = new Map<string, WikiRole>(nodes.map((n) => [n.id, n.wikiRole]))
 
-    // Build links from resolvedLinks
+    // Link targets per source, restricted to the selected edge source
+    const linkTargets = new Map<string, LinkTargets>()
+    for (const sourcePath of filteredPaths) {
+        linkTargets.set(
+            sourcePath,
+            getLinkTargets(sourcePath, entryMap.get(sourcePath), metadataCache, edgeSource)
+        )
+    }
+
+    // Build links from resolved targets
     const links: GraphLink[] = []
     const seenLinks = new Set<string>()
     const externalNodes = new Map<string, GraphNode>()
 
     for (const sourcePath of filteredPaths) {
-        const targets = metadataCache.resolvedLinks[sourcePath]
-        if (!targets) continue
+        const targets = linkTargets.get(sourcePath)?.resolved ?? []
         const sourceRole = nodeRoleMap.get(sourcePath) ?? 'unknown'
 
-        for (const targetPath of Object.keys(targets)) {
+        for (const targetPath of targets) {
             const targetInFiltered = filteredPaths.has(targetPath)
             const targetInEntries = entryPaths.has(targetPath)
 
@@ -143,11 +153,10 @@ export function buildGraphData(
     const frontierNodes = new Map<string, GraphNode>()
     if (showFrontier) {
         for (const sourcePath of filteredPaths) {
-            const unresolvedTargets = metadataCache.unresolvedLinks[sourcePath]
-            if (!unresolvedTargets) continue
+            const unresolvedTargets = linkTargets.get(sourcePath)?.unresolved ?? []
             const sourceRole = nodeRoleMap.get(sourcePath) ?? 'unknown'
 
-            for (const targetName of Object.keys(unresolvedTargets)) {
+            for (const targetName of unresolvedTargets) {
                 const frontierId = `frontier:${targetName}`
                 if (!frontierNodes.has(frontierId)) {
                     frontierNodes.set(frontierId, {
@@ -193,6 +202,63 @@ export function buildGraphData(
     }
 
     return { nodes: allNodes, links }
+}
+
+interface LinkTargets {
+    /** Vault paths of existing link targets */
+    resolved: string[]
+    /** Link paths of targets that do not exist */
+    unresolved: string[]
+}
+
+/**
+ * Collect the link targets of a source note for the given edge source.
+ * `all` reads the vault-wide link maps, matching the core graph exactly.
+ * `frontmatter` and `body` read the note's own cache, which keeps links
+ * declared in properties (`frontmatterLinks`) apart from those in the body
+ * (`links` and `embeds`), and resolve each one the way Obsidian does.
+ */
+function getLinkTargets(
+    sourcePath: string,
+    entry: BasesEntry | undefined,
+    metadataCache: MetadataCache,
+    edgeSource: EdgeSource
+): LinkTargets {
+    if (edgeSource === 'all') {
+        return {
+            resolved: Object.keys(metadataCache.resolvedLinks[sourcePath] ?? {}),
+            unresolved: Object.keys(metadataCache.unresolvedLinks[sourcePath] ?? {})
+        }
+    }
+
+    const metadata = entry ? metadataCache.getFileCache(entry.file) : null
+    const references: Reference[] =
+        edgeSource === 'frontmatter'
+            ? (metadata?.frontmatterLinks ?? [])
+            : [...(metadata?.links ?? []), ...(metadata?.embeds ?? [])]
+
+    const resolved = new Set<string>()
+    const unresolved = new Set<string>()
+    for (const reference of references) {
+        const linkpath = toLinkpath(reference.link)
+        if (!linkpath) continue
+        const target = metadataCache.getFirstLinkpathDest(linkpath, sourcePath)
+        if (target) {
+            resolved.add(target.path)
+        } else {
+            unresolved.add(linkpath)
+        }
+    }
+    return { resolved: [...resolved], unresolved: [...unresolved] }
+}
+
+/**
+ * Strip the subpath (`#heading`, `#^block`) from a link, like Obsidian's
+ * `getLinkpath`, which is not available at runtime under bun:test.
+ */
+function toLinkpath(link: string): string {
+    const hashIndex = link.indexOf('#')
+    return (hashIndex === -1 ? link : link.slice(0, hashIndex)).trim()
 }
 
 function getCreatedTimestamp(

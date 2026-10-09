@@ -27,6 +27,7 @@ When a new business rule is mentioned:
 ## Graph Data
 
 - Connections between nodes are derived from Obsidian's `metadataCache.resolvedLinks`
+- The "Draw edges from" option (`edgeSource`) restricts edges to frontmatter links or body links (links + embeds); default `all` keeps the `resolvedLinks` behavior unchanged. Frontier nodes follow the same restriction
 - Bidirectional links are deduplicated (A→B and B→A produce one edge)
 - External nodes (linked but not in the Base filter) are only shown when the "Show linked notes outside the base" option is enabled
 - Frontier nodes (unresolved link targets) are only shown when the "Show frontier nodes" option is enabled

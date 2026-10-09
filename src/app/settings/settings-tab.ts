@@ -23,6 +23,11 @@ const EXPLORED_FILTER_OPTIONS: Record<string, string> = {
     explored: 'Explored only',
     unexplored: 'Unexplored only'
 }
+const EDGE_SOURCE_OPTIONS: Record<string, string> = {
+    all: 'All links',
+    frontmatter: 'Frontmatter links only',
+    body: 'Body links only'
+}
 
 /**
  * Settings tab, declared rather than rendered (Obsidian 1.13+).
@@ -119,6 +124,15 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
                         }
                     },
                     {
+                        name: 'Default edge source',
+                        desc: 'Which links draw edges in new views. Frontmatter links only shows the relations declared in properties, without prose mentions.',
+                        control: {
+                            type: 'dropdown',
+                            key: 'defaultEdgeSource',
+                            options: EDGE_SOURCE_OPTIONS
+                        }
+                    },
+                    {
                         name: 'Default node spacing',
                         desc: 'Controls how far apart nodes spread. Higher values = more space between nodes. Can be overridden per view. (200–5000, default 1500)',
                         control: {
@@ -200,6 +214,8 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
                 return this.plugin.settings.showExternalNodesDefault
             case 'defaultExploredFilter':
                 return this.plugin.settings.defaultExploredFilter
+            case 'defaultEdgeSource':
+                return this.plugin.settings.defaultEdgeSource
             case 'nodeSpacing':
                 return this.plugin.settings.nodeSpacing
             default:
@@ -269,6 +285,13 @@ export class GraphExplorerSettingTab extends PluginSettingTab {
                 const next = this.expectOption(key, value, EXPLORED_FILTER_OPTIONS)
                 await this.write((d) => {
                     d.defaultExploredFilter = next
+                })
+                return
+            }
+            case 'defaultEdgeSource': {
+                const next = this.expectOption(key, value, EDGE_SOURCE_OPTIONS)
+                await this.write((d) => {
+                    d.defaultEdgeSource = next
                 })
                 return
             }
